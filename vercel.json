@@ -1,0 +1,27 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "env": {
+    "NEXT_PUBLIC_SUPABASE_URL": "https://otgopumbastbjnkhikjd.supabase.co",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im90Z29wdW1iYXN0Ympua2hpa2pkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2Njg0OTEsImV4cCI6MjA4NjI0NDQ5MX0.r5caijAVxQ_2_k_zrcIB-LoW6b1joQn0YKu8BsTxJwY",
+    "SUPABASE_SERVICE_ROLE_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFwcF9mc19kMzQ3YTJmOS0wNzIyLTRmMTEtOWIwMC0wZGQwY2EzNmIxMjhfYWdlbnRfMSIsImlhdCI6MTc3MjU4MzkzMCwiZXhwIjoyMDg3OTQzOTMwfQ.8Fnw7Qqe4EPX_t3wLhe_NNWm8AluqB-RE_XrzAofJk0",
+    "SUPABASE_DB_SCHEMA": "fs_d347a2f9-0722-4f11-9b00-0dd0ca36b128_agent_1"
+  },
+  "functions": {
+    "api/index.js": {
+      "maxDuration": 10
+    }
+  },
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api?path=$1"
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ]
+}
