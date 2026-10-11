@@ -7,7 +7,6 @@ import {
   Search,
   Mail,
   AlertCircle,
-  XCircle,
   Upload,
   Trophy,
   RefreshCw,
@@ -51,6 +50,8 @@ interface Stats {
   total: number;
   checkedIn: number;
   notCheckedIn: number;
+  paymentsVerified?: number;
+  paymentsPending?: number;
   branchCounts: Record<string, number>;
   yearCounts: Record<string, number>;
 }
@@ -795,7 +796,7 @@ export default function AdminDashboard() {
         </div>
 
         {stats && (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="p-5 rounded-2xl bg-[#191e1b]/90 border border-[#303a32]">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-9 h-9 rounded-lg bg-blue-500/20 flex items-center justify-center">
@@ -809,21 +810,34 @@ export default function AdminDashboard() {
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="p-5 rounded-2xl bg-[#191e1b]/90 border border-[#303a32]">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-9 h-9 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+                  <ShieldCheck size={18} className="text-emerald-400" />
+                </div>
+                <span className="text-gray-400 text-sm">Payments Verified</span>
+              </div>
+              <p className="text-3xl font-black text-emerald-400">{stats.paymentsVerified ?? 0}</p>
+              <p className="text-xs text-gray-400 mt-1">{stats.paymentsPending ?? 0} pending verification</p>
+            </motion.div>
+
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }} className="p-5 rounded-2xl bg-[#191e1b]/90 border border-[#303a32]">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-9 h-9 rounded-lg bg-emerald-500/20 flex items-center justify-center">
                   <UserCheck size={18} className="text-emerald-400" />
                 </div>
                 <span className="text-gray-400 text-sm">Checked In</span>
               </div>
               <p className="text-3xl font-black text-emerald-400">{stats.checkedIn}</p>
+              <p className="text-xs text-gray-400 mt-1">Venue attendance</p>
             </motion.div>
 
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="p-5 rounded-2xl bg-[#191e1b]/90 border border-[#303a32]">
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }} className="p-5 rounded-2xl bg-[#191e1b]/90 border border-[#303a32]">
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-9 h-9 rounded-lg bg-red-500/20 flex items-center justify-center">
-                  <XCircle size={18} className="text-red-400" />
+                <div className="w-9 h-9 rounded-lg bg-amber-500/20 flex items-center justify-center">
+                  <CalendarClock size={18} className="text-amber-400" />
                 </div>
-                <span className="text-gray-400 text-sm">Pending</span>
+                <span className="text-gray-400 text-sm">Awaiting Check-in</span>
               </div>
-              <p className="text-3xl font-black text-red-400">{stats.notCheckedIn}</p>
+              <p className="text-3xl font-black text-amber-400">{stats.notCheckedIn}</p>
+              <p className="text-xs text-gray-400 mt-1">Not arrived yet</p>
             </motion.div>
 
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="p-5 rounded-2xl bg-[#191e1b]/90 border border-[#303a32]">
@@ -854,9 +868,9 @@ export default function AdminDashboard() {
         {stats && (
           <div className="mb-8 p-5 rounded-2xl bg-[#191e1b]/90 border border-[#303a32]">
             <div className="flex justify-between text-sm mb-3">
-              <span className="text-gray-400">Check-in Progress</span>
+              <span className="text-gray-400">Venue Check-in Progress</span>
               <span className="text-white font-semibold">
-                {stats.checkedIn} / {stats.total} students arrived
+                {stats.checkedIn} / {stats.total} students arrived ({stats.notCheckedIn} awaiting check-in)
               </span>
             </div>
             <div className="h-3 bg-white/10 rounded-full overflow-hidden">
@@ -910,7 +924,7 @@ export default function AdminDashboard() {
                     <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider hidden md:table-cell">Branch</th>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider hidden lg:table-cell">Year</th>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider hidden md:table-cell">Payment</th>
-                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Event Check-in</th>
                     <th className="text-right px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
@@ -952,15 +966,15 @@ export default function AdminDashboard() {
                         {p.check_in_status ? (
                           <div className="flex items-center gap-1.5">
                             <div className="w-2 h-2 rounded-full bg-emerald-400" />
-                            <span className="text-emerald-400 text-xs font-medium">Checked In</span>
+                            <span className="text-emerald-400 text-xs font-semibold">Checked In</span>
                           </div>
                         ) : (
                           <div className="flex items-center gap-1.5">
-                            <div className="w-2 h-2 rounded-full bg-gray-600" />
-                            <span className="text-gray-500 text-xs">Pending</span>
+                            <div className="w-2 h-2 rounded-full bg-gray-500" />
+                            <span className="text-gray-400 text-xs font-medium">Not Checked In</span>
                           </div>
                         )}
-                        {p.check_in_time && <p className="text-gray-600 text-xs">{new Date(p.check_in_time).toLocaleTimeString()}</p>}
+                        {p.check_in_time && <p className="text-gray-500 text-xs mt-0.5">{new Date(p.check_in_time).toLocaleTimeString()}</p>}
                       </td>
                       <td className="px-4 py-3 text-right">
                         <div className="relative inline-block text-left">

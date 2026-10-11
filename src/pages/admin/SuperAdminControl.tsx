@@ -445,28 +445,6 @@ export default function SuperAdminControl() {
     }
   };
 
-  // Change admin role
-  const handleChangeRole = (admin: AdminAccount, newRole: 'admin' | 'super_admin') => {
-    setConfirmDialog({
-      title: 'Change Admin Role',
-      message: `Are you sure you want to change the role of "${admin.email}" to "${newRole === 'super_admin' ? 'Super Admin' : 'Admin'}"?`,
-      confirmLabel: 'Change Role',
-      confirmVariant: 'warning',
-      onConfirm: async () => {
-        const res = await fetch('/api/control/admins', {
-          method: 'PUT',
-          headers: authHeaders(),
-          body: JSON.stringify({ id: admin.id, role: newRole }),
-        });
-        const data = await readJsonSafe<{ ok?: boolean; error?: string }>(res);
-        if (!res.ok) throw new Error(getErrorMessage(data, 'Failed to change admin role'));
-
-        setActionMessage({ text: `Role updated to ${newRole} for "${admin.email}".`, type: 'success' });
-        fetchAdmins();
-      },
-    });
-  };
-
   // Remove admin ID completely
   const handleRemoveAdminId = (admin: AdminAccount) => {
     setConfirmDialog({
@@ -1321,16 +1299,6 @@ export default function SuperAdminControl() {
                                         Activate
                                       </button>
                                     )}
-
-                                    {/* Role toggle button */}
-                                    <button
-                                      onClick={() => handleChangeRole(admin, 'super_admin')}
-                                      aria-label={`Promote ${admin.email} to Super Admin`}
-                                      className="px-2.5 py-1.5 rounded-lg bg-[#a3b46a]/10 border border-[#a3b46a]/30 text-[#a3b46a] hover:bg-[#a3b46a]/20 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-[#a3b46a]"
-                                      title="Promote to Super Admin"
-                                    >
-                                      Promote
-                                    </button>
 
                                     {/* Password Reset */}
                                     <button

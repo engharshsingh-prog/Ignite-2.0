@@ -1,4 +1,5 @@
 import db from './_db.js';
+import { writeActivity } from './_activity.js';
 
 export function getSuperAdminEmails() {
   const raw = String(process.env.SUPER_ADMIN_EMAILS || '');
@@ -31,7 +32,7 @@ export async function isAllowedAdminEmail(email) {
 }
 
 export async function getAdminFromRequest(req) {
-  const authHeader = req.headers.authorization || '';
+  const authHeader = req.headers?.authorization || '';
   if (!authHeader.startsWith('Bearer ')) return null;
   const token = authHeader.slice('Bearer '.length).trim();
   if (!token) return null;
@@ -67,6 +68,7 @@ export async function getAdminFromRequest(req) {
       return null;
     }
 
+    // Role is derived ONLY from SUPER_ADMIN_EMAILS server environment variable
     const role = superAdmin ? 'super_admin' : 'admin';
 
     // Touch session last_seen_at
@@ -77,6 +79,7 @@ export async function getAdminFromRequest(req) {
       email: normalizedEmail,
       role,
       session_id: row.session_id,
+      is_super_admin: superAdmin,
     };
   } catch (err) {
     console.error('getAdminFromRequest error:', err);
@@ -100,6 +103,21 @@ export async function requireSuperAdmin(req, res) {
     return null;
   }
   if (admin.role !== 'super_admin') {
+    const path = req.originalUrl || req.url || '';
+    const ip = req.ip || req.headers?.['x-forwarded-for'] || req.socket?.remoteAddress || '';
+    await writeActivity({
+      entity_type: 'security_violation',
+      entity_id: admin.id || 0,
+      action: 'unauthorized_super_admin_attempt',
+      actor_email: admin.email,
+      details: {
+        path,
+        method: req.method,
+        ip: typeof ip === 'string' ? ip.split(',')[0].trim() : '',
+        message: 'Non-super-admin attempted to access super-admin endpoint.',
+      },
+    }).catch(() => {});
+
     res.status(403).json({ error: 'Forbidden: Super Admin access required' });
     return null;
   }

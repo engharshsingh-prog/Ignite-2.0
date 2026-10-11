@@ -28,6 +28,8 @@ import approvalResolve from './auth/approval-resolve.js';
 import controlData from './control/data.js';
 import controlAdmins from './control/admins.js';
 import controlSessions from './control/sessions.js';
+import { getAdminFromRequest, requireSuperAdmin } from './_auth.js';
+import { writeActivity } from './_activity.js';
 
 const routeHandlers = new Map([
   ['/activities', activities],
@@ -60,7 +62,19 @@ const routeHandlers = new Map([
   ['/validation-handler', validationHandler],
   ['/validation-handler-access', validationHandlerAccess],
   ['/winners', winners],
+  ['/super-admin/data', controlData],
+  ['/super-admin/admins', controlAdmins],
+  ['/super-admin/sessions', controlSessions],
+  ['/super-admin/approvals', approvals],
+  ['/super-admin/approval-resolve', approvalResolve],
+  ['/super-admin/control', controlData],
 ]);
+
+async function genericSuperAdminHandler(req, res) {
+  const superAdmin = await requireSuperAdmin(req, res);
+  if (!superAdmin) return;
+  return res.status(200).json({ ok: true, message: 'Super admin endpoint' });
+}
 
 function normalizeApiPath(req) {
   const rewrittenPath = req?.query?.path;
@@ -84,7 +98,36 @@ function normalizeApiPath(req) {
 
 export default async function dispatchApiRequest(req, res) {
   const path = normalizeApiPath(req);
-  const handler = routeHandlers.get(path);
+
+  // Policy check: No UI or API may create, promote or demote a super_admin.
+  // Any request trying to set role='super_admin' through any API must fail with 403 and be written to activity_logs.
+  if (req.body?.role === 'super_admin' || req.query?.role === 'super_admin') {
+    const admin = await getAdminFromRequest(req);
+    const actorEmail = admin?.email || 'unauthenticated';
+    await writeActivity({
+      entity_type: 'security_violation',
+      entity_id: admin?.id || 0,
+      action: 'forbidden_super_admin_role_change_attempt',
+      actor_email: actorEmail,
+      details: {
+        path,
+        method: req.method,
+        ip: req.ip || req.headers?.['x-forwarded-for'] || '',
+        message: 'No UI or API may create, promote or assign super_admin role.',
+        attempted_role: 'super_admin',
+      },
+    }).catch(() => {});
+    return res.status(403).json({
+      error: 'Forbidden: No UI or API may create, promote or assign super_admin role. Super admin privileges are derived solely from SUPER_ADMIN_EMAILS in server environment.'
+    });
+  }
+
+  let handler = routeHandlers.get(path);
+
+  // If path starts with /super-admin or /control and no specific handler was found, route to genericSuperAdminHandler
+  if (!handler && (path.startsWith('/super-admin') || path.startsWith('/control'))) {
+    handler = genericSuperAdminHandler;
+  }
 
   if (!handler) {
     return res.status(404).json({ error: 'API route not found' });

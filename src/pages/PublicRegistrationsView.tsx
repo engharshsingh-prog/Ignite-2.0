@@ -305,7 +305,7 @@ export default function PublicRegistrationsView() {
                     <td className="px-4 py-3 text-sm text-gray-300">{p.skills.join(', ') || '-'}</td>
                     <td className="px-4 py-3 text-sm text-gray-300">{p.payment_id}</td>
                     <td className="px-4 py-3 text-sm">{p.payment_verified ? <span className="text-emerald-300">Verified</span> : <span className="text-olive-300">Pending</span>}</td>
-                    <td className="px-4 py-3 text-sm">{p.check_in_status ? <span className="text-emerald-300">Checked In</span> : <span className="text-gray-400">Pending</span>}</td>
+                    <td className="px-4 py-3 text-sm">{p.check_in_status ? <span className="text-emerald-300">Checked In</span> : <span className="text-gray-400">Not Checked In</span>}</td>
                     <td className="px-4 py-3 text-sm">
                       <button
                         onClick={() =>

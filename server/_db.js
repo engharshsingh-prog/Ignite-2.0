@@ -572,6 +572,18 @@ async function initSchema() {
       await executeStatement('UPDATE auth_users SET password_hash = ? WHERE id = ?', [adminHash, adminUser.rows[0].id]);
     }
   }
+
+  // Enforce Super Admin policy in database:
+  // Exactly the configured SUPER_ADMIN_EMAILS have role = 'super_admin'.
+  // Nobody else can ever be a super_admin.
+  const allDbUsers = await executeStatement('SELECT id, email, role FROM auth_users');
+  for (const u of (allDbUsers?.rows || [])) {
+    const isSuper = superEmails.has(String(u.email || '').trim().toLowerCase());
+    const expectedRole = isSuper ? 'super_admin' : 'admin';
+    if (u.role !== expectedRole) {
+      await executeStatement('UPDATE auth_users SET role = ? WHERE id = ?', [expectedRole, u.id]);
+    }
+  }
 }
 
 const ready = initSchema();

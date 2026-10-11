@@ -254,20 +254,27 @@ function rowArrayToObject(headers, row) {
 }
 ```
 
-## Super Admin Control Panel & Dedicated Icon
+## Super Admin Policy (Strict Role Rules)
 
-- **Dedicated Icon**: A distinct `Crown` icon button with an olive accent ring (`#a3b46a`) is displayed in the admin top bar / dashboard header and navigation bar ONLY when the authenticated user is a verified Super Admin (`role === "super_admin"`).
-- **Pending Requests Badge**: Displays a live indicator of pending admin access requests (hidden at 0, capped at "9+").
-- **Route**: `/admin/super` (protected by `AdminGuard requireSuperAdmin` client-side and `requireSuperAdmin` database checks on every server endpoint). Non-super-admins are redirected to `/admin`, and direct API requests from regular admins return 403 Forbidden.
-- **Panel Sections**:
-  1. **Admin Requests**: Pending requests with email, timestamp, IP/client info, and one-click Approve / Reject buttons with confirmation dialogs, plus authorization history.
-  2. **Admins**: Admin roster with status, role, and actions to Revoke Access, Reactivate, Promote/Change Role, Reset Password, or Remove Admin ID. Self-demotion and removal of configured Super Admins is strictly prevented server-side.
-  3. **Activity Log**: Searchable and filterable audit trail of administrative actions from `activity_logs`.
-  4. **Overview**: Metric counters (participants, check-ins, media review queue, active sessions) and quick links to full data views.
+- **Exactly Two Super Admins**:
+  - `j74117204@gmail.com`
+  - `pragatiie0601@gmail.com`
+  Nobody else can ever be a super admin.
+- **Source of Truth**: The server environment variable `SUPER_ADMIN_EMAILS` (comma-separated, trimmed, case-insensitive) set to exactly these two addresses:
+  ```env
+  SUPER_ADMIN_EMAILS=j74117204@gmail.com,pragatiie0601@gmail.com
+  ```
+- **Fail-Closed Design**: If `SUPER_ADMIN_EMAILS` is missing or empty, the server fails closed: nobody receives super admin rights.
+- **Immutable Role Derivation**: The `super_admin` role is derived **exclusively** from `SUPER_ADMIN_EMAILS`, never from a database field that a client request can alter. No UI or API may create, promote, or demote a `super_admin`. Role-change endpoints can only switch between `admin` and no access (`suspended` / `unapproved`), never to `super_admin`.
+- **Full Governance Control**: Super admins have complete master authority: access to all data, approve/reject admin access requests, make any approved account an admin, revoke admins, view audit logs.
+- **Auto-Approval**: Super admins are auto-approved upon login and cannot be rejected, revoked, suspended, or demoted through the app. Changing the super admin roster strictly requires updating the server environment variable and redeploying.
+- **Regular Admins**: Any other email (including legacy allowlist addresses like `sharvilm112@gmail.com`, `adityabhai01@gmail.com`, `harsh188200@gmail.com`) is a regular admin only if approved by a super admin (or migrated as approved in the database). They never possess super admin rights.
+- **Server Enforcement**: All role checks and authorization barriers are enforced on the server on every request against the database and environment variables. No client-side email checks or hard-coded allowlists exist in the frontend.
+- **Security Audit Logs**: Any unauthorized attempt to call `/api/super-admin/*` or `/api/control/*` endpoints, or any attempt to set `role=super_admin` through any API, fails with HTTP `403 Forbidden` and is immediately written to `activity_logs`.
 
 ## Status
 
 - Build passed (`tsc -b && vite build` 0 errors).
-- Super Admin access and governance controls operational.
+- Super Admin policy and governance controls operational.
 #   I g n i t e - 2 . 0  
  

@@ -54,8 +54,18 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Password must be at least 8 characters long' });
       }
 
-      if (superAdminSet.has(normalizedEmail)) {
-        return res.status(400).json({ error: 'This email is already configured as a Super Admin in server environment.' });
+      if (superAdminSet.has(normalizedEmail) || req.body?.role === 'super_admin') {
+        await writeActivity({
+          entity_type: 'security_violation',
+          entity_id: 0,
+          action: 'forbidden_super_admin_role_change_attempt',
+          actor_email: superAdmin.email,
+          details: {
+            message: 'No UI or API may create, promote or assign a super_admin.',
+            email: normalizedEmail,
+          },
+        }).catch(() => {});
+        return res.status(403).json({ error: 'Forbidden: No UI or API may create or promote a super_admin.' });
       }
 
       const existing = await db
@@ -125,14 +135,32 @@ export default async function handler(req, res) {
         return res.status(403).json({ error: 'A Super Admin cannot revoke or demote themselves.' });
       }
 
-      if (role && ['admin', 'super_admin'].includes(role)) {
-        await db.prepare('UPDATE auth_users SET role = ? WHERE id = ?').run(role, targetUser.id);
+      if (role === 'super_admin') {
+        await writeActivity({
+          entity_type: 'security_violation',
+          entity_id: targetUser.id,
+          action: 'forbidden_super_admin_role_change_attempt',
+          actor_email: superAdmin.email,
+          details: {
+            message: 'No UI or API may promote to super_admin.',
+            target_email: targetEmail,
+          },
+        }).catch(() => {});
+        return res.status(403).json({ error: 'Forbidden: No UI or API may create, promote or demote a super_admin.' });
+      }
+
+      if (role && role !== 'admin') {
+        return res.status(400).json({ error: 'Invalid role. Roles can only be admin.' });
+      }
+
+      if (role === 'admin') {
+        await db.prepare("UPDATE auth_users SET role = 'admin' WHERE id = ?").run(targetUser.id);
         await writeActivity({
           entity_type: 'admin_management',
           entity_id: targetUser.id,
           action: 'change_admin_role',
           actor_email: superAdmin.email,
-          details: { target_email: targetEmail, new_role: role },
+          details: { target_email: targetEmail, new_role: 'admin' },
         });
       }
 
