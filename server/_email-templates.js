@@ -188,3 +188,74 @@ export function messageTemplate(payload = {}) {
 export function notificationTemplate(payload = {}) {
   return renderThemedEmail({ type: 'notification', ...payload });
 }
+
+export function participantApprovalRequestToAdminTemplate({ participant, reviewUrl }) {
+  const skillsValue = Array.isArray(participant?.skills) ? participant.skills.join(', ') : '-';
+
+  return renderThemedEmail({
+    type: 'notification',
+    preheader: `Registration Approval Required: ${participant?.full_name || 'Participant'} (${participant?.registration_id || 'ID'})`,
+    heading: 'New Participant Registration Submitted',
+    subheading: 'A new participant has completed Step 1 registration and requires admin verification.',
+    message: 'Please review the participant information below. You can approve or reject this registration request in the Admin Dashboard.',
+    cta: {
+      url: reviewUrl,
+      label: 'Review Request in Admin Dashboard',
+    },
+    meta: [
+      { label: 'Registration ID', value: participant?.registration_id || '-' },
+      { label: 'Full Name', value: participant?.full_name || '-' },
+      { label: 'Email', value: participant?.email || '-' },
+      { label: 'WhatsApp Number', value: participant?.whatsapp_number || '-' },
+      { label: 'Roll / Enrolment No', value: participant?.roll_number || '-' },
+      { label: 'Branch', value: participant?.branch || '-' },
+      { label: 'Year', value: participant?.year || '-' },
+      { label: 'Skills', value: skillsValue },
+      { label: 'Submitted Date', value: participant?.registered_at || new Date().toISOString() },
+      { label: 'Current Status', value: 'Pending Admin Verification' },
+    ],
+    footerNote: 'Only authorized administrators can approve or reject participant registrations.',
+  });
+}
+
+export function participantRegistrationApprovedTemplate({ participant, step2Url }) {
+  return renderThemedEmail({
+    type: 'success',
+    badge: 'Registration Approved',
+    preheader: 'Ignite 2.O — Your Registration Has Been Approved!',
+    heading: 'Registration Approved!',
+    subheading: `Hello ${participant?.full_name || 'Participant'},`,
+    message: `Congratulations! Your Step 1 registration for Ignite 2.O has been successfully verified and approved by our admin team.\n\nYou can now proceed to Step 2 and complete the payment process.\n\nClick the secure button below to continue:`,
+    cta: {
+      url: step2Url,
+      label: 'Proceed to Step 2 & Payment',
+    },
+    meta: [
+      { label: 'Your Registration ID', value: participant?.registration_id || '-' },
+      { label: 'Full Name', value: participant?.full_name || '-' },
+      { label: 'Roll Number', value: participant?.roll_number || '-' },
+      { label: 'Branch & Year', value: `${participant?.branch || '-'} (${participant?.year || '-'})` },
+      { label: 'Approval Status', value: 'Approved' },
+    ],
+    footerNote: 'Please do not share this continuation link with others. If not in your inbox, check Spam and Promotions folders.',
+  });
+}
+
+export function participantRegistrationRejectedTemplate({ participant, reason }) {
+  return renderThemedEmail({
+    type: 'warning',
+    badge: 'Registration Update',
+    preheader: 'Ignite 2.O — Registration Status Update',
+    heading: 'Registration Status Update',
+    subheading: `Hello ${participant?.full_name || 'Participant'},`,
+    message: `We reviewed your Step 1 registration submission for Ignite 2.O. Unfortunately, our admin team was unable to approve your registration at this time.${reason ? `\n\nReason: ${reason}` : ''}\n\nIf you believe this was an error, please verify your details and register again.`,
+    meta: [
+      { label: 'Registration ID', value: participant?.registration_id || '-' },
+      { label: 'Full Name', value: participant?.full_name || '-' },
+      { label: 'Roll Number', value: participant?.roll_number || '-' },
+      { label: 'Status', value: 'Rejected' },
+      { label: 'Reason', value: reason || 'Details could not be verified' },
+    ],
+    footerNote: 'Ignite 2.O Team — Engineering Dept, IET, DDU Gorakhpur University',
+  });
+}

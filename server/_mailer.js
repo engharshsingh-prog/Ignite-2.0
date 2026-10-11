@@ -7,6 +7,9 @@ import {
   otpTemplate,
   registrationConfirmationTemplate,
   renderThemedEmail,
+  participantApprovalRequestToAdminTemplate,
+  participantRegistrationApprovedTemplate,
+  participantRegistrationRejectedTemplate,
 } from './_email-templates.js';
 
 function readSmtpConfig() {
@@ -172,4 +175,93 @@ export async function sendLoginApprovalNotification({ adminEmail, ip, userAgent,
       console.error(`Failed to send approval email to ${recipient}:`, e?.message);
     }
   }
+}
+
+export async function sendParticipantApprovalRequestToAdmin({ participant, adminEmails, reviewUrl }) {
+  const recipients = Array.from(adminEmails || []).filter(Boolean);
+  if (recipients.length === 0) return;
+
+  const config = readSmtpConfig();
+  if (!config || !config.auth.pass || config.auth.pass.startsWith('your-') || config.auth.pass.startsWith('YOUR_')) {
+    console.log(`\n======================================================`);
+    console.log(`[SMTP DEV MODE] Participant Registration Approval Request:`);
+    console.log(`Participant: ${participant?.full_name} (${participant?.email})`);
+    console.log(`Registration ID: ${participant?.registration_id}`);
+    console.log(`WhatsApp: ${participant?.whatsapp_number} | Roll: ${participant?.roll_number}`);
+    console.log(`Review URL: ${reviewUrl}`);
+    console.log(`Notifying Admins: ${recipients.join(', ')}`);
+    console.log(`======================================================\n`);
+    return;
+  }
+
+  const { transport, from } = getTransport();
+  const content = participantApprovalRequestToAdminTemplate({ participant, reviewUrl });
+  const subject = `[Ignite 2.O] Registration Approval Required: ${participant?.full_name || 'Participant'} (${participant?.registration_id || 'ID'})`;
+
+  for (const recipient of recipients) {
+    try {
+      await transport.sendMail({
+        from,
+        to: recipient,
+        subject,
+        text: content.text,
+        html: content.html,
+      });
+    } catch (e) {
+      console.error(`Failed to send participant approval request email to ${recipient}:`, e?.message);
+    }
+  }
+}
+
+export async function sendParticipantRegistrationApprovedEmail({ participant, step2Url }) {
+  if (!participant?.email) return;
+
+  const config = readSmtpConfig();
+  if (!config || !config.auth.pass || config.auth.pass.startsWith('your-') || config.auth.pass.startsWith('YOUR_')) {
+    console.log(`\n======================================================`);
+    console.log(`[SMTP DEV MODE] Participant Registration Approved Email:`);
+    console.log(`To: ${participant.email}`);
+    console.log(`Name: ${participant.full_name}`);
+    console.log(`Registration ID: ${participant.registration_id}`);
+    console.log(`Step 2 Continuation Link: ${step2Url}`);
+    console.log(`======================================================\n`);
+    return;
+  }
+
+  const { transport, from } = getTransport();
+  const content = participantRegistrationApprovedTemplate({ participant, step2Url });
+
+  await transport.sendMail({
+    from,
+    to: participant.email,
+    subject: 'Ignite 2.O — Your Registration Has Been Approved!',
+    text: content.text,
+    html: content.html,
+  });
+}
+
+export async function sendParticipantRegistrationRejectedEmail({ participant, reason }) {
+  if (!participant?.email) return;
+
+  const config = readSmtpConfig();
+  if (!config || !config.auth.pass || config.auth.pass.startsWith('your-') || config.auth.pass.startsWith('YOUR_')) {
+    console.log(`\n======================================================`);
+    console.log(`[SMTP DEV MODE] Participant Registration Rejected Email:`);
+    console.log(`To: ${participant.email}`);
+    console.log(`Name: ${participant.full_name}`);
+    console.log(`Reason: ${reason || 'Details could not be verified'}`);
+    console.log(`======================================================\n`);
+    return;
+  }
+
+  const { transport, from } = getTransport();
+  const content = participantRegistrationRejectedTemplate({ participant, reason });
+
+  await transport.sendMail({
+    from,
+    to: participant.email,
+    subject: 'Ignite 2.O — Registration Status Update',
+    text: content.text,
+    html: content.html,
+  });
 }

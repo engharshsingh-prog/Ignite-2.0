@@ -28,6 +28,14 @@ import approvalResolve from './auth/approval-resolve.js';
 import controlData from './control/data.js';
 import controlAdmins from './control/admins.js';
 import controlSessions from './control/sessions.js';
+import {
+  handleGetRegistrationApprovals,
+  handleResolveRegistrationApproval,
+  handleResendApprovalEmail,
+  handleVerifyStep2Access,
+  handleSubmitStep2Payment,
+  handleGetRegistrationStatus,
+} from './registration-flow.js';
 import { getAdminFromRequest, requireSuperAdmin } from './_auth.js';
 import { writeActivity } from './_activity.js';
 
@@ -57,6 +65,12 @@ const routeHandlers = new Map([
   ['/public-participants', publicParticipants],
   ['/public-media-control', publicMediaControl],
   ['/registration-control', registrationControl],
+  ['/registration-approvals', handleGetRegistrationApprovals],
+  ['/registration-approvals/resolve', handleResolveRegistrationApproval],
+  ['/registration-approvals/resend-email', handleResendApprovalEmail],
+  ['/registration-step2/verify', handleVerifyStep2Access],
+  ['/registration-step2/submit-payment', handleSubmitStep2Payment],
+  ['/registration-status', handleGetRegistrationStatus],
   ['/sheet-sync', sheetSync],
   ['/stats', stats],
   ['/validation-handler', validationHandler],

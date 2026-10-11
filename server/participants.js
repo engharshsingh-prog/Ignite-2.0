@@ -1,7 +1,15 @@
+import crypto from 'node:crypto';
 import db, { encodeSkills, toParticipant } from './_db.js';
 import { requireAdmin } from './_auth.js';
 import { writeActivity } from './_activity.js';
-import { sendRegistrationConfirmationEmail } from './_mailer.js';
+import {
+  sendRegistrationConfirmationEmail,
+  sendParticipantApprovalRequestToAdmin,
+} from './_mailer.js';
+import {
+  getBaseUrl,
+  getAuthorizedAdminEmails,
+} from './registration-flow.js';
 
 const ALLOWED_YEARS = ['1st Year', '2nd Year'];
 
@@ -9,9 +17,9 @@ function isGmailEmail(email) {
   return /^[^\s@]+@gmail\.com$/.test(String(email || '').trim().toLowerCase());
 }
 
-function validateParticipantInput(payload) {
-  const { email, full_name, roll_number, branch, year, skills, payment_id, whatsapp_number } = payload;
-  if (!email || !full_name || !roll_number || !branch || !year || skills === undefined || !payment_id || !whatsapp_number) {
+function validateStep1Input(payload) {
+  const { email, full_name, roll_number, branch, year, skills, whatsapp_number } = payload;
+  if (!email || !full_name || !roll_number || !branch || !year || skills === undefined || !whatsapp_number) {
     return 'All fields are required';
   }
   if (!isGmailEmail(email)) return 'Only gmail.com addresses are allowed';
@@ -25,19 +33,18 @@ function validateParticipantInput(payload) {
   return null;
 }
 
+function validateAdminEditInput(payload) {
+  const step1Err = validateStep1Input(payload);
+  if (step1Err) return step1Err;
+  return null;
+}
+
 async function checkDuplicate(field, value, currentId = null) {
   if (!value) return false;
   if (currentId) {
     return db.prepare(`SELECT id FROM participants WHERE ${field} = ? AND id != ?`).get(value, currentId);
   }
   return db.prepare(`SELECT id FROM participants WHERE ${field} = ?`).get(value);
-}
-
-async function findExistingByRollAndEmail(roll_number, email) {
-  if (!roll_number || !email) return null;
-  return db
-    .prepare('SELECT id FROM participants WHERE roll_number = ? AND email = ? LIMIT 1')
-    .get(String(roll_number), String(email).trim().toLowerCase());
 }
 
 export default async function handler(req, res) {
@@ -51,18 +58,22 @@ export default async function handler(req, res) {
       const admin = await requireAdmin(req, res);
       if (!admin) return;
 
-      const { search, branch } = req.query;
+      const { search, branch, approval_status } = req.query;
       const params = [];
       let where = '1=1';
 
       if (search) {
-        where += ' AND (full_name LIKE ? OR roll_number LIKE ? OR email LIKE ? OR payment_id LIKE ? OR whatsapp_number LIKE ?)';
+        where += ' AND (full_name LIKE ? OR roll_number LIKE ? OR email LIKE ? OR payment_id LIKE ? OR whatsapp_number LIKE ? OR registration_id LIKE ?)';
         const needle = `%${search}%`;
-        params.push(needle, needle, needle, needle, needle);
+        params.push(needle, needle, needle, needle, needle, needle);
       }
       if (branch && branch !== 'all') {
         where += ' AND branch = ?';
         params.push(branch);
+      }
+      if (approval_status && approval_status !== 'all') {
+        where += ' AND approval_status = ?';
+        params.push(approval_status);
       }
 
       const rows = (await db.prepare(`SELECT * FROM participants WHERE ${where} ORDER BY registered_at DESC`).all(...params)).map(toParticipant);
@@ -75,10 +86,10 @@ export default async function handler(req, res) {
         return res.status(403).json({ error: 'Registrations are currently closed by admin.' });
       }
 
-      const validationError = validateParticipantInput(req.body || {});
+      const validationError = validateStep1Input(req.body || {});
       if (validationError) return res.status(400).json({ error: validationError });
 
-      const { email, full_name, roll_number, branch, year, skills, payment_id, whatsapp_number, otp_token } = req.body;
+      const { email, full_name, roll_number, branch, year, skills, whatsapp_number, otp_token } = req.body;
 
       const normalizedEmail = String(email).trim().toLowerCase();
       const cleanRoll = String(roll_number).trim();
@@ -103,75 +114,99 @@ export default async function handler(req, res) {
         return res.status(403).json({ error: 'Invalid or expired OTP verification. Please verify your email again.' });
       }
 
-      const existingSameRollAndEmail = await findExistingByRollAndEmail(cleanRoll, normalizedEmail);
-
-      if (!existingSameRollAndEmail && (await checkDuplicate('email', normalizedEmail))) {
-        return res.status(409).json({ error: 'This email address is already registered' });
+      const existingByEmail = await db.prepare('SELECT id, approval_status, payment_id FROM participants WHERE email = ? LIMIT 1').get(normalizedEmail);
+      if (existingByEmail) {
+        if (existingByEmail.approval_status === 'approved' && existingByEmail.payment_id) {
+          return res.status(409).json({ error: 'This email address is already registered and payment submitted.' });
+        }
+        if (existingByEmail.approval_status === 'pending_approval') {
+          return res.status(409).json({ error: 'Your registration has already been submitted and is currently pending admin verification.' });
+        }
       }
-      if (await checkDuplicate('payment_id', payment_id)) {
-        return res.status(409).json({ error: 'This registration payment ID is already used' });
+
+      const existingByRoll = await db.prepare('SELECT id, approval_status, payment_id FROM participants WHERE roll_number = ? LIMIT 1').get(cleanRoll);
+      if (existingByRoll && existingByRoll.id !== existingByEmail?.id) {
+        if (existingByRoll.approval_status !== 'rejected') {
+          return res.status(409).json({ error: 'This roll number/enrolment number is already registered.' });
+        }
       }
 
-      let participant;
-      if (existingSameRollAndEmail?.id) {
+      const token = crypto.randomBytes(32).toString('hex');
+      const tokenExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+      let participantId;
+
+      if (existingByEmail?.id && existingByEmail.approval_status === 'rejected') {
+        // Re-submit previously rejected participant
         await db
           .prepare(
             `
               UPDATE participants
-              SET full_name = ?, branch = ?, year = ?, skills = ?, payment_id = ?, whatsapp_number = ?
+              SET full_name = ?, roll_number = ?, branch = ?, year = ?, skills = ?, whatsapp_number = ?,
+                  approval_status = 'pending_approval',
+                  step2_token = ?,
+                  step2_token_expires_at = ?,
+                  rejected_at = NULL,
+                  rejected_by = NULL,
+                  rejection_reason = NULL,
+                  registered_at = datetime('now')
               WHERE id = ?
             `
           )
-          .run(full_name, branch, year, encodeSkills(skills), payment_id, whatsapp_number, existingSameRollAndEmail.id);
-
-        participant = toParticipant(await db.prepare('SELECT * FROM participants WHERE id = ?').get(existingSameRollAndEmail.id));
-
-        await writeActivity({
-          entity_type: 'participant',
-          entity_id: participant.id,
-          action: 'registration_updated',
-          actor_email: participant.email,
-          details: {
-            roll_number: participant.roll_number,
-            branch: participant.branch,
-            year: participant.year,
-          },
-        });
+          .run(full_name, cleanRoll, branch, year, encodeSkills(skills), whatsapp_number, token, tokenExpiresAt, existingByEmail.id);
+        participantId = existingByEmail.id;
       } else {
         const result = await db
           .prepare(
             `
-              INSERT INTO participants (email, full_name, roll_number, branch, year, skills, payment_id, whatsapp_number)
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+              INSERT INTO participants (
+                email, full_name, roll_number, branch, year, skills, whatsapp_number,
+                approval_status, step2_token, step2_token_expires_at, registered_at
+              )
+              VALUES (?, ?, ?, ?, ?, ?, ?, 'pending_approval', ?, ?, datetime('now'))
             `
           )
-          .run(normalizedEmail, full_name, cleanRoll, branch, year, encodeSkills(skills), payment_id, whatsapp_number);
-
-        participant = toParticipant(await db.prepare('SELECT * FROM participants WHERE id = ?').get(result.lastInsertRowid));
-
-        await writeActivity({
-          entity_type: 'participant',
-          entity_id: participant.id,
-          action: 'registration_created',
-          actor_email: participant.email,
-          details: {
-            full_name: participant.full_name,
-            roll_number: participant.roll_number,
-            branch: participant.branch,
-            year: participant.year,
-          },
-        });
+          .run(normalizedEmail, full_name, cleanRoll, branch, year, encodeSkills(skills), whatsapp_number, token, tokenExpiresAt);
+        participantId = result.lastInsertRowid;
       }
 
+      // Generate formatted unique registration ID
+      const regId = `IGN26-${String(participantId).padStart(4, '0')}`;
+      await db.prepare('UPDATE participants SET registration_id = ? WHERE id = ?').run(regId, participantId);
+
+      const participant = toParticipant(await db.prepare('SELECT * FROM participants WHERE id = ?').get(participantId));
+
+      // Mark OTP as consumed
       await db.prepare('UPDATE email_otp_sessions SET consumed = 1 WHERE id = ?').run(verifiedOtp.id);
 
+      // Log activity
+      await writeActivity({
+        entity_type: 'participant',
+        entity_id: participant.id,
+        action: 'registration_step1_submitted',
+        actor_email: participant.email,
+        details: {
+          registration_id: participant.registration_id,
+          full_name: participant.full_name,
+          roll_number: participant.roll_number,
+          branch: participant.branch,
+          year: participant.year,
+        },
+      });
+
+      // Send approval notification email to authorized admins
       try {
-        await sendRegistrationConfirmationEmail(participant);
+        const adminEmails = await getAuthorizedAdminEmails();
+        const reviewUrl = `${getBaseUrl(req)}/admin/dashboard`;
+        await sendParticipantApprovalRequestToAdmin({ participant, adminEmails, reviewUrl });
       } catch (mailErr) {
-        console.error('Confirmation mail error:', mailErr);
+        console.error('Admin approval notification mail error:', mailErr);
       }
 
-      return res.status(existingSameRollAndEmail?.id ? 200 : 201).json(participant);
+      return res.status(201).json({
+        success: true,
+        message: 'Step 1 registration submitted successfully. Please wait while our admin team verifies your details. You will receive an email once your registration is approved.',
+        participant,
+      });
     }
 
     if (req.method === 'PUT') {
@@ -184,13 +219,13 @@ export default async function handler(req, res) {
       const existing = await db.prepare('SELECT * FROM participants WHERE id = ?').get(id);
       if (!existing) return res.status(404).json({ error: 'Participant not found' });
 
-      const validationError = validateParticipantInput({ email, full_name, roll_number, branch, year, skills, payment_id, whatsapp_number });
+      const validationError = validateAdminEditInput({ email, full_name, roll_number, branch, year, skills, whatsapp_number });
       if (validationError) return res.status(400).json({ error: validationError });
 
       if (await checkDuplicate('email', String(email).trim().toLowerCase(), id)) {
         return res.status(409).json({ error: 'This email address is already registered' });
       }
-      if (await checkDuplicate('payment_id', payment_id, id)) {
+      if (payment_id && (await checkDuplicate('payment_id', payment_id, id))) {
         return res.status(409).json({ error: 'This registration payment ID is already used' });
       }
 

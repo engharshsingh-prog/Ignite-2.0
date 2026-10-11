@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
@@ -110,12 +111,23 @@ const schemaStatements = [
       branch TEXT NOT NULL,
       year TEXT NOT NULL,
       skills TEXT NOT NULL DEFAULT '[]',
-      payment_id TEXT NOT NULL UNIQUE,
+      payment_id TEXT UNIQUE DEFAULT NULL,
       whatsapp_number TEXT NOT NULL,
       payment_verified INTEGER NOT NULL DEFAULT 0,
       check_in_status INTEGER NOT NULL DEFAULT 0,
       check_in_time TEXT,
       registered_at TEXT NOT NULL DEFAULT (datetime('now')),
+      approval_status TEXT NOT NULL DEFAULT 'pending_approval',
+      registration_id TEXT UNIQUE,
+      step2_token TEXT,
+      step2_token_expires_at TEXT,
+      approved_at TEXT,
+      approved_by TEXT,
+      rejected_at TEXT,
+      rejected_by TEXT,
+      rejection_reason TEXT,
+      approval_email_sent INTEGER NOT NULL DEFAULT 0,
+      approval_email_error TEXT,
       CHECK (length(roll_number) <= 15),
       CHECK (length(whatsapp_number) = 10)
     )
@@ -406,6 +418,104 @@ async function migrateParticipantsRollConstraint() {
   }
 }
 
+async function migrateParticipantsApprovalSchema() {
+  const tableDef = await executeStatement("SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'participants'");
+  const currentSql = tableDef.rows[0]?.sql || '';
+
+  const hasPaymentNotNull = currentSql.includes('payment_id TEXT NOT NULL');
+  if (hasPaymentNotNull) {
+    let savepointStarted = false;
+    try {
+      await executeStatement('SAVEPOINT participants_approval_migration');
+      savepointStarted = true;
+      await executeStatement(`
+        CREATE TABLE IF NOT EXISTS participants__approval_migrated (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          email TEXT NOT NULL UNIQUE,
+          full_name TEXT NOT NULL,
+          roll_number TEXT NOT NULL,
+          branch TEXT NOT NULL,
+          year TEXT NOT NULL,
+          skills TEXT NOT NULL DEFAULT '[]',
+          payment_id TEXT UNIQUE DEFAULT NULL,
+          whatsapp_number TEXT NOT NULL,
+          payment_verified INTEGER NOT NULL DEFAULT 0,
+          check_in_status INTEGER NOT NULL DEFAULT 0,
+          check_in_time TEXT,
+          registered_at TEXT NOT NULL DEFAULT (datetime('now')),
+          approval_status TEXT NOT NULL DEFAULT 'pending_approval',
+          registration_id TEXT UNIQUE,
+          step2_token TEXT,
+          step2_token_expires_at TEXT,
+          approved_at TEXT,
+          approved_by TEXT,
+          rejected_at TEXT,
+          rejected_by TEXT,
+          rejection_reason TEXT,
+          approval_email_sent INTEGER NOT NULL DEFAULT 0,
+          approval_email_error TEXT,
+          CHECK (length(roll_number) <= 15),
+          CHECK (length(whatsapp_number) = 10)
+        )
+      `);
+
+      await executeStatement(`
+        INSERT INTO participants__approval_migrated (
+          id, email, full_name, roll_number, branch, year, skills, payment_id, whatsapp_number,
+          payment_verified, check_in_status, check_in_time, registered_at,
+          approval_status, registration_id
+        )
+        SELECT
+          id, email, full_name, roll_number, branch, year, skills, payment_id, whatsapp_number,
+          payment_verified, check_in_status, check_in_time, registered_at,
+          'approved', 'IGN26-' || printf('%04d', id)
+        FROM participants
+      `);
+
+      await executeStatement('DROP TABLE participants');
+      await executeStatement('ALTER TABLE participants__approval_migrated RENAME TO participants');
+      await executeStatement('RELEASE SAVEPOINT participants_approval_migration');
+      console.log('[db] Successfully migrated participants table to support approval workflow');
+    } catch (error) {
+      if (savepointStarted) {
+        try {
+          await executeStatement('ROLLBACK TO SAVEPOINT participants_approval_migration');
+          await executeStatement('RELEASE SAVEPOINT participants_approval_migration');
+        } catch {}
+      }
+      console.error('[db] Failed to migrate participants approval schema:', error);
+      throw error;
+    }
+  }
+
+  await ensureColumn('participants', 'approval_status', "TEXT NOT NULL DEFAULT 'pending_approval'");
+  await ensureColumn('participants', 'registration_id', "TEXT");
+  await ensureColumn('participants', 'step2_token', "TEXT");
+  await ensureColumn('participants', 'step2_token_expires_at', "TEXT");
+  await ensureColumn('participants', 'approved_at', "TEXT");
+  await ensureColumn('participants', 'approved_by', "TEXT");
+  await ensureColumn('participants', 'rejected_at', "TEXT");
+  await ensureColumn('participants', 'rejected_by', "TEXT");
+  await ensureColumn('participants', 'rejection_reason', "TEXT");
+  await ensureColumn('participants', 'approval_email_sent', "INTEGER NOT NULL DEFAULT 0");
+  await ensureColumn('participants', 'approval_email_error', "TEXT");
+
+  try {
+    await executeStatement(`
+      UPDATE participants 
+      SET registration_id = 'IGN26-' || printf('%04d', id) 
+      WHERE registration_id IS NULL OR registration_id = ''
+    `);
+    await executeStatement(`
+      UPDATE participants 
+      SET approval_status = 'approved' 
+      WHERE (approval_status IS NULL OR approval_status = 'pending_approval') AND (payment_id IS NOT NULL AND payment_id != '')
+    `);
+  } catch (e) {
+    console.error('[db] Error updating default registration_ids:', e);
+  }
+}
+
 async function initSchema() {
   for (const sql of schemaStatements) {
     await executeStatement(sql);
@@ -413,6 +523,7 @@ async function initSchema() {
 
   await migrateParticipantsUniqueness();
   await migrateParticipantsRollConstraint();
+  await migrateParticipantsApprovalSchema();
 
   await ensureColumn('participants', 'payment_verified', "INTEGER NOT NULL DEFAULT 0");
   await ensureColumn('media', 'thumb_url', "TEXT NOT NULL DEFAULT ''");
@@ -630,6 +741,9 @@ export function toParticipant(row) {
     skills: safeJsonArray(row.skills),
     payment_verified: Boolean(row.payment_verified),
     check_in_status: Boolean(row.check_in_status),
+    approval_status: row.approval_status || 'pending_approval',
+    registration_id: row.registration_id || (row.id ? `IGN26-${String(row.id).padStart(4, '0')}` : null),
+    approval_email_sent: Boolean(row.approval_email_sent),
   };
 }
 

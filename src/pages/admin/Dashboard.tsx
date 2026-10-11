@@ -25,6 +25,13 @@ import {
   CalendarClock,
   ShieldAlert,
   Crown,
+  Check,
+  Eye,
+  Clock,
+  Send,
+  Phone,
+  CheckCircle2,
+  XCircle,
 } from 'lucide-react';
 import { authHeaders, checkAdminAuth, type AdminUser } from '../../lib/auth';
 import LoadingSpinner from '../../components/LoadingSpinner';
@@ -32,6 +39,7 @@ import { getErrorMessage, readJsonSafe } from '../../lib/http';
 
 interface Participant {
   id: number;
+  registration_id?: string;
   full_name: string;
   roll_number: string;
   branch: string;
@@ -39,17 +47,28 @@ interface Participant {
   year: string;
   whatsapp_number: string;
   skills: string[];
-  payment_id: string;
+  payment_id: string | null;
   payment_verified: boolean;
   check_in_status: boolean;
   check_in_time: string | null;
   registered_at: string;
+  approval_status?: 'pending_approval' | 'approved' | 'rejected';
+  approved_at?: string | null;
+  approved_by?: string | null;
+  rejected_at?: string | null;
+  rejected_by?: string | null;
+  rejection_reason?: string | null;
+  approval_email_sent?: boolean;
+  approval_email_error?: string | null;
 }
 
 interface Stats {
   total: number;
   checkedIn: number;
   notCheckedIn: number;
+  pendingApprovals?: number;
+  approvedRegistrations?: number;
+  rejectedRegistrations?: number;
   paymentsVerified?: number;
   paymentsPending?: number;
   branchCounts: Record<string, number>;
@@ -117,7 +136,7 @@ function toFormData(participant: Participant): ParticipantForm {
     branch: participant.branch,
     year: participant.year,
     skills: participant.skills.join(', '),
-    payment_id: participant.payment_id,
+    payment_id: participant.payment_id || '',
     whatsapp_number: participant.whatsapp_number,
   };
 }
@@ -167,6 +186,14 @@ export default function AdminDashboard() {
   const [currentUser, setCurrentUser] = useState<AdminUser | null>(null);
   const [pendingApprovalCount, setPendingApprovalCount] = useState(0);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Participant Registration Approval States (Step 1 -> Step 2)
+  const [approvalTab, setApprovalTab] = useState<'pending' | 'approved' | 'rejected' | 'all'>('pending');
+  const [reviewingParticipant, setReviewingParticipant] = useState<Participant | null>(null);
+  const [rejectModalParticipant, setRejectModalParticipant] = useState<Participant | null>(null);
+  const [rejectionReasonInput, setRejectionReasonInput] = useState('');
+  const [resolvingApprovalId, setResolvingApprovalId] = useState<number | null>(null);
+  const [resendingApprovalId, setResendingApprovalId] = useState<number | null>(null);
 
   useEffect(() => {
     let intervalId: number | undefined;
@@ -398,6 +425,116 @@ export default function AdminDashboard() {
       });
     } finally {
       setSendingConfirmationId(null);
+    }
+  };
+
+  const handleApproveRegistration = async (participant: Participant) => {
+    setResolvingApprovalId(participant.id);
+    try {
+      const res = await fetch('/api/registration-approvals/resolve', {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({
+          participant_id: participant.id,
+          action: 'approve',
+        }),
+      });
+      const data = await readJsonSafe<{ error?: string; message?: string; email_sent?: boolean }>(res);
+      if (!res.ok) throw new Error(getErrorMessage(data, 'Failed to approve registration'));
+
+      setStatusDialog({
+        title: 'Registration Approved',
+        message: data?.message || `${participant.full_name}'s registration has been approved. Approval email with Step 2 continuation link was sent.`,
+        tone: 'success',
+      });
+      if (reviewingParticipant?.id === participant.id) {
+        setReviewingParticipant(null);
+      }
+      fetchData();
+    } catch (err) {
+      setStatusDialog({
+        title: 'Approval Failed',
+        message: err instanceof Error ? err.message : 'Failed to approve registration',
+        tone: 'error',
+      });
+    } finally {
+      setResolvingApprovalId(null);
+    }
+  };
+
+  const handleOpenRejectModal = (participant: Participant) => {
+    setRejectModalParticipant(participant);
+    setRejectionReasonInput('');
+  };
+
+  const handleRejectRegistration = async () => {
+    if (!rejectModalParticipant) return;
+    const participant = rejectModalParticipant;
+    setResolvingApprovalId(participant.id);
+    try {
+      const res = await fetch('/api/registration-approvals/resolve', {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({
+          participant_id: participant.id,
+          action: 'reject',
+          reason: rejectionReasonInput.trim() || undefined,
+        }),
+      });
+      const data = await readJsonSafe<{ error?: string; message?: string }>(res);
+      if (!res.ok) throw new Error(getErrorMessage(data, 'Failed to reject registration'));
+
+      setStatusDialog({
+        title: 'Registration Rejected',
+        message: data?.message || `${participant.full_name}'s registration was marked as rejected.`,
+        tone: 'success',
+      });
+      setRejectModalParticipant(null);
+      if (reviewingParticipant?.id === participant.id) {
+        setReviewingParticipant(null);
+      }
+      fetchData();
+    } catch (err) {
+      setStatusDialog({
+        title: 'Rejection Failed',
+        message: err instanceof Error ? err.message : 'Failed to reject registration',
+        tone: 'error',
+      });
+    } finally {
+      setResolvingApprovalId(null);
+    }
+  };
+
+  const handleResendApprovalEmail = async (participant: Participant) => {
+    setResendingApprovalId(participant.id);
+    setStatusDialog({
+      title: 'Resending Approval Email',
+      message: `Sending Step 2 continuation link to ${participant.email}...`,
+      tone: 'loading',
+    });
+    try {
+      const res = await fetch('/api/registration-approvals/resend-email', {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({ participant_id: participant.id }),
+      });
+      const data = await readJsonSafe<{ error?: string; message?: string }>(res);
+      if (!res.ok) throw new Error(getErrorMessage(data, 'Failed to resend approval email'));
+
+      setStatusDialog({
+        title: 'Approval Email Sent',
+        message: data?.message || `Step 2 continuation link sent to ${participant.email}`,
+        tone: 'success',
+      });
+      fetchData();
+    } catch (err) {
+      setStatusDialog({
+        title: 'Resend Failed',
+        message: err instanceof Error ? err.message : 'Failed to resend approval email',
+        tone: 'error',
+      });
+    } finally {
+      setResendingApprovalId(null);
     }
   };
 
@@ -807,7 +944,22 @@ export default function AdminDashboard() {
               <p className="text-3xl font-black">{stats.total}</p>
             </motion.div>
 
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="p-5 rounded-2xl bg-[#191e1b]/90 border border-[#303a32]">
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className={`p-5 rounded-2xl bg-[#191e1b]/90 border ${((stats.pendingApprovals ?? 0) > 0) ? 'border-amber-500/50 shadow-lg shadow-amber-500/10' : 'border-[#303a32]'}`}>
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-9 h-9 rounded-lg bg-amber-500/20 flex items-center justify-center">
+                  <Clock size={18} className="text-amber-400" />
+                </div>
+                <span className="text-gray-400 text-sm">Step 1 Approvals</span>
+              </div>
+              <p className={`text-3xl font-black ${((stats.pendingApprovals ?? 0) > 0) ? 'text-amber-400' : 'text-white'}`}>
+                {stats.pendingApprovals ?? 0}
+              </p>
+              <p className="text-xs text-gray-400 mt-1">
+                {(stats.pendingApprovals ?? 0) > 0 ? 'Pending admin verification' : 'All requests reviewed'}
+              </p>
+            </motion.div>
+
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }} className="p-5 rounded-2xl bg-[#191e1b]/90 border border-[#303a32]">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-9 h-9 rounded-lg bg-emerald-500/20 flex items-center justify-center">
                   <ShieldCheck size={18} className="text-emerald-400" />
@@ -818,7 +970,7 @@ export default function AdminDashboard() {
               <p className="text-xs text-gray-400 mt-1">{stats.paymentsPending ?? 0} pending verification</p>
             </motion.div>
 
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }} className="p-5 rounded-2xl bg-[#191e1b]/90 border border-[#303a32]">
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }} className="p-5 rounded-2xl bg-[#191e1b]/90 border border-[#303a32]">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-9 h-9 rounded-lg bg-emerald-500/20 flex items-center justify-center">
                   <UserCheck size={18} className="text-emerald-400" />
@@ -826,18 +978,7 @@ export default function AdminDashboard() {
                 <span className="text-gray-400 text-sm">Checked In</span>
               </div>
               <p className="text-3xl font-black text-emerald-400">{stats.checkedIn}</p>
-              <p className="text-xs text-gray-400 mt-1">Venue attendance</p>
-            </motion.div>
-
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }} className="p-5 rounded-2xl bg-[#191e1b]/90 border border-[#303a32]">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-9 h-9 rounded-lg bg-amber-500/20 flex items-center justify-center">
-                  <CalendarClock size={18} className="text-amber-400" />
-                </div>
-                <span className="text-gray-400 text-sm">Awaiting Check-in</span>
-              </div>
-              <p className="text-3xl font-black text-amber-400">{stats.notCheckedIn}</p>
-              <p className="text-xs text-gray-400 mt-1">Not arrived yet</p>
+              <p className="text-xs text-gray-400 mt-1">{stats.notCheckedIn} awaiting check-in</p>
             </motion.div>
 
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="p-5 rounded-2xl bg-[#191e1b]/90 border border-[#303a32]">
@@ -884,6 +1025,255 @@ export default function AdminDashboard() {
           </div>
         )}
 
+        {/* Step 1 Participant Registration Approvals Section */}
+        <div className="mb-8 p-6 rounded-2xl bg-[#191e1b]/95 border border-[#303a32] shadow-xl">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+            <div>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                  <Clock size={20} />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                    Step 1 Registration Approvals Queue
+                    {(stats?.pendingApprovals ?? 0) > 0 && (
+                      <span className="px-2 py-0.5 text-xs font-black rounded-full bg-amber-400 text-black animate-pulse">
+                        {stats?.pendingApprovals} Pending
+                      </span>
+                    )}
+                  </h2>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    Verify participant details & WhatsApp group membership before unlocking Step 2 and payment access.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Filter Tabs */}
+            <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-xl bg-black/40 border border-white/5">
+              <button
+                onClick={() => setApprovalTab('pending')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 ${
+                  approvalTab === 'pending'
+                    ? 'bg-amber-500 text-black font-bold shadow'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                <Clock size={12} />
+                Pending
+                <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${approvalTab === 'pending' ? 'bg-black/30 text-black' : 'bg-white/10 text-gray-300'}`}>
+                  {stats?.pendingApprovals ?? 0}
+                </span>
+              </button>
+              <button
+                onClick={() => setApprovalTab('approved')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 ${
+                  approvalTab === 'approved'
+                    ? 'bg-emerald-500 text-black font-bold shadow'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                <CheckCircle2 size={12} />
+                Approved
+                <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${approvalTab === 'approved' ? 'bg-black/30 text-black' : 'bg-white/10 text-gray-300'}`}>
+                  {stats?.approvedRegistrations ?? 0}
+                </span>
+              </button>
+              <button
+                onClick={() => setApprovalTab('rejected')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 ${
+                  approvalTab === 'rejected'
+                    ? 'bg-red-500 text-white font-bold shadow'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                <XCircle size={12} />
+                Rejected
+                <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${approvalTab === 'rejected' ? 'bg-black/30 text-white' : 'bg-white/10 text-gray-300'}`}>
+                  {stats?.rejectedRegistrations ?? 0}
+                </span>
+              </button>
+              <button
+                onClick={() => setApprovalTab('all')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 ${
+                  approvalTab === 'all'
+                    ? 'bg-white/20 text-white font-bold shadow'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                All
+                <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${approvalTab === 'all' ? 'bg-black/30 text-white' : 'bg-white/10 text-gray-300'}`}>
+                  {participants.length}
+                </span>
+              </button>
+            </div>
+          </div>
+
+          {/* Filtered Approval Queue */}
+          {(() => {
+            const queueItems = participants.filter((p) => {
+              const status = p.approval_status || 'approved';
+              if (approvalTab === 'pending') return status === 'pending_approval';
+              if (approvalTab === 'approved') return status === 'approved';
+              if (approvalTab === 'rejected') return status === 'rejected';
+              return true;
+            });
+
+            if (queueItems.length === 0) {
+              return (
+                <div className="py-8 text-center text-gray-500 bg-black/20 rounded-xl border border-white/5">
+                  <ShieldCheck size={28} className="mx-auto mb-2 opacity-30 text-emerald-400" />
+                  <p className="text-sm">No registrations found in this tab.</p>
+                </div>
+              );
+            }
+
+            return (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm">
+                  <thead>
+                    <tr className="border-b border-white/10 text-xs text-gray-400 font-semibold uppercase tracking-wider">
+                      <th className="py-2.5 px-3">Reg ID & Participant</th>
+                      <th className="py-2.5 px-3">WhatsApp / Phone</th>
+                      <th className="py-2.5 px-3 hidden md:table-cell">Roll / Enrolment</th>
+                      <th className="py-2.5 px-3 hidden lg:table-cell">Branch & Year</th>
+                      <th className="py-2.5 px-3">Status</th>
+                      <th className="py-2.5 px-3 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/5">
+                    {queueItems.map((p) => {
+                      const isPending = (p.approval_status || 'approved') === 'pending_approval';
+                      const isApproved = (p.approval_status || 'approved') === 'approved';
+                      const isRejected = p.approval_status === 'rejected';
+
+                      return (
+                        <tr key={p.id} className="hover:bg-white/[0.02] transition-colors">
+                          <td className="py-3 px-3">
+                            <div className="flex items-center gap-2">
+                              <span className="font-mono text-xs px-2 py-0.5 rounded bg-[#252f28] text-emerald-300 font-bold border border-emerald-500/20">
+                                {p.registration_id || `ID-${p.id}`}
+                              </span>
+                              <div>
+                                <p className="font-semibold text-white text-sm">{p.full_name}</p>
+                                <p className="text-xs text-gray-400">{p.email}</p>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="py-3 px-3">
+                            <a
+                              href={`https://wa.me/${p.whatsapp_number.replace(/[^0-9]/g, '')}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex items-center gap-1.5 text-xs text-emerald-300 hover:text-emerald-200 font-mono bg-emerald-500/10 px-2 py-1 rounded-lg border border-emerald-500/20"
+                              title="Chat on WhatsApp"
+                            >
+                              <Phone size={12} />
+                              {p.whatsapp_number}
+                            </a>
+                          </td>
+                          <td className="py-3 px-3 hidden md:table-cell">
+                            <span className="font-mono text-xs text-gray-300">{p.roll_number}</span>
+                          </td>
+                          <td className="py-3 px-3 hidden lg:table-cell">
+                            <span className="text-xs text-gray-300">{p.branch} • {p.year}</span>
+                          </td>
+                          <td className="py-3 px-3">
+                            {isPending ? (
+                              <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/40 text-amber-300">
+                                <Clock size={11} /> Pending Review
+                              </span>
+                            ) : isApproved ? (
+                              <div>
+                                <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/40 text-emerald-300">
+                                  <CheckCircle2 size={11} /> Approved
+                                </span>
+                                {p.approval_email_sent === false && (
+                                  <p className="text-[10px] text-amber-400 mt-0.5">Email failed</p>
+                                )}
+                              </div>
+                            ) : (
+                              <div>
+                                <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-red-500/15 border border-red-500/40 text-red-300">
+                                  <XCircle size={11} /> Rejected
+                                </span>
+                                {p.rejection_reason && (
+                                  <p className="text-[10px] text-gray-400 max-w-[150px] truncate mt-0.5" title={p.rejection_reason}>
+                                    {p.rejection_reason}
+                                  </p>
+                                )}
+                              </div>
+                            )}
+                          </td>
+                          <td className="py-3 px-3 text-right">
+                            <div className="flex items-center justify-end gap-1.5">
+                              <button
+                                onClick={() => setReviewingParticipant(p)}
+                                className="px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300 text-xs font-medium inline-flex items-center gap-1 border border-white/10"
+                                title="Review Full Form"
+                              >
+                                <Eye size={13} />
+                                Review
+                              </button>
+
+                              {isPending && (
+                                <>
+                                  <button
+                                    onClick={() => handleApproveRegistration(p)}
+                                    disabled={resolvingApprovalId === p.id}
+                                    className="px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold inline-flex items-center gap-1 shadow-md disabled:opacity-50"
+                                    title="Approve & Send Step 2 Email"
+                                  >
+                                    <Check size={13} />
+                                    {resolvingApprovalId === p.id ? 'Approving...' : 'Approve'}
+                                  </button>
+                                  <button
+                                    onClick={() => handleOpenRejectModal(p)}
+                                    disabled={resolvingApprovalId === p.id}
+                                    className="px-2.5 py-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-300 border border-red-500/30 text-xs font-medium inline-flex items-center gap-1 disabled:opacity-50"
+                                    title="Reject Registration"
+                                  >
+                                    <X size={13} />
+                                    Reject
+                                  </button>
+                                </>
+                              )}
+
+                              {isApproved && (
+                                <button
+                                  onClick={() => handleResendApprovalEmail(p)}
+                                  disabled={resendingApprovalId === p.id}
+                                  className="px-2.5 py-1.5 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 text-blue-300 border border-blue-500/30 text-xs font-medium inline-flex items-center gap-1 disabled:opacity-50"
+                                  title="Resend Step 2 Continuation Email"
+                                >
+                                  <Send size={12} />
+                                  {resendingApprovalId === p.id ? 'Sending...' : 'Resend Link'}
+                                </button>
+                              )}
+
+                              {isRejected && (
+                                <button
+                                  onClick={() => handleApproveRegistration(p)}
+                                  disabled={resolvingApprovalId === p.id}
+                                  className="px-2.5 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 text-xs font-medium inline-flex items-center gap-1 disabled:opacity-50"
+                                  title="Reverse Rejection & Approve"
+                                >
+                                  <Check size={12} />
+                                  Re-approve
+                                </button>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            );
+          })()}
+        </div>
+
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
           <div className="relative flex-1">
             <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500" />
@@ -923,6 +1313,7 @@ export default function AdminDashboard() {
                     <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider hidden sm:table-cell">Roll / Enrolment No</th>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider hidden md:table-cell">Branch</th>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider hidden lg:table-cell">Year</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Step 1 Approval</th>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider hidden md:table-cell">Payment</th>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Event Check-in</th>
                     <th className="text-right px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Actions</th>
@@ -937,8 +1328,18 @@ export default function AdminDashboard() {
                             {p.full_name.charAt(0)}
                           </div>
                           <div>
-                            <p className="font-medium text-white text-sm">{p.full_name}</p>
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <p className="font-medium text-white text-sm">{p.full_name}</p>
+                              {p.registration_id && (
+                                <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-white/10 text-emerald-300 font-semibold border border-white/10">
+                                  {p.registration_id}
+                                </span>
+                              )}
+                            </div>
                             <p className="text-gray-500 text-xs">{p.email}</p>
+                            <p className="text-gray-400 text-[11px] sm:hidden flex items-center gap-1 mt-0.5">
+                              <Phone size={10} /> {p.whatsapp_number}
+                            </p>
                           </div>
                         </div>
                       </td>
@@ -951,14 +1352,33 @@ export default function AdminDashboard() {
                       <td className="px-4 py-3 hidden lg:table-cell">
                         <span className="text-gray-400 text-sm">{p.year}</span>
                       </td>
+                      <td className="px-4 py-3">
+                        {(p.approval_status === 'approved' || !p.approval_status) ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold">
+                            <CheckCircle2 size={12} /> Approved
+                          </span>
+                        ) : p.approval_status === 'rejected' ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-semibold" title={p.rejection_reason || 'Rejected'}>
+                            <XCircle size={12} /> Rejected
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-semibold animate-pulse">
+                            <Clock size={12} /> Pending
+                          </span>
+                        )}
+                      </td>
                       <td className="px-4 py-3 hidden md:table-cell">
                         {p.payment_verified ? (
                           <span className="inline-flex items-center px-2 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold">
                             Verified
                           </span>
+                        ) : p.approval_status === 'pending_approval' ? (
+                          <span className="inline-flex items-center px-2 py-1 rounded-lg bg-gray-500/10 border border-gray-500/30 text-gray-400 text-xs font-semibold">
+                            Locked (Step 1)
+                          </span>
                         ) : (
                           <span className="inline-flex items-center px-2 py-1 rounded-lg bg-olive-500/10 border border-olive-500/30 text-olive-300 text-xs font-semibold">
-                            Pending
+                            Pending Pay
                           </span>
                         )}
                       </td>
@@ -1117,6 +1537,63 @@ export default function AdminDashboard() {
               transform: openActionMenu.openUp ? 'translate(-100%, -100%)' : 'translateX(-100%)',
             }}
           >
+            <button
+              onClick={() => {
+                setReviewingParticipant(participant);
+                setOpenActionMenu(null);
+              }}
+              className="w-full px-3 py-2 text-left text-xs text-amber-200 hover:bg-amber-500/10 flex items-center gap-2 border-b border-white/5"
+            >
+              <Eye size={13} /> Review Step 1 Form
+            </button>
+            {participant.approval_status === 'pending_approval' && (
+              <>
+                <button
+                  onClick={() => {
+                    handleApproveRegistration(participant);
+                    setOpenActionMenu(null);
+                  }}
+                  disabled={resolvingApprovalId === participant.id}
+                  className="w-full px-3 py-2 text-left text-xs text-emerald-300 hover:bg-emerald-500/10 flex items-center gap-2 border-b border-white/5 disabled:opacity-50"
+                >
+                  <Check size={13} /> Approve Step 1
+                </button>
+                <button
+                  onClick={() => {
+                    handleOpenRejectModal(participant);
+                    setOpenActionMenu(null);
+                  }}
+                  disabled={resolvingApprovalId === participant.id}
+                  className="w-full px-3 py-2 text-left text-xs text-red-300 hover:bg-red-500/10 flex items-center gap-2 border-b border-white/5 disabled:opacity-50"
+                >
+                  <X size={13} /> Reject Step 1
+                </button>
+              </>
+            )}
+            {participant.approval_status === 'approved' && (
+              <button
+                onClick={() => {
+                  handleResendApprovalEmail(participant);
+                  setOpenActionMenu(null);
+                }}
+                disabled={resendingApprovalId === participant.id}
+                className="w-full px-3 py-2 text-left text-xs text-blue-300 hover:bg-blue-500/10 flex items-center gap-2 border-b border-white/5 disabled:opacity-50"
+              >
+                <Send size={13} /> Resend Step 2 Link
+              </button>
+            )}
+            {participant.approval_status === 'rejected' && (
+              <button
+                onClick={() => {
+                  handleApproveRegistration(participant);
+                  setOpenActionMenu(null);
+                }}
+                disabled={resolvingApprovalId === participant.id}
+                className="w-full px-3 py-2 text-left text-xs text-emerald-300 hover:bg-emerald-500/10 flex items-center gap-2 border-b border-white/5 disabled:opacity-50"
+              >
+                <Check size={13} /> Re-approve Step 1
+              </button>
+            )}
             <button
               onClick={() => {
                 handleSendRegistrationDetails(participant);
@@ -1462,6 +1939,292 @@ export default function AdminDashboard() {
                   </button>
                 </div>
               )}
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Review Step 1 Registration Modal */}
+      {reviewingParticipant && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[10000] flex items-center justify-center p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="w-full max-w-2xl bg-[#171b18] border border-[#303a32] rounded-2xl shadow-2xl overflow-hidden"
+          >
+            <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between bg-[#191e1b]">
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-lg font-bold text-white">Review Step 1 Registration</h3>
+                  {reviewingParticipant.registration_id && (
+                    <span className="font-mono text-xs px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 font-bold border border-emerald-500/30">
+                      {reviewingParticipant.registration_id}
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-gray-400 mt-0.5">Verify participant information before authorizing Step 2 payment access</p>
+              </div>
+              <button
+                onClick={() => setReviewingParticipant(null)}
+                className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-300"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-5 max-h-[75vh] overflow-y-auto">
+              {/* WhatsApp / Phone Alert Box */}
+              <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-start gap-3">
+                <div className="w-9 h-9 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-400 flex-shrink-0">
+                  <Phone size={18} />
+                </div>
+                <div className="flex-1">
+                  <p className="text-xs font-semibold text-emerald-300 uppercase tracking-wider">WhatsApp Number (Present in Official Group)</p>
+                  <div className="flex items-center gap-3 mt-1 flex-wrap">
+                    <span className="text-lg font-mono font-bold text-white">{reviewingParticipant.whatsapp_number}</span>
+                    <a
+                      href={`https://wa.me/${reviewingParticipant.whatsapp_number.replace(/[^0-9]/g, '')}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-xs px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-medium inline-flex items-center gap-1 transition-colors"
+                    >
+                      <Phone size={12} /> Check on WhatsApp
+                    </a>
+                  </div>
+                  <p className="text-[11px] text-gray-400 mt-1">
+                    Confirm that this phone number is a member in our Ignite 2.O WhatsApp community before approving.
+                  </p>
+                </div>
+              </div>
+
+              {/* Participant Details Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm bg-black/20 p-4 rounded-xl border border-white/5">
+                <div>
+                  <span className="text-xs text-gray-400 block">Full Name</span>
+                  <span className="font-semibold text-white">{reviewingParticipant.full_name}</span>
+                </div>
+                <div>
+                  <span className="text-xs text-gray-400 block">Email Address</span>
+                  <span className="font-mono text-gray-200">{reviewingParticipant.email}</span>
+                </div>
+                <div>
+                  <span className="text-xs text-gray-400 block">Roll Number / Enrolment No</span>
+                  <span className="font-mono text-white font-semibold">{reviewingParticipant.roll_number}</span>
+                </div>
+                <div>
+                  <span className="text-xs text-gray-400 block">Branch & Year</span>
+                  <span className="text-gray-200">{reviewingParticipant.branch} • {reviewingParticipant.year}</span>
+                </div>
+                <div className="sm:col-span-2">
+                  <span className="text-xs text-gray-400 block">Skills / Interests</span>
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {reviewingParticipant.skills.length > 0 ? (
+                      reviewingParticipant.skills.map((skill, idx) => (
+                        <span key={idx} className="px-2 py-0.5 rounded bg-white/10 text-xs text-gray-300">
+                          {skill}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="text-gray-500 text-xs italic">None listed</span>
+                    )}
+                  </div>
+                </div>
+                <div>
+                  <span className="text-xs text-gray-400 block">Submitted At</span>
+                  <span className="text-gray-300 text-xs">
+                    {reviewingParticipant.registered_at ? new Date(reviewingParticipant.registered_at).toLocaleString() : 'N/A'}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-xs text-gray-400 block">Payment Status</span>
+                  <span className="text-xs">
+                    {reviewingParticipant.payment_id ? (
+                      <span className="text-emerald-300 font-mono">Paid (Ref: {reviewingParticipant.payment_id})</span>
+                    ) : (
+                      <span className="text-amber-300">Locked until Step 1 approval</span>
+                    )}
+                  </span>
+                </div>
+              </div>
+
+              {/* Audit / Approval History */}
+              <div className="p-4 rounded-xl bg-black/30 border border-white/5 text-xs space-y-2">
+                <p className="font-semibold text-gray-300 uppercase tracking-wider text-[11px]">Approval Audit Status</p>
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-400">Current Status:</span>
+                  {(reviewingParticipant.approval_status === 'approved' || !reviewingParticipant.approval_status) ? (
+                    <span className="inline-flex items-center gap-1 font-bold text-emerald-400">
+                      <CheckCircle2 size={12} /> Approved
+                    </span>
+                  ) : reviewingParticipant.approval_status === 'rejected' ? (
+                    <span className="inline-flex items-center gap-1 font-bold text-red-400">
+                      <XCircle size={12} /> Rejected
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 font-bold text-amber-400 animate-pulse">
+                      <Clock size={12} /> Pending Approval
+                    </span>
+                  )}
+                </div>
+
+                {reviewingParticipant.approved_by && (
+                  <p className="text-gray-400">
+                    Approved by <span className="text-gray-200">{reviewingParticipant.approved_by}</span> on{' '}
+                    {reviewingParticipant.approved_at ? new Date(reviewingParticipant.approved_at).toLocaleString() : 'N/A'}
+                  </p>
+                )}
+
+                {reviewingParticipant.approval_email_sent !== undefined && (
+                  <p className="text-gray-400">
+                    Participant continuation email:{' '}
+                    {reviewingParticipant.approval_email_sent ? (
+                      <span className="text-emerald-400">Delivered successfully</span>
+                    ) : (
+                      <span className="text-amber-400">
+                        Delivery failed {reviewingParticipant.approval_email_error ? `(${reviewingParticipant.approval_email_error})` : ''} — use Resend button
+                      </span>
+                    )}
+                  </p>
+                )}
+
+                {reviewingParticipant.rejected_by && (
+                  <div className="p-2.5 rounded bg-red-500/10 border border-red-500/20 text-red-300">
+                    <p className="font-semibold">Rejected by {reviewingParticipant.rejected_by}</p>
+                    {reviewingParticipant.rejection_reason && (
+                      <p className="mt-1">Reason: {reviewingParticipant.rejection_reason}</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Modal Actions */}
+            <div className="px-6 py-4 border-t border-white/10 bg-[#191e1b] flex flex-wrap items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => setReviewingParticipant(null)}
+                className="px-4 py-2 rounded-xl border border-white/20 text-gray-300 hover:bg-white/10 text-sm font-medium"
+              >
+                Close
+              </button>
+
+              <div className="flex flex-wrap items-center gap-2">
+                {((reviewingParticipant.approval_status || 'approved') === 'pending_approval') && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => handleOpenRejectModal(reviewingParticipant)}
+                      disabled={resolvingApprovalId === reviewingParticipant.id}
+                      className="px-4 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-300 border border-red-500/30 text-sm font-semibold inline-flex items-center gap-1.5 disabled:opacity-50"
+                    >
+                      <X size={15} /> Reject
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleApproveRegistration(reviewingParticipant)}
+                      disabled={resolvingApprovalId === reviewingParticipant.id}
+                      className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold inline-flex items-center gap-1.5 shadow-lg shadow-emerald-600/20 disabled:opacity-50"
+                    >
+                      <Check size={16} />
+                      {resolvingApprovalId === reviewingParticipant.id ? 'Approving...' : 'Approve & Unlock Step 2'}
+                    </button>
+                  </>
+                )}
+
+                {((reviewingParticipant.approval_status || 'approved') === 'approved') && (
+                  <button
+                    type="button"
+                    onClick={() => handleResendApprovalEmail(reviewingParticipant)}
+                    disabled={resendingApprovalId === reviewingParticipant.id}
+                    className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold inline-flex items-center gap-1.5 shadow-lg disabled:opacity-50"
+                  >
+                    <Send size={14} />
+                    {resendingApprovalId === reviewingParticipant.id ? 'Sending...' : 'Resend Step 2 Link Email'}
+                  </button>
+                )}
+
+                {(reviewingParticipant.approval_status === 'rejected') && (
+                  <button
+                    type="button"
+                    onClick={() => handleApproveRegistration(reviewingParticipant)}
+                    disabled={resolvingApprovalId === reviewingParticipant.id}
+                    className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold inline-flex items-center gap-1.5 disabled:opacity-50"
+                  >
+                    <Check size={15} /> Reverse Rejection & Approve
+                  </button>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Reject Registration Modal */}
+      {rejectModalParticipant && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[10001] flex items-center justify-center p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="w-full max-w-md bg-[#1c1417] border border-red-500/30 rounded-2xl shadow-2xl overflow-hidden"
+          >
+            <div className="px-5 py-4 border-b border-red-500/20 bg-red-950/30 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-red-500/20 text-red-400 flex items-center justify-center">
+                  <XCircle size={18} />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-white">Reject Step 1 Registration</h3>
+                  <p className="text-xs text-gray-400">{rejectModalParticipant.full_name} ({rejectModalParticipant.roll_number})</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setRejectModalParticipant(null)}
+                className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-300"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <div className="p-5 space-y-4">
+              <p className="text-sm text-gray-300 leading-relaxed">
+                Rejecting this registration will lock the participant out of Step 2 and payment access. You can specify a reason that will be visible to the participant.
+              </p>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-300 mb-1.5">
+                  Rejection Reason (Optional / Recommended)
+                </label>
+                <textarea
+                  value={rejectionReasonInput}
+                  onChange={(e) => setRejectionReasonInput(e.target.value)}
+                  placeholder="e.g. Phone number not found in official Ignite 2.O WhatsApp community, invalid roll number..."
+                  rows={3}
+                  className="w-full bg-[#111411] border border-red-500/30 rounded-xl px-3 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-400"
+                />
+              </div>
+
+              <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-300">
+                A notification email with this reason will be sent to <span className="font-mono text-white">{rejectModalParticipant.email}</span>.
+              </div>
+            </div>
+
+            <div className="px-5 py-3.5 border-t border-white/10 bg-black/40 flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setRejectModalParticipant(null)}
+                className="px-4 py-2 rounded-xl border border-white/20 text-gray-300 hover:bg-white/10 text-sm font-medium"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleRejectRegistration}
+                disabled={resolvingApprovalId === rejectModalParticipant.id}
+                className="px-5 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white text-sm font-bold inline-flex items-center gap-1.5 disabled:opacity-50"
+              >
+                <X size={15} />
+                {resolvingApprovalId === rejectModalParticipant.id ? 'Rejecting...' : 'Confirm Rejection'}
+              </button>
             </div>
           </motion.div>
         </div>
