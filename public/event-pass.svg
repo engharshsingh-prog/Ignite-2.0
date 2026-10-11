@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2000" height="800" viewBox="0 0 2000 800">
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#171c18"/>
+      <stop offset="1" stop-color="#0e120f"/>
+    </linearGradient>
+    <linearGradient id="rail" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#718044"/>
+      <stop offset="1" stop-color="#4f6035"/>
+    </linearGradient>
+    <pattern id="dots" width="72" height="72" patternUnits="userSpaceOnUse">
+      <circle cx="12" cy="14" r="2" fill="#bdca91" opacity=".16"/>
+      <circle cx="48" cy="52" r="3" fill="#3b82f6" opacity=".12"/>
+    </pattern>
+  </defs>
+  <rect width="2000" height="800" fill="url(#background)"/>
+  <rect width="2000" height="800" fill="url(#dots)"/>
+  <rect x="26" y="26" width="1948" height="748" rx="30" fill="none" stroke="#9dab68" stroke-width="8"/>
+  <rect x="0" y="0" width="310" height="800" fill="url(#rail)"/>
+  <path d="M310 0v800" stroke="#a3b46a" stroke-width="5"/>
+  <text x="160" y="240" text-anchor="middle" fill="#f4f6ed" font-family="Arial,sans-serif" font-size="48" font-weight="700" letter-spacing="8" transform="rotate(-90 160 240)">ADMIT ONE</text>
+  <text x="160" y="604" text-anchor="middle" fill="#f4f6ed" font-family="Arial,sans-serif" font-size="32" letter-spacing="5" transform="rotate(-90 160 604)">FRESHER PASS</text>
+  <text x="410" y="152" fill="#bdca91" font-family="Arial,sans-serif" font-size="31" font-weight="600" letter-spacing="8">THE CAMPUS CELEBRATION</text>
+  <text x="400" y="314" fill="#f4f6ed" font-family="Arial,sans-serif" font-size="112" font-weight="800" letter-spacing="3">IGNITE <tspan fill="#93b6ff">2.O</tspan></text>
+  <text x="410" y="405" fill="#d5ddb9" font-family="Arial,sans-serif" font-size="54" font-weight="600" letter-spacing="5">FRESHER'S PASS</text>
+  <path d="M410 452h1080" stroke="#65783e" stroke-width="5"/>
+  <rect x="390" y="486" width="1130" height="154" rx="18" fill="#111612" stroke="#303a32" stroke-width="2"/>
+  <text x="1660" y="136" text-anchor="middle" fill="#d5ddb9" font-family="Arial,sans-serif" font-size="31" font-weight="600" letter-spacing="5">SCAN HERE</text>
+  <rect x="1657" y="195" width="208" height="208" rx="5" fill="#f4f6ed" stroke="#3b82f6" stroke-width="6"/>
+  <text x="1760" y="478" text-anchor="middle" fill="#bdca91" font-family="Arial,sans-serif" font-size="23" letter-spacing="3">REGISTRATION PASS</text>
+  <circle cx="1942" cy="54" r="12" fill="#3b82f6"/>
+  <circle cx="58" cy="744" r="12" fill="#3b82f6"/>
+</svg>
