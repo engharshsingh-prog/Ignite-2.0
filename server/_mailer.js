@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import nodemailer from 'nodemailer';
 import {
   announcementTemplate,
@@ -35,6 +36,31 @@ function readSmtpConfig() {
 let cachedTransport = null;
 let cachedFrom = null;
 
+function createNewTransport(config) {
+  const transport = nodemailer.createTransport({
+    host: config.host,
+    port: config.port,
+    secure: config.secure,
+    auth: config.auth,
+    pool: true,
+    maxConnections: 3,
+    maxMessages: 100,
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 15000,
+  });
+
+  transport.on('error', (err) => {
+    console.error('[SMTP Transport Pool Error]:', err?.message || err);
+    try {
+      transport.close();
+    } catch (_) {}
+    cachedTransport = null;
+  });
+
+  return transport;
+}
+
 function getTransport() {
   if (cachedTransport && cachedFrom) {
     return { transport: cachedTransport, from: cachedFrom };
@@ -46,12 +72,7 @@ function getTransport() {
   }
 
   cachedFrom = config.from;
-  cachedTransport = nodemailer.createTransport({
-    host: config.host,
-    port: config.port,
-    secure: config.secure,
-    auth: config.auth,
-  });
+  cachedTransport = createNewTransport(config);
 
   return { transport: cachedTransport, from: cachedFrom };
 }
@@ -63,19 +84,50 @@ export async function sendOtpEmail(email, otp) {
     console.log(`[SMTP DEV MODE] Registration OTP for ${email}: ${otp}`);
     console.log(`(Real emails require a valid 16-character Google App Password in .env)`);
     console.log(`======================================================\n`);
-    return;
+    return { devMode: true, messageId: 'dev-mode' };
   }
 
-  const { transport, from } = getTransport();
   const content = otpTemplate({ otp });
-
-  await transport.sendMail({
-    from,
+  const mailOptions = {
     to: email,
-    subject: 'Ignite 2.O Registration OTP Verification',
+    subject: `[Ignite 2.O] Verification Code: ${otp}`,
     text: content.text,
     html: content.html,
-  });
+    priority: 'high',
+    headers: {
+      'X-Priority': '1',
+      'X-MSMail-Priority': 'High',
+      'Importance': 'high',
+      'Priority': 'urgent',
+      'Auto-Submitted': 'auto-generated',
+    },
+  };
+
+  try {
+    const { transport, from } = getTransport();
+    const info = await transport.sendMail({ from, ...mailOptions });
+    console.log(`[SMTP SUCCESS] OTP email delivered to ${email} (MessageID: ${info?.messageId})`);
+    return { ok: true, messageId: info?.messageId, accepted: info?.accepted };
+  } catch (err) {
+    console.error(`[SMTP ERROR] Failed to send OTP to ${email}:`, err?.message || err);
+    // Connection reset or stale pool socket: reset and retry once with fresh connection
+    if (cachedTransport) {
+      try {
+        cachedTransport.close();
+      } catch (_) {}
+      cachedTransport = null;
+    }
+
+    try {
+      const { transport: freshTransport, from: freshFrom } = getTransport();
+      const retryInfo = await freshTransport.sendMail({ from: freshFrom, ...mailOptions });
+      console.log(`[SMTP RETRY SUCCESS] OTP email delivered to ${email} (MessageID: ${retryInfo?.messageId})`);
+      return { ok: true, messageId: retryInfo?.messageId, accepted: retryInfo?.accepted };
+    } catch (retryErr) {
+      console.error(`[SMTP RETRY ERROR] Final failure sending OTP to ${email}:`, retryErr?.message || retryErr);
+      throw new Error(`Email delivery failed: ${retryErr?.message || 'SMTP error'}`);
+    }
+  }
 }
 
 export async function sendRegistrationConfirmationEmail(participant) {

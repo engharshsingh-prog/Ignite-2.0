@@ -24,8 +24,11 @@ function escapeHtml(value) {
 
 function stripTags(html) {
   return String(html || '')
-    .replace(/<[^>]*>/g, ' ')
-    .replace(/\s+/g, ' ')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/p>/gi, '\n\n')
+    .replace(/<\/li>/gi, '\n')
+    .replace(/<[^>]*>/g, '')
+    .replace(/[ \t]+/g, ' ')
     .trim();
 }
 
@@ -68,7 +71,7 @@ export function renderThemedEmail({
   highlights = [],
   meta = [],
   cta,
-  footerNote = 'If this email is not visible in your inbox, please check Spam and Promotions folders.',
+  footerNote = 'This is an official communication from Ignite 2.O. Please do not reply directly to this automated email.',
   badge,
 }) {
   const tone = toneMap[type] || toneMap.notification;
@@ -92,7 +95,7 @@ export function renderThemedEmail({
     `<title>${safePreheader}</title>` +
     `</head>` +
     `<body style="margin:0; padding:0; background:#050510; color:#ffffff; font-family:Rajdhani, 'Segoe UI', Tahoma, Arial, sans-serif;">` +
-    `<div style="display:none; max-height:0; overflow:hidden; opacity:0;">${safePreheader}</div>` +
+    `<div style="display:none; max-height:0px; max-width:0px; font-size:1px; line-height:1px; color:#ffffff; overflow:hidden; mso-hide:all;">${safePreheader}</div>` +
     `<table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background:#050510; padding:24px 10px;">` +
     `<tr><td align="center">` +
     `<table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width:640px; border:1px solid rgba(255,255,255,0.14); border-radius:20px; overflow:hidden; background:#0d0d1f;">` +
@@ -121,33 +124,63 @@ export function renderThemedEmail({
   return {
     html,
     text: stripTags(
-      `${preheader}\n${heading}\n${subheading}\n${message}\n` +
-      `${Array.isArray(highlights) ? highlights.join('\n') : ''}\n` +
-      `${Array.isArray(meta) ? meta.map((row) => `${row?.label}: ${row?.value}`).join('\n') : ''}\n` +
-      `${footerNote}`
+      `${preheader}\n\n${heading}\n${subheading}\n\n${message}\n\n` +
+      `${Array.isArray(highlights) ? highlights.join('\n') : ''}\n\n` +
+      `${Array.isArray(meta) ? meta.map((row) => `${row?.label}: ${row?.value}`).join('\n') : ''}\n\n` +
+      `${safeFooter}\n${BRAND} | ${CAMPUS}\n${UNIVERSITY}`
     ),
   };
 }
 
 export function otpTemplate({ otp }) {
   const safeOtp = escapeHtml(otp);
-  const { html, text } = renderThemedEmail({
-    type: 'otp',
-    preheader: 'Ignite 2.O OTP Verification',
-    heading: 'Verify Your Email',
-    subheading: 'Use this OTP to continue your Ignite 2.O registration.',
-    message: `Your one-time password is: ${safeOtp}\nThis OTP will expire in 10 minutes.`,
-    highlights: ['OTP is valid for one registration flow only.', 'Do not share this OTP with anyone.'],
-    footerNote: 'Mandatory email verification is enabled. If not in inbox, check Spam and Promotions folders.',
-  });
+  const html =
+    `<!doctype html>` +
+    `<html>` +
+    `<head>` +
+    `<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />` +
+    `<meta name="viewport" content="width=device-width, initial-scale=1.0" />` +
+    `<title>Ignite 2.O — Email Verification Code</title>` +
+    `</head>` +
+    `<body style="margin:0; padding:0; background:#0b0f19; color:#e2e8f0; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">` +
+    `<div style="display:none; max-height:0px; max-width:0px; font-size:1px; line-height:1px; color:#ffffff; overflow:hidden; mso-hide:all;">Your verification code is ${safeOtp}</div>` +
+    `<table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background:#0b0f19; padding:32px 12px;">` +
+    `<tr><td align="center">` +
+    `<table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width:540px; border:1px solid #1e293b; border-radius:16px; overflow:hidden; background:#0f172a; box-shadow:0 10px 25px -5px rgba(0,0,0,0.5);">` +
+    `<tr><td style="padding:28px 28px 20px 28px; background:linear-gradient(135deg, rgba(59,130,246,0.12), rgba(30,41,59,0.5)); border-bottom:1px solid #1e293b;">` +
+    `<div style="display:inline-block; font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:#60a5fa; background:rgba(59,130,246,0.15); border:1px solid rgba(59,130,246,0.3); padding:4px 10px; border-radius:999px; font-weight:600; margin-bottom:12px;">OTP Verification</div>` +
+    `<h1 style="margin:0; font-size:24px; font-weight:700; color:#ffffff; letter-spacing:-0.02em;">Verify Your Email Address</h1>` +
+    `<p style="margin:8px 0 0 0; font-size:14px; color:#94a3b8; line-height:1.5;">Use the one-time verification code below to complete your registration for Ignite 2.O.</p>` +
+    `</td></tr>` +
+    `<tr><td style="padding:32px 28px; text-align:center;">` +
+    `<p style="margin:0 0 14px 0; font-size:12px; color:#94a3b8; text-transform:uppercase; letter-spacing:0.06em; font-weight:600;">One-Time Verification Code</p>` +
+    `<div style="display:inline-block; background:#1e293b; border:2px solid #3b82f6; border-radius:12px; padding:14px 32px; letter-spacing:8px; font-size:32px; font-weight:700; color:#60a5fa; font-family:'Courier New', Courier, monospace;">` +
+    `${safeOtp}` +
+    `</div>` +
+    `<p style="margin:16px 0 0 0; font-size:13px; color:#cbd5e1;">This code is valid for <strong>10 minutes</strong> and can only be used once.</p>` +
+    `<div style="margin-top:24px; padding:12px 16px; background:rgba(30,41,59,0.7); border-radius:8px; border-left:3px solid #3b82f6; text-align:left;">` +
+    `<p style="margin:0; font-size:13px; color:#94a3b8; line-height:1.5;">Security reminder: Never share this verification code with anyone. Our team will never ask for your code.</p>` +
+    `</div>` +
+    `</td></tr>` +
+    `<tr><td style="padding:16px 28px 24px 28px; border-top:1px solid #1e293b; background:#0b0f19;">` +
+    `<p style="margin:0; color:#64748b; font-size:12px; line-height:1.5;">This is an automated verification code from Ignite 2.O. If you did not request this, you can safely ignore this email.</p>` +
+    `<p style="margin:8px 0 0 0; color:#475569; font-size:11px; line-height:1.5;">Ignite 2.O | ${CAMPUS}<br />${UNIVERSITY}</p>` +
+    `</td></tr>` +
+    `</table>` +
+    `</td></tr>` +
+    `</table>` +
+    `</body></html>`;
 
-  return {
-    html: html.replace(
-      safeOtp,
-      `<span style="display:inline-block; font-size:28px; letter-spacing:5px; font-weight:700; color:#3b82f6;">${safeOtp}</span>`
-    ),
-    text,
-  };
+  const text =
+    `Ignite 2.O — Email Verification\n\n` +
+    `Your verification code is: ${otp}\n\n` +
+    `This code will expire in 10 minutes.\n` +
+    `Use this code to verify your email address on the Ignite 2.O registration page.\n\n` +
+    `Do not share this code with anyone.\n` +
+    `If you did not request this verification code, please ignore this email.\n\n` +
+    `Ignite 2.O | ${CAMPUS}\n${UNIVERSITY}`;
+
+  return { html, text };
 }
 
 export function registrationConfirmationTemplate(participant) {

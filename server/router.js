@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import activities from './activities.js';
 import checkin from './checkin.js';
 import emailOtp from './email-otp.js';

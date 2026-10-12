@@ -143,6 +143,15 @@ export default function Register() {
   const [otpVerified, setOtpVerified] = useState(false);
   const [otpLoading, setOtpLoading] = useState(false);
   const [otpMessage, setOtpMessage] = useState('');
+  const [otpCooldown, setOtpCooldown] = useState(0);
+
+  useEffect(() => {
+    if (otpCooldown <= 0) return;
+    const interval = setInterval(() => {
+      setOtpCooldown(c => (c <= 1 ? 0 : c - 1));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [otpCooldown]);
 
   // Status Lookup Modal
   const [showStatusModal, setShowStatusModal] = useState(false);
@@ -238,6 +247,7 @@ export default function Register() {
       setOtpSent(false);
       setOtpVerified(false);
       setOtpMessage('');
+      setOtpCooldown(0);
     }
     setError('');
   };
@@ -245,6 +255,11 @@ export default function Register() {
   const handleSendOtp = async () => {
     if (validateField('email', form.email) !== 'valid') {
       setError('Enter a valid gmail.com address before requesting OTP.');
+      return;
+    }
+
+    if (otpCooldown > 0) {
+      setError(`Please wait ${otpCooldown}s before requesting another OTP.`);
       return;
     }
 
@@ -258,13 +273,19 @@ export default function Register() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'send', email: form.email }),
       });
-      const data = await readJsonSafe<{ error?: string }>(res);
-      if (!res.ok) throw new Error(getErrorMessage(data, 'Failed to send OTP'));
+      const data = await readJsonSafe<{ error?: string; cooldown_seconds?: number; message?: string }>(res);
+      if (!res.ok) {
+        if (data?.cooldown_seconds) {
+          setOtpCooldown(data.cooldown_seconds);
+        }
+        throw new Error(getErrorMessage(data, 'Failed to send OTP'));
+      }
 
       setOtpSent(true);
       setOtpVerified(false);
       setOtpToken('');
-      setOtpMessage('OTP sent. Check Inbox, Spam, and Promotions folders.');
+      setOtpCooldown(data?.cooldown_seconds || 45);
+      setOtpMessage(data?.message || 'OTP sent. Please check your Gmail inbox (and Spam or Updates folder).');
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to send OTP');
     } finally {
@@ -986,10 +1007,16 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
                   <button
                     type="button"
                     onClick={handleSendOtp}
-                    disabled={otpLoading || validateField('email', form.email) !== 'valid'}
+                    disabled={otpLoading || otpCooldown > 0 || validateField('email', form.email) !== 'valid'}
                     className="sm:w-40 px-4 py-2.5 rounded-lg bg-blue-600/20 border border-blue-500/30 text-blue-300 text-sm hover:bg-blue-600/30 transition-colors disabled:opacity-50"
                   >
-                    {otpLoading ? 'Sending...' : otpSent ? 'Resend OTP' : 'Send OTP'}
+                    {otpLoading
+                      ? 'Sending...'
+                      : otpCooldown > 0
+                      ? `Resend in ${otpCooldown}s`
+                      : otpSent
+                      ? 'Resend OTP'
+                      : 'Send OTP'}
                   </button>
                   <div className="flex-1 flex gap-2">
                     <input
@@ -1002,7 +1029,7 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
                     <button
                       type="button"
                       onClick={handleVerifyOtp}
-                      disabled={otpLoading || !otpSent}
+                      disabled={otpLoading || !otpSent || otpVerified}
                       className="px-4 py-2 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-sm hover:bg-emerald-500/30 transition-colors disabled:opacity-50"
                     >
                       {otpLoading ? '...' : otpVerified ? 'Verified' : 'Verify'}
