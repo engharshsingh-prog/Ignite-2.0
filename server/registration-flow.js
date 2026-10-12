@@ -8,6 +8,7 @@ import {
   sendParticipantRegistrationRejectedEmail,
   sendRegistrationConfirmationEmail,
 } from './_mailer.js';
+import { storeMediaUpload } from './_media-storage.js';
 
 export function getBaseUrl(req) {
   if (process.env.SITE_URL) return process.env.SITE_URL.replace(/\/+$/, '');
@@ -292,6 +293,9 @@ export async function handleVerifyStep2Access(req, res) {
         year: participant.year,
         whatsapp_number: participant.whatsapp_number,
         payment_id: participant.payment_id,
+        account_holder_name: participant.account_holder_name,
+        payment_screenshot_url: participant.payment_screenshot_url,
+        payment_status: participant.payment_status,
         payment_verified: participant.payment_verified,
       },
     });
@@ -314,9 +318,9 @@ export async function handleVerifyStep2Access(req, res) {
   });
 }
 
-// 5. POST /api/registration-step2/submit-payment - Submit payment ID (Public, strictly validates approval status from DB)
+// 5. POST /api/registration-step2/submit-payment - Submit payment details & screenshot (Public, strictly validates approval status from DB)
 export async function handleSubmitStep2Payment(req, res) {
-  const { token, payment_id } = req.body || {};
+  const { token, payment_id, account_holder_name, screenshot_data_url } = req.body || {};
 
   if (!token) {
     return res.status(400).json({ error: 'Continuation token is required to submit payment.' });
@@ -325,6 +329,32 @@ export async function handleSubmitStep2Payment(req, res) {
   const cleanPaymentId = String(payment_id || '').trim();
   if (!cleanPaymentId || cleanPaymentId.length < 6) {
     return res.status(400).json({ error: 'Valid payment transaction / UPI reference ID is required (min 6 characters).' });
+  }
+
+  const cleanAccountHolder = String(account_holder_name || '').trim();
+  if (!cleanAccountHolder || cleanAccountHolder.length < 2) {
+    return res.status(400).json({ error: 'Account Holder Name is required (minimum 2 characters).' });
+  }
+
+  const cleanScreenshotUrl = String(screenshot_data_url || '').trim();
+  if (!cleanScreenshotUrl) {
+    return res.status(400).json({ error: 'Upload Payment Screenshot is required before completing payment submission.' });
+  }
+
+  // Validate screenshot data url format
+  const screenshotMatch = cleanScreenshotUrl.match(/^data:image\/(png|jpe?g|webp);base64,(.+)$/i);
+  if (!screenshotMatch) {
+    return res.status(400).json({
+      error: 'Invalid payment screenshot format. Only PNG, JPG, JPEG, and WEBP images are accepted.',
+    });
+  }
+
+  // Validate size (max 10MB approx = 14MB base64)
+  const approxBytes = Math.round((screenshotMatch[2].length * 3) / 4);
+  if (approxBytes > 10 * 1024 * 1024) {
+    return res.status(400).json({
+      error: 'Payment screenshot file size exceeds 10MB limit. Please upload a smaller image.',
+    });
   }
 
   // Look up participant strictly by step2_token from database
@@ -352,17 +382,34 @@ export async function handleSubmitStep2Payment(req, res) {
     return res.status(409).json({ error: 'This payment transaction ID has already been used by another participant.' });
   }
 
-  // Update participant with payment_id
+  // Securely store the uploaded payment screenshot file using existing storage architecture
+  let storedScreenshotUrl = null;
+  try {
+    const uploadResult = await storeMediaUpload({
+      category: 'payment-screenshots',
+      originalDataUrl: cleanScreenshotUrl,
+    });
+    storedScreenshotUrl = uploadResult?.url || null;
+  } catch (uploadErr) {
+    console.error('Error saving payment screenshot:', uploadErr);
+    return res.status(500).json({ error: 'Failed to process payment screenshot upload.' });
+  }
+
+  // Update participant with payment_id, account_holder_name, screenshot URL, and initial pending_verification status
   await db
     .prepare(
       `
         UPDATE participants
         SET payment_id = ?,
-            payment_verified = 0
+            account_holder_name = ?,
+            payment_screenshot_url = ?,
+            payment_status = 'pending_verification',
+            payment_verified = 0,
+            payment_rejected_reason = NULL
         WHERE id = ?
       `
     )
-    .run(cleanPaymentId, row.id);
+    .run(cleanPaymentId, cleanAccountHolder, storedScreenshotUrl, row.id);
 
   const updated = toParticipant(await db.prepare('SELECT * FROM participants WHERE id = ?').get(row.id));
 
@@ -375,6 +422,8 @@ export async function handleSubmitStep2Payment(req, res) {
     details: {
       registration_id: updated.registration_id,
       payment_id: cleanPaymentId,
+      account_holder_name: cleanAccountHolder,
+      screenshot_url: storedScreenshotUrl,
       full_name: updated.full_name,
     },
   });
@@ -388,7 +437,7 @@ export async function handleSubmitStep2Payment(req, res) {
 
   return res.status(200).json({
     success: true,
-    message: 'Payment details submitted successfully! Awaiting payment verification by admin.',
+    message: 'Payment details and screenshot submitted successfully! Awaiting verification by admin.',
     participant: updated,
   });
 }
@@ -424,6 +473,11 @@ export async function handleGetRegistrationStatus(req, res) {
     whatsapp_number: participant.whatsapp_number,
     approval_status: participant.approval_status,
     rejection_reason: participant.rejection_reason,
+    payment_id: participant.payment_id,
+    account_holder_name: participant.account_holder_name,
+    payment_screenshot_url: participant.payment_screenshot_url,
+    payment_status: participant.payment_status,
+    payment_rejected_reason: participant.payment_rejected_reason,
     has_paid: Boolean(participant.payment_id),
     payment_verified: participant.payment_verified,
     registered_at: participant.registered_at,

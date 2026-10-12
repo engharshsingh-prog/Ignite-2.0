@@ -9,6 +9,7 @@ import { drawPassEventDetails } from '../lib/passArtwork';
 
 interface Participant {
   id: number;
+  registration_id?: string;
   email: string;
   full_name: string;
   roll_number: string;
@@ -16,8 +17,12 @@ interface Participant {
   year: string;
   skills: string[];
   payment_id: string;
+  account_holder_name?: string | null;
+  payment_screenshot_url?: string | null;
   whatsapp_number: string;
   payment_verified: boolean;
+  payment_status?: 'pending_verification' | 'approved' | 'rejected';
+  payment_rejected_reason?: string | null;
   check_in_status: boolean;
   check_in_time: string | null;
   registered_at: string;
@@ -386,13 +391,29 @@ export default function MyProfile() {
                 <div className="flex items-center justify-between py-3 border-b border-white/10">
                   <span className="text-gray-400 text-sm">Payment Status</span>
                   <div className="flex items-center gap-2">
-                    {participant.payment_verified ? (
-                      <><CheckCircle size={18} className="text-emerald-400" /><span className="text-emerald-400 font-semibold">Verified</span></>
+                    {participant.payment_status === 'approved' || participant.payment_verified ? (
+                      <><CheckCircle size={18} className="text-emerald-400" /><span className="text-emerald-400 font-semibold">Approved</span></>
+                    ) : participant.payment_status === 'rejected' ? (
+                      <><XCircle size={18} className="text-red-400" /><span className="text-red-400 font-semibold">Rejected</span></>
                     ) : (
-                      <><AlertCircle size={18} className="text-olive-300" /><span className="text-olive-300 font-semibold">Pending Verification</span></>
+                      <><AlertCircle size={18} className="text-amber-400" /><span className="text-amber-400 font-semibold">Pending Verification</span></>
                     )}
                   </div>
                 </div>
+
+                {participant.payment_status === 'rejected' && participant.payment_rejected_reason && (
+                  <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-300">
+                    <span className="font-semibold text-red-200">Rejection Reason: </span>
+                    {participant.payment_rejected_reason}
+                  </div>
+                )}
+
+                {participant.account_holder_name && (
+                  <div className="flex justify-between py-3 border-b border-white/10 gap-3">
+                    <span className="text-gray-400 text-sm">Account Holder Name</span>
+                    <span className="text-white text-sm text-right font-medium">{participant.account_holder_name}</span>
+                  </div>
+                )}
 
                 <div className="flex items-center justify-between py-3 border-b border-white/10">
                   <span className="text-gray-400 text-sm">Check-in Status</span>

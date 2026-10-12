@@ -146,13 +146,17 @@ async function participantsForExport() {
   const rows = (await db.prepare('SELECT * FROM participants ORDER BY registered_at DESC').all()).map(toParticipant);
   return rows.map((row) => ({
     id: row.id,
+    registration_id: row.registration_id || '',
     full_name: row.full_name,
     email: row.email,
     roll_number: row.roll_number,
     branch: row.branch,
     year: row.year,
     skills: (row.skills || []).join(', '),
-    payment_id: row.payment_id,
+    payment_id: row.payment_id || '',
+    account_holder_name: row.account_holder_name || '',
+    payment_screenshot_url: row.payment_screenshot_url || '',
+    payment_status: row.payment_status || (row.payment_verified ? 'approved' : 'pending_verification'),
     whatsapp_number: row.whatsapp_number,
     payment_verified: row.payment_verified ? 1 : 0,
     check_in_status: row.check_in_status ? 1 : 0,

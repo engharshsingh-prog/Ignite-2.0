@@ -128,6 +128,12 @@ const schemaStatements = [
       rejection_reason TEXT,
       approval_email_sent INTEGER NOT NULL DEFAULT 0,
       approval_email_error TEXT,
+      account_holder_name TEXT,
+      payment_screenshot_url TEXT,
+      payment_status TEXT NOT NULL DEFAULT 'pending_verification',
+      payment_rejected_reason TEXT,
+      payment_verified_at TEXT,
+      payment_verified_by TEXT,
       CHECK (length(roll_number) <= 15),
       CHECK (length(whatsapp_number) = 10)
     )
@@ -526,6 +532,22 @@ async function initSchema() {
   await migrateParticipantsApprovalSchema();
 
   await ensureColumn('participants', 'payment_verified', "INTEGER NOT NULL DEFAULT 0");
+  await ensureColumn('participants', 'account_holder_name', "TEXT");
+  await ensureColumn('participants', 'payment_screenshot_url', "TEXT");
+  await ensureColumn('participants', 'payment_status', "TEXT NOT NULL DEFAULT 'pending_verification'");
+  await ensureColumn('participants', 'payment_rejected_reason', "TEXT");
+  await ensureColumn('participants', 'payment_verified_at', "TEXT");
+  await ensureColumn('participants', 'payment_verified_by', "TEXT");
+
+  try {
+    await executeStatement(`
+      UPDATE participants 
+      SET payment_status = 'approved' 
+      WHERE payment_verified = 1 AND (payment_status IS NULL OR payment_status = 'pending_verification')
+    `);
+  } catch (err) {
+    console.error('[db] Error syncing payment_status in migration:', err);
+  }
   await ensureColumn('media', 'thumb_url', "TEXT NOT NULL DEFAULT ''");
   await ensureColumn('media', 'status', "TEXT NOT NULL DEFAULT 'approved'");
   await ensureColumn('media', 'uploaded_by', "TEXT NOT NULL DEFAULT 'admin'");
@@ -744,6 +766,12 @@ export function toParticipant(row) {
     approval_status: row.approval_status || 'pending_approval',
     registration_id: row.registration_id || (row.id ? `IGN26-${String(row.id).padStart(4, '0')}` : null),
     approval_email_sent: Boolean(row.approval_email_sent),
+    account_holder_name: row.account_holder_name || null,
+    payment_screenshot_url: row.payment_screenshot_url || null,
+    payment_status: row.payment_status || (row.payment_verified ? 'approved' : 'pending_verification'),
+    payment_rejected_reason: row.payment_rejected_reason || null,
+    payment_verified_at: row.payment_verified_at || null,
+    payment_verified_by: row.payment_verified_by || null,
   };
 }
 

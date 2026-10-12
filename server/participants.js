@@ -63,9 +63,9 @@ export default async function handler(req, res) {
       let where = '1=1';
 
       if (search) {
-        where += ' AND (full_name LIKE ? OR roll_number LIKE ? OR email LIKE ? OR payment_id LIKE ? OR whatsapp_number LIKE ? OR registration_id LIKE ?)';
+        where += ' AND (full_name LIKE ? OR roll_number LIKE ? OR email LIKE ? OR payment_id LIKE ? OR whatsapp_number LIKE ? OR registration_id LIKE ? OR account_holder_name LIKE ?)';
         const needle = `%${search}%`;
-        params.push(needle, needle, needle, needle, needle, needle);
+        params.push(needle, needle, needle, needle, needle, needle, needle);
       }
       if (branch && branch !== 'all') {
         where += ' AND branch = ?';
@@ -213,7 +213,7 @@ export default async function handler(req, res) {
       const admin = await requireAdmin(req, res);
       if (!admin) return;
 
-      const { id, email, full_name, roll_number, branch, year, skills, payment_id, whatsapp_number } = req.body || {};
+      const { id, email, full_name, roll_number, branch, year, skills, payment_id, whatsapp_number, account_holder_name } = req.body || {};
       if (!id) return res.status(400).json({ error: 'Participant ID required' });
 
       const existing = await db.prepare('SELECT * FROM participants WHERE id = ?').get(id);
@@ -233,11 +233,24 @@ export default async function handler(req, res) {
         .prepare(
           `
             UPDATE participants
-            SET email = ?, full_name = ?, roll_number = ?, branch = ?, year = ?, skills = ?, payment_id = ?, whatsapp_number = ?
+            SET email = ?, full_name = ?, roll_number = ?, branch = ?, year = ?, skills = ?, payment_id = ?, whatsapp_number = ?,
+                account_holder_name = CASE WHEN ? IS NOT NULL THEN ? ELSE account_holder_name END
             WHERE id = ?
           `
         )
-        .run(String(email).trim().toLowerCase(), full_name, String(roll_number).trim(), branch, year, encodeSkills(skills), payment_id, whatsapp_number, id);
+        .run(
+          String(email).trim().toLowerCase(),
+          full_name,
+          String(roll_number).trim(),
+          branch,
+          year,
+          encodeSkills(skills),
+          payment_id,
+          whatsapp_number,
+          account_holder_name !== undefined ? account_holder_name : null,
+          account_holder_name !== undefined ? account_holder_name : null,
+          id
+        );
 
       const updated = toParticipant(await db.prepare('SELECT * FROM participants WHERE id = ?').get(id));
       const previous = toParticipant(existing);

@@ -10,6 +10,7 @@ import {
   CreditCard,
   Hash,
   Mail,
+  MessageCircle,
   Phone,
   QrCode,
   RefreshCw,
@@ -17,6 +18,8 @@ import {
   ShieldAlert,
   ShieldCheck,
   Sparkles,
+  Trash2,
+  Upload,
   User,
   X,
   XCircle,
@@ -49,6 +52,10 @@ interface SubmittedParticipant {
   rejection_reason?: string | null;
   payment_id?: string | null;
   payment_verified?: boolean;
+  payment_status?: 'pending_verification' | 'approved' | 'rejected';
+  payment_rejected_reason?: string | null;
+  account_holder_name?: string | null;
+  payment_screenshot_url?: string | null;
 }
 
 const BRANCHES = [
@@ -85,6 +92,8 @@ function validateField(name: string, value: string): FieldState {
       return /^\d{10}$/.test(value.trim()) ? 'valid' : 'invalid';
     case 'payment_id':
       return value.trim().length >= 6 ? 'valid' : 'invalid';
+    case 'account_holder_name':
+      return value.trim().length >= 2 ? 'valid' : 'invalid';
     case 'branch':
     case 'year':
       return value !== '' ? 'valid' : 'idle';
@@ -111,6 +120,12 @@ export default function Register() {
   // Step 2 Payment Form
   const [paymentId, setPaymentId] = useState('');
   const [paymentIdState, setPaymentIdState] = useState<FieldState>('idle');
+  const [accountHolderName, setAccountHolderName] = useState('');
+  const [accountHolderNameState, setAccountHolderNameState] = useState<FieldState>('idle');
+  const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
+  const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null);
+  const [screenshotDataUrl, setScreenshotDataUrl] = useState<string | null>(null);
+  const [screenshotError, setScreenshotError] = useState('');
   const [step2Token, setStep2Token] = useState<string | null>(null);
 
   // Active Participant context (for pending/approved/completed display)
@@ -353,10 +368,63 @@ export default function Register() {
     }
   };
 
+  const handleScreenshotChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+    const ext = file.name.split('.').pop()?.toLowerCase();
+    const validExts = ['png', 'jpg', 'jpeg', 'webp'];
+    if (!validTypes.includes(file.type) && (!ext || !validExts.includes(ext))) {
+      setScreenshotError('Please upload an image in PNG, JPG, JPEG, or WEBP format.');
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      setScreenshotError('Image file size exceeds 10MB limit. Please upload a smaller image.');
+      return;
+    }
+
+    setScreenshotError('');
+    setScreenshotFile(file);
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = String(reader.result || '');
+      setScreenshotDataUrl(result);
+      setScreenshotPreview(result);
+    };
+    reader.onerror = () => {
+      setScreenshotError('Failed to read the selected screenshot. Please try again.');
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveScreenshot = () => {
+    setScreenshotFile(null);
+    setScreenshotPreview(null);
+    setScreenshotDataUrl(null);
+    setScreenshotError('');
+  };
+
   // Submit Step 2 Payment
   const handleSubmitStep2Payment = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setScreenshotError('');
+
+    const aState = validateField('account_holder_name', accountHolderName);
+    setAccountHolderNameState(aState);
+    if (aState !== 'valid') {
+      setError('Account Holder Name is required (minimum 2 characters).');
+      return;
+    }
+
+    if (!screenshotDataUrl) {
+      setScreenshotError('Payment screenshot is required. Please upload your payment screenshot.');
+      setError('Please upload your payment screenshot before submitting.');
+      return;
+    }
 
     const pState = validateField('payment_id', paymentId);
     setPaymentIdState(pState);
@@ -375,7 +443,12 @@ export default function Register() {
       const res = await fetch('/api/registration-step2/submit-payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: step2Token, payment_id: paymentId.trim() }),
+        body: JSON.stringify({
+          token: step2Token,
+          payment_id: paymentId.trim(),
+          account_holder_name: accountHolderName.trim(),
+          screenshot_data_url: screenshotDataUrl,
+        }),
       });
       const data = await readJsonSafe<{ success?: boolean; participant?: SubmittedParticipant; error?: string }>(res);
       if (!res.ok) throw new Error(getErrorMessage(data, 'Payment submission failed'));
@@ -411,7 +484,12 @@ export default function Register() {
         approval_status?: 'pending_approval' | 'approved' | 'rejected';
         token?: string | null;
         has_paid?: boolean;
+        payment_id?: string | null;
         payment_verified?: boolean;
+        payment_status?: 'pending_verification' | 'approved' | 'rejected';
+        payment_rejected_reason?: string | null;
+        account_holder_name?: string | null;
+        payment_screenshot_url?: string | null;
         rejection_reason?: string | null;
         error?: string;
       }>(res);
@@ -420,6 +498,15 @@ export default function Register() {
 
       if (data?.approval_status === 'approved') {
         if (data.has_paid) {
+          setActiveParticipant(prev => prev ? {
+            ...prev,
+            payment_id: data.payment_id ?? prev.payment_id,
+            payment_verified: data.payment_verified ?? prev.payment_verified,
+            payment_status: data.payment_status ?? prev.payment_status,
+            payment_rejected_reason: data.payment_rejected_reason ?? prev.payment_rejected_reason,
+            account_holder_name: data.account_holder_name ?? prev.account_holder_name,
+            payment_screenshot_url: data.payment_screenshot_url ?? prev.payment_screenshot_url,
+          } : null);
           setViewState('completed');
         } else if (data.token) {
           setStep2Token(data.token);
@@ -470,6 +557,12 @@ export default function Register() {
         rejection_reason?: string | null;
         token?: string | null;
         has_paid?: boolean;
+        payment_id?: string | null;
+        payment_verified?: boolean;
+        payment_status?: 'pending_verification' | 'approved' | 'rejected';
+        payment_rejected_reason?: string | null;
+        account_holder_name?: string | null;
+        payment_screenshot_url?: string | null;
         error?: string;
       }>(res);
 
@@ -488,6 +581,12 @@ export default function Register() {
         whatsapp_number: data.whatsapp_number || '',
         approval_status: data.approval_status,
         rejection_reason: data.rejection_reason,
+        payment_id: data.payment_id,
+        payment_verified: data.payment_verified,
+        payment_status: data.payment_status,
+        payment_rejected_reason: data.payment_rejected_reason,
+        account_holder_name: data.account_holder_name,
+        payment_screenshot_url: data.payment_screenshot_url,
       };
 
       setActiveParticipant(p);
@@ -532,6 +631,19 @@ export default function Register() {
 
   // VIEW 1: Final Completed Screen
   if (viewState === 'completed' && activeParticipant) {
+    const waHolderName = activeParticipant.account_holder_name || accountHolderName || 'N/A';
+    const waText = `Hello Samarjeet Yadav, I have completed my payment for Ignite 2.O. Please find my payment details below.
+
+Participant Name: ${activeParticipant.full_name}
+Account Holder Name: ${waHolderName}
+Registration ID: ${activeParticipant.registration_id || 'N/A'}
+
+I am sharing my payment screenshot for verification. Please confirm my payment.`;
+
+    const waLink = `https://wa.me/919984972334?text=${encodeURIComponent(waText)}`;
+    const isApproved = activeParticipant.payment_status === 'approved' || Boolean(activeParticipant.payment_verified);
+    const isRejected = activeParticipant.payment_status === 'rejected';
+
     return (
       <div className="min-h-screen bg-[#111411] grid-bg flex items-center justify-center px-4 pt-20 pb-16">
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="max-w-md w-full text-center">
@@ -541,7 +653,7 @@ export default function Register() {
           <h2 className="text-3xl font-display font-black text-white mb-2">Registration Complete!</h2>
           <p className="text-gray-300 mb-6">Your payment details have been submitted and recorded successfully.</p>
 
-          <div className="bg-[#191e1b]/90 border border-[#303a32] rounded-2xl p-6 text-left space-y-3 mb-6 gradient-border">
+          <div className="bg-[#191e1b]/90 border border-[#303a32] rounded-2xl p-6 text-left space-y-3 mb-5 gradient-border">
             <div className="flex justify-between gap-3 border-b border-white/5 pb-2">
               <span className="text-gray-400 text-sm">Registration ID</span>
               <span className="text-emerald-400 font-mono font-bold text-sm">{activeParticipant.registration_id}</span>
@@ -550,6 +662,12 @@ export default function Register() {
               <span className="text-gray-400 text-sm">Name</span>
               <span className="text-white font-medium text-right">{activeParticipant.full_name}</span>
             </div>
+            {(activeParticipant.account_holder_name || accountHolderName) && (
+              <div className="flex justify-between gap-3">
+                <span className="text-gray-400 text-sm">Account Holder Name</span>
+                <span className="text-white font-medium text-right">{activeParticipant.account_holder_name || accountHolderName}</span>
+              </div>
+            )}
             <div className="flex justify-between gap-3">
               <span className="text-gray-400 text-sm">Roll / Enrolment No</span>
               <span className="text-white font-medium font-mono text-right">{activeParticipant.roll_number}</span>
@@ -566,15 +684,81 @@ export default function Register() {
             )}
             <div className="flex justify-between gap-3 items-center">
               <span className="text-gray-400 text-sm">Payment Status</span>
-              <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${activeParticipant.payment_verified ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'}`}>
-                {activeParticipant.payment_verified ? 'Verified' : 'Verification Pending'}
-              </span>
+              {isApproved ? (
+                <span className="text-xs px-2.5 py-0.5 rounded-full font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                  Approved
+                </span>
+              ) : isRejected ? (
+                <span className="text-xs px-2.5 py-0.5 rounded-full font-semibold bg-red-500/20 text-red-400 border border-red-500/30">
+                  Rejected
+                </span>
+              ) : (
+                <span className="text-xs px-2.5 py-0.5 rounded-full font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                  Pending Verification
+                </span>
+              )}
             </div>
+
+            {(activeParticipant.payment_screenshot_url || screenshotPreview) && (
+              <div className="border-t border-white/5 pt-3">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-gray-400 text-xs">Uploaded Payment Screenshot</span>
+                  <a
+                    href={activeParticipant.payment_screenshot_url || screenshotPreview || '#'}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-blue-300 hover:underline"
+                  >
+                    View Full Image
+                  </a>
+                </div>
+                <div className="rounded-xl border border-white/10 overflow-hidden w-24 h-24 bg-black/40">
+                  <img
+                    src={activeParticipant.payment_screenshot_url || screenshotPreview || ''}
+                    alt="Payment Screenshot Preview"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
+          {isRejected && activeParticipant.payment_rejected_reason && (
+            <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/20 text-left text-xs text-red-300 mb-5">
+              <span className="font-semibold text-red-200">Rejection Reason: </span>
+              {activeParticipant.payment_rejected_reason}
+            </div>
+          )}
+
+          {/* WhatsApp Payment Confirmation Button */}
+          <a
+            href={waLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2.5 w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white font-bold text-sm sm:text-base shadow-lg shadow-emerald-600/25 transition-all text-center mb-3"
+          >
+            <MessageCircle size={18} />
+            Send Payment Screenshot on WhatsApp
+          </a>
+
+          {/* WhatsApp Instruction Notice Box */}
+          <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/25 text-left text-xs text-amber-200/90 mb-5 space-y-1.5">
+            <p className="font-semibold text-amber-300 flex items-center gap-1.5">
+              <AlertCircle size={14} className="flex-shrink-0" />
+              Manual Screenshot Attachment in WhatsApp:
+            </p>
+            <p>
+              WhatsApp's click-to-chat opens with your details pre-filled, but <strong>cannot automatically attach images</strong>.
+              Please manually attach and send your payment screenshot to <strong>Samarjeet Yadav (+91 99849 72334)</strong> in the WhatsApp chat.
+            </p>
+            <p className="text-gray-400 text-[11px]">
+              Your screenshot is also uploaded on this portal and is waiting for administrator verification.
+            </p>
           </div>
 
           <a
             href="/my-profile"
-            className="block w-full py-3.5 rounded-xl bg-gradient-to-r from-[#3b82f6] to-[#718044] text-white font-bold hover:opacity-90 transition-opacity text-center"
+            className="block w-full py-3.5 rounded-xl bg-gradient-to-r from-[#3b82f6] to-[#718044] text-white font-bold hover:opacity-90 transition-opacity text-center text-sm sm:text-base"
           >
             Go to My Profile & Entry Pass
           </a>
@@ -1007,6 +1191,97 @@ export default function Register() {
                 <p className="text-xs text-gray-400 mt-3 break-all text-center">
                   UPI ID: <span className="font-mono text-white font-medium">{UPI_ID}</span>
                 </p>
+              </div>
+
+              {/* Account Holder Name */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1.5">Account Holder Name *</label>
+                <div className="relative">
+                  <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500" />
+                  <input
+                    name="account_holder_name"
+                    value={accountHolderName}
+                    onChange={e => {
+                      setAccountHolderName(e.target.value);
+                      setAccountHolderNameState(validateField('account_holder_name', e.target.value));
+                      setError('');
+                    }}
+                    placeholder="Name of account holder who made the payment"
+                    className={`w-full bg-white/5 border rounded-xl pl-10 pr-4 py-3 text-white placeholder-gray-600 focus:outline-none transition-colors ${
+                      accountHolderNameState === 'valid'
+                        ? 'border-emerald-500 focus:border-emerald-400'
+                        : accountHolderNameState === 'invalid'
+                        ? 'border-red-500 focus:border-red-400'
+                        : 'border-white/10 focus:border-[#3b82f6]'
+                    }`}
+                  />
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Enter the exact account holder name corresponding to the bank / UPI account used for payment.
+                </p>
+              </div>
+
+              {/* Upload Payment Screenshot */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                  Upload Payment Screenshot *
+                </label>
+                <div className="relative">
+                  {!screenshotPreview ? (
+                    <label className={`flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-white/[0.04] transition-colors ${screenshotError ? 'border-red-500/60 bg-red-500/5' : 'border-white/15 bg-white/5'}`}>
+                      <Upload size={30} className={`mb-2 ${screenshotError ? 'text-red-400' : 'text-gray-400'}`} />
+                      <p className="text-sm font-semibold text-gray-200">Click to upload payment screenshot</p>
+                      <p className="text-xs text-gray-400 mt-1">PNG, JPG, JPEG, or WEBP (Max 10MB)</p>
+                      <input
+                        type="file"
+                        accept="image/png,image/jpeg,image/jpg,image/webp"
+                        onChange={handleScreenshotChange}
+                        className="hidden"
+                      />
+                    </label>
+                  ) : (
+                    <div className="p-4 rounded-2xl bg-white/5 border border-white/15 flex flex-col sm:flex-row items-center gap-4">
+                      <img
+                        src={screenshotPreview}
+                        alt="Payment screenshot preview"
+                        className="w-24 h-24 sm:w-28 sm:h-28 object-cover rounded-xl border border-white/20 shadow-md flex-shrink-0"
+                      />
+                      <div className="flex-1 text-center sm:text-left min-w-0">
+                        <div className="flex items-center gap-2 justify-center sm:justify-start">
+                          <CheckCircle size={16} className="text-emerald-400" />
+                          <span className="text-sm font-semibold text-emerald-300">Screenshot Selected</span>
+                        </div>
+                        <p className="text-xs text-gray-300 truncate mt-1">{screenshotFile?.name || 'payment-screenshot'}</p>
+                        {screenshotFile?.size && (
+                          <p className="text-[11px] text-gray-500">{(screenshotFile.size / 1024).toFixed(1)} KB</p>
+                        )}
+                        <div className="flex items-center gap-2 mt-3 justify-center sm:justify-start">
+                          <label className="px-3 py-1.5 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 text-xs font-medium cursor-pointer border border-blue-500/30 transition-colors">
+                            Replace Screenshot
+                            <input
+                              type="file"
+                              accept="image/png,image/jpeg,image/jpg,image/webp"
+                              onChange={handleScreenshotChange}
+                              className="hidden"
+                            />
+                          </label>
+                          <button
+                            type="button"
+                            onClick={handleRemoveScreenshot}
+                            className="px-3 py-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-300 text-xs font-medium border border-red-500/30 transition-colors inline-flex items-center gap-1"
+                          >
+                            <Trash2 size={12} /> Remove
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                {screenshotError && (
+                  <p className="text-xs text-red-400 mt-1.5 flex items-center gap-1">
+                    <AlertCircle size={12} /> {screenshotError}
+                  </p>
+                )}
               </div>
 
               <div>

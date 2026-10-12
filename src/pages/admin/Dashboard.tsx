@@ -32,6 +32,8 @@ import {
   Phone,
   CheckCircle2,
   XCircle,
+  Image,
+  ExternalLink,
 } from 'lucide-react';
 import { authHeaders, checkAdminAuth, type AdminUser } from '../../lib/auth';
 import LoadingSpinner from '../../components/LoadingSpinner';
@@ -49,6 +51,12 @@ interface Participant {
   skills: string[];
   payment_id: string | null;
   payment_verified: boolean;
+  account_holder_name?: string | null;
+  payment_screenshot_url?: string | null;
+  payment_status?: 'pending_verification' | 'approved' | 'rejected';
+  payment_rejected_reason?: string | null;
+  payment_verified_at?: string | null;
+  payment_verified_by?: string | null;
   check_in_status: boolean;
   check_in_time: string | null;
   registered_at: string;
@@ -126,6 +134,7 @@ interface ParticipantForm {
   skills: string;
   payment_id: string;
   whatsapp_number: string;
+  account_holder_name: string;
 }
 
 function toFormData(participant: Participant): ParticipantForm {
@@ -138,6 +147,7 @@ function toFormData(participant: Participant): ParticipantForm {
     skills: participant.skills.join(', '),
     payment_id: participant.payment_id || '',
     whatsapp_number: participant.whatsapp_number,
+    account_holder_name: participant.account_holder_name || '',
   };
 }
 
@@ -194,6 +204,12 @@ export default function AdminDashboard() {
   const [rejectionReasonInput, setRejectionReasonInput] = useState('');
   const [resolvingApprovalId, setResolvingApprovalId] = useState<number | null>(null);
   const [resendingApprovalId, setResendingApprovalId] = useState<number | null>(null);
+
+  // Payment Verification States (Step 2)
+  const [screenshotModal, setScreenshotModal] = useState<{ url: string; title: string; participant?: Participant } | null>(null);
+  const [rejectPaymentModalParticipant, setRejectPaymentModalParticipant] = useState<Participant | null>(null);
+  const [rejectPaymentReasonInput, setRejectPaymentReasonInput] = useState('');
+  const [resolvingPaymentId, setResolvingPaymentId] = useState<number | null>(null);
 
   useEffect(() => {
     let intervalId: number | undefined;
@@ -334,6 +350,98 @@ export default function AdminDashboard() {
       console.error(err);
     } finally {
       setVerifyingPayment(null);
+    }
+  };
+
+  const handleApprovePayment = async (participant: Participant) => {
+    setResolvingPaymentId(participant.id);
+    try {
+      const res = await fetch('/api/payment-verification', {
+        method: 'PUT',
+        headers: authHeaders(),
+        body: JSON.stringify({
+          id: participant.id,
+          payment_status: 'approved',
+        }),
+      });
+      const data = await readJsonSafe<{ error?: string; message?: string }>(res);
+      if (!res.ok) throw new Error(getErrorMessage(data, 'Failed to approve payment'));
+
+      setStatusDialog({
+        title: 'Payment Approved',
+        message: data?.message || `Payment for ${participant.full_name} has been verified and approved.`,
+        tone: 'success',
+      });
+      if (screenshotModal?.participant?.id === participant.id) {
+        setScreenshotModal(null);
+      }
+      if (reviewingParticipant?.id === participant.id) {
+        setReviewingParticipant(prev => (prev ? { ...prev, payment_status: 'approved', payment_verified: true } : null));
+      }
+      fetchData();
+    } catch (err) {
+      setStatusDialog({
+        title: 'Payment Approval Failed',
+        message: err instanceof Error ? err.message : 'Failed to approve payment',
+        tone: 'error',
+      });
+    } finally {
+      setResolvingPaymentId(null);
+    }
+  };
+
+  const handleOpenRejectPaymentModal = (participant: Participant) => {
+    setRejectPaymentModalParticipant(participant);
+    setRejectPaymentReasonInput('');
+  };
+
+  const handleRejectPayment = async () => {
+    if (!rejectPaymentModalParticipant) return;
+    const participant = rejectPaymentModalParticipant;
+    setResolvingPaymentId(participant.id);
+    try {
+      const res = await fetch('/api/payment-verification', {
+        method: 'PUT',
+        headers: authHeaders(),
+        body: JSON.stringify({
+          id: participant.id,
+          payment_status: 'rejected',
+          reason: rejectPaymentReasonInput.trim() || undefined,
+        }),
+      });
+      const data = await readJsonSafe<{ error?: string; message?: string }>(res);
+      if (!res.ok) throw new Error(getErrorMessage(data, 'Failed to reject payment'));
+
+      setStatusDialog({
+        title: 'Payment Rejected',
+        message: data?.message || `Payment for ${participant.full_name} was marked as rejected.`,
+        tone: 'success',
+      });
+      setRejectPaymentModalParticipant(null);
+      if (screenshotModal?.participant?.id === participant.id) {
+        setScreenshotModal(null);
+      }
+      if (reviewingParticipant?.id === participant.id) {
+        setReviewingParticipant(prev =>
+          prev
+            ? {
+                ...prev,
+                payment_status: 'rejected',
+                payment_verified: false,
+                payment_rejected_reason: rejectPaymentReasonInput.trim() || null,
+              }
+            : null
+        );
+      }
+      fetchData();
+    } catch (err) {
+      setStatusDialog({
+        title: 'Payment Rejection Failed',
+        message: err instanceof Error ? err.message : 'Failed to reject payment',
+        tone: 'error',
+      });
+    } finally {
+      setResolvingPaymentId(null);
     }
   };
 
@@ -1368,19 +1476,80 @@ export default function AdminDashboard() {
                         )}
                       </td>
                       <td className="px-4 py-3 hidden md:table-cell">
-                        {p.payment_verified ? (
-                          <span className="inline-flex items-center px-2 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold">
-                            Verified
-                          </span>
-                        ) : p.approval_status === 'pending_approval' ? (
-                          <span className="inline-flex items-center px-2 py-1 rounded-lg bg-gray-500/10 border border-gray-500/30 text-gray-400 text-xs font-semibold">
-                            Locked (Step 1)
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center px-2 py-1 rounded-lg bg-olive-500/10 border border-olive-500/30 text-olive-300 text-xs font-semibold">
-                            Pending Pay
-                          </span>
-                        )}
+                        <div className="space-y-1">
+                          {p.payment_status === 'approved' || p.payment_verified ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold">
+                              <CheckCircle2 size={11} /> Approved
+                            </span>
+                          ) : p.payment_status === 'rejected' ? (
+                            <span
+                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-semibold cursor-help"
+                              title={p.payment_rejected_reason || 'Payment rejected'}
+                            >
+                              <XCircle size={11} /> Rejected
+                            </span>
+                          ) : (p.payment_screenshot_url || p.account_holder_name || p.payment_id) ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-semibold animate-pulse">
+                              <Clock size={11} /> Pending Verification
+                            </span>
+                          ) : p.approval_status === 'pending_approval' ? (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-lg bg-gray-500/10 border border-gray-500/30 text-gray-400 text-xs font-semibold">
+                              Locked (Step 1)
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-lg bg-blue-500/10 border border-blue-500/30 text-blue-300 text-xs font-semibold">
+                              Awaiting Pay
+                            </span>
+                          )}
+
+                          {p.account_holder_name && (
+                            <p className="text-[11px] text-gray-300 truncate max-w-[150px]" title={p.account_holder_name}>
+                              Holder: <span className="text-white font-medium">{p.account_holder_name}</span>
+                            </p>
+                          )}
+
+                          {p.payment_screenshot_url && (
+                            <div>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setScreenshotModal({
+                                    url: p.payment_screenshot_url!,
+                                    title: `${p.full_name} - Payment Screenshot`,
+                                    participant: p,
+                                  })
+                                }
+                                className="inline-flex items-center gap-1 text-[11px] text-blue-300 hover:text-blue-200 font-medium bg-blue-500/10 hover:bg-blue-500/20 px-2 py-0.5 rounded border border-blue-500/30 transition-colors"
+                              >
+                                <Image size={11} /> Screenshot
+                              </button>
+                            </div>
+                          )}
+
+                          {/* Quick Payment Verification Actions */}
+                          {(p.payment_status === 'pending_verification' || (p.payment_id && !p.payment_verified)) && (
+                            <div className="flex items-center gap-1 pt-0.5">
+                              <button
+                                type="button"
+                                onClick={() => handleApprovePayment(p)}
+                                disabled={resolvingPaymentId === p.id}
+                                className="text-[10px] px-2 py-0.5 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-semibold inline-flex items-center gap-0.5 disabled:opacity-50"
+                                title="Approve Payment"
+                              >
+                                <Check size={10} /> Approve
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleOpenRejectPaymentModal(p)}
+                                disabled={resolvingPaymentId === p.id}
+                                className="text-[10px] px-1.5 py-0.5 rounded bg-red-500/15 hover:bg-red-500/25 text-red-300 border border-red-500/30 inline-flex items-center gap-0.5 disabled:opacity-50"
+                                title="Reject Payment"
+                              >
+                                <X size={10} /> Reject
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       </td>
                       <td className="px-4 py-3">
                         {p.check_in_status ? (
@@ -1497,6 +1666,14 @@ export default function AdminDashboard() {
                 />
               </div>
               <div>
+                <label className="block text-xs text-gray-400 mb-1.5">Account Holder Name</label>
+                <input
+                  value={editForm.account_holder_name}
+                  onChange={e => setEditForm(prev => (prev ? { ...prev, account_holder_name: e.target.value } : prev))}
+                  className="w-full bg-[#191e1b]/90 border border-[#303a32] rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-indigo-500"
+                />
+              </div>
+              <div>
                 <label className="block text-xs text-gray-400 mb-1.5">Skills (comma-separated)</label>
                 <input
                   value={editForm.skills}
@@ -1603,6 +1780,41 @@ export default function AdminDashboard() {
               className="w-full px-3 py-2 text-left text-xs text-sky-200 hover:bg-sky-500/10 flex items-center gap-2 border-b border-white/5 disabled:opacity-50"
             >
               <Mail size={13} /> {sendingConfirmationId === participant.id ? 'Sending Details...' : 'Send Details'}
+            </button>
+            {participant.payment_screenshot_url && (
+              <button
+                onClick={() => {
+                  setScreenshotModal({
+                    url: participant.payment_screenshot_url!,
+                    title: `${participant.full_name} - Payment Screenshot`,
+                    participant,
+                  });
+                  setOpenActionMenu(null);
+                }}
+                className="w-full px-3 py-2 text-left text-xs text-blue-300 hover:bg-blue-500/10 flex items-center gap-2 border-b border-white/5"
+              >
+                <Image size={13} /> View Payment Screenshot
+              </button>
+            )}
+            <button
+              onClick={() => {
+                handleApprovePayment(participant);
+                setOpenActionMenu(null);
+              }}
+              disabled={resolvingPaymentId === participant.id}
+              className="w-full px-3 py-2 text-left text-xs text-emerald-300 hover:bg-emerald-500/10 flex items-center gap-2 border-b border-white/5 disabled:opacity-50"
+            >
+              <Check size={13} /> Approve Payment
+            </button>
+            <button
+              onClick={() => {
+                handleOpenRejectPaymentModal(participant);
+                setOpenActionMenu(null);
+              }}
+              disabled={resolvingPaymentId === participant.id}
+              className="w-full px-3 py-2 text-left text-xs text-red-300 hover:bg-red-500/10 flex items-center gap-2 border-b border-white/5 disabled:opacity-50"
+            >
+              <X size={13} /> Reject Payment
             </button>
             <button
               onClick={() => {
@@ -2036,14 +2248,133 @@ export default function AdminDashboard() {
                   </span>
                 </div>
                 <div>
-                  <span className="text-xs text-gray-400 block">Payment Status</span>
+                  <span className="text-xs text-gray-400 block">Step 1 Approval</span>
                   <span className="text-xs">
-                    {reviewingParticipant.payment_id ? (
-                      <span className="text-emerald-300 font-mono">Paid (Ref: {reviewingParticipant.payment_id})</span>
+                    {reviewingParticipant.approval_status === 'approved' ? (
+                      <span className="text-emerald-300 font-semibold">Approved</span>
+                    ) : reviewingParticipant.approval_status === 'rejected' ? (
+                      <span className="text-red-300 font-semibold">Rejected</span>
                     ) : (
-                      <span className="text-amber-300">Locked until Step 1 approval</span>
+                      <span className="text-amber-300 font-semibold">Pending Approval</span>
                     )}
                   </span>
+                </div>
+              </div>
+
+              {/* Step 2: Payment & Screenshot Verification Card */}
+              <div className="p-4 rounded-xl bg-gradient-to-br from-blue-950/20 to-black/30 border border-blue-500/20 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <ShieldCheck size={16} className="text-blue-400" />
+                    <p className="font-semibold text-white text-xs uppercase tracking-wider">
+                      Step 2: Payment & Screenshot Verification
+                    </p>
+                  </div>
+                  <div>
+                    {reviewingParticipant.payment_status === 'approved' || reviewingParticipant.payment_verified ? (
+                      <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/40 text-emerald-300">
+                        <CheckCircle2 size={11} /> Approved
+                      </span>
+                    ) : reviewingParticipant.payment_status === 'rejected' ? (
+                      <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-red-500/15 border border-red-500/40 text-red-300">
+                        <XCircle size={11} /> Rejected
+                      </span>
+                    ) : (reviewingParticipant.payment_screenshot_url || reviewingParticipant.account_holder_name || reviewingParticipant.payment_id) ? (
+                      <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/40 text-amber-300 animate-pulse">
+                        <Clock size={11} /> Pending Verification
+                      </span>
+                    ) : (
+                      <span className="text-[11px] text-gray-500 font-medium">Awaiting Submission</span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs pt-1">
+                  <div>
+                    <span className="text-gray-400 block text-[11px]">Account Holder Name:</span>
+                    <span className="text-white font-medium">
+                      {reviewingParticipant.account_holder_name || <span className="text-gray-500 italic">Not provided</span>}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-gray-400 block text-[11px]">Payment Reference / UTR ID:</span>
+                    <span className="font-mono text-blue-300 font-medium">
+                      {reviewingParticipant.payment_id || <span className="text-gray-500 italic">Not provided</span>}
+                    </span>
+                  </div>
+                </div>
+
+                {reviewingParticipant.payment_rejected_reason && (
+                  <div className="p-2.5 rounded-lg bg-red-500/10 border border-red-500/20 text-xs text-red-300">
+                    <span className="font-semibold text-red-200">Rejection Reason: </span>
+                    {reviewingParticipant.payment_rejected_reason}
+                  </div>
+                )}
+
+                {reviewingParticipant.payment_verified_by && (
+                  <p className="text-[11px] text-gray-400">
+                    Payment verified by <span className="text-gray-200">{reviewingParticipant.payment_verified_by}</span>
+                    {reviewingParticipant.payment_verified_at ? ` on ${new Date(reviewingParticipant.payment_verified_at).toLocaleString()}` : ''}
+                  </p>
+                )}
+
+                {/* Uploaded Payment Screenshot Preview */}
+                {reviewingParticipant.payment_screenshot_url ? (
+                  <div className="pt-2 border-t border-white/5 flex items-center gap-4">
+                    <img
+                      src={reviewingParticipant.payment_screenshot_url}
+                      alt="Payment Screenshot Preview"
+                      className="w-20 h-20 object-cover rounded-xl border border-white/20 cursor-pointer hover:opacity-80 transition-opacity shadow-md"
+                      onClick={() =>
+                        setScreenshotModal({
+                          url: reviewingParticipant.payment_screenshot_url!,
+                          title: `${reviewingParticipant.full_name} - Payment Screenshot`,
+                          participant: reviewingParticipant,
+                        })
+                      }
+                    />
+                    <div className="space-y-1.5">
+                      <p className="text-xs font-medium text-gray-200">Payment Screenshot Attached</p>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setScreenshotModal({
+                            url: reviewingParticipant.payment_screenshot_url!,
+                            title: `${reviewingParticipant.full_name} - Payment Screenshot`,
+                            participant: reviewingParticipant,
+                          })
+                        }
+                        className="px-3 py-1.5 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 text-xs font-semibold inline-flex items-center gap-1.5 border border-blue-500/30 transition-colors"
+                      >
+                        <Image size={13} /> View Full Screenshot
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-[11px] text-gray-500 italic pt-1 border-t border-white/5">
+                    No payment screenshot uploaded yet
+                  </p>
+                )}
+
+                {/* Action Buttons for Payment */}
+                <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-white/5">
+                  <button
+                    type="button"
+                    onClick={() => handleApprovePayment(reviewingParticipant)}
+                    disabled={resolvingPaymentId === reviewingParticipant.id}
+                    className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold inline-flex items-center gap-1.5 shadow-md disabled:opacity-50"
+                  >
+                    <Check size={13} />
+                    {resolvingPaymentId === reviewingParticipant.id ? 'Approving...' : 'Approve Payment'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleOpenRejectPaymentModal(reviewingParticipant)}
+                    disabled={resolvingPaymentId === reviewingParticipant.id}
+                    className="px-3 py-1.5 rounded-lg bg-red-500/15 hover:bg-red-500/25 text-red-300 border border-red-500/30 text-xs font-medium inline-flex items-center gap-1.5 disabled:opacity-50"
+                  >
+                    <X size={13} /> Reject Payment
+                  </button>
                 </div>
               </div>
 
@@ -2224,6 +2555,153 @@ export default function AdminDashboard() {
               >
                 <X size={15} />
                 {resolvingApprovalId === rejectModalParticipant.id ? 'Rejecting...' : 'Confirm Rejection'}
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Payment Screenshot Modal */}
+      {screenshotModal && (
+        <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-[10002] flex items-center justify-center p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="w-full max-w-2xl bg-[#171b18] border border-[#303a32] rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+          >
+            <div className="px-5 py-3.5 border-b border-white/10 flex items-center justify-between bg-[#191e1b]">
+              <div className="flex items-center gap-2">
+                <Image size={18} className="text-blue-400" />
+                <h3 className="text-sm sm:text-base font-bold text-white truncate max-w-xs sm:max-w-md">
+                  {screenshotModal.title}
+                </h3>
+              </div>
+              <div className="flex items-center gap-2">
+                <a
+                  href={screenshotModal.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-gray-300 inline-flex items-center gap-1 border border-white/10"
+                >
+                  <ExternalLink size={12} /> Open Tab
+                </a>
+                <button
+                  onClick={() => setScreenshotModal(null)}
+                  className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-300"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-4 flex-1 overflow-auto flex items-center justify-center bg-black/60 min-h-[300px]">
+              <img
+                src={screenshotModal.url}
+                alt="Payment Screenshot Full"
+                className="max-h-[60vh] max-w-full object-contain rounded-lg shadow-xl"
+              />
+            </div>
+
+            {screenshotModal.participant && (
+              <div className="px-5 py-3 border-t border-white/10 bg-[#191e1b] flex flex-wrap items-center justify-between gap-3 text-xs">
+                <div>
+                  <span className="text-gray-400">Account Holder: </span>
+                  <span className="text-white font-medium">{screenshotModal.participant.account_holder_name || 'N/A'}</span>
+                  <span className="text-gray-400 ml-3">Ref ID: </span>
+                  <span className="text-blue-300 font-mono font-medium">{screenshotModal.participant.payment_id || 'N/A'}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleOpenRejectPaymentModal(screenshotModal.participant!)}
+                    disabled={resolvingPaymentId === screenshotModal.participant.id}
+                    className="px-3 py-1.5 rounded-lg bg-red-500/15 hover:bg-red-500/25 text-red-300 border border-red-500/30 font-medium inline-flex items-center gap-1 disabled:opacity-50"
+                  >
+                    <X size={13} /> Reject Payment
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleApprovePayment(screenshotModal.participant!)}
+                    disabled={resolvingPaymentId === screenshotModal.participant.id}
+                    className="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold inline-flex items-center gap-1 disabled:opacity-50"
+                  >
+                    <Check size={13} />
+                    {resolvingPaymentId === screenshotModal.participant.id ? 'Approving...' : 'Approve Payment'}
+                  </button>
+                </div>
+              </div>
+            )}
+          </motion.div>
+        </div>
+      )}
+
+      {/* Reject Payment Modal */}
+      {rejectPaymentModalParticipant && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[10002] flex items-center justify-center p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="w-full max-w-md bg-[#1c1417] border border-red-500/30 rounded-2xl shadow-2xl overflow-hidden"
+          >
+            <div className="px-5 py-4 border-b border-red-500/20 bg-red-950/30 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-red-500/20 text-red-400 flex items-center justify-center">
+                  <XCircle size={18} />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-white">Reject Payment Verification</h3>
+                  <p className="text-xs text-gray-400">{rejectPaymentModalParticipant.full_name} ({rejectPaymentModalParticipant.roll_number})</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setRejectPaymentModalParticipant(null)}
+                className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-300"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <div className="p-5 space-y-4">
+              <p className="text-sm text-gray-300 leading-relaxed">
+                Rejecting this payment will mark the participant's payment as Rejected and record the reason. The participant will see this status on their registration and profile pages.
+              </p>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-300 mb-1.5">
+                  Rejection Reason (Optional / Recommended)
+                </label>
+                <textarea
+                  value={rejectPaymentReasonInput}
+                  onChange={(e) => setRejectPaymentReasonInput(e.target.value)}
+                  placeholder="e.g. UTR reference not found in bank statement, screenshot unreadable, partial amount received..."
+                  rows={3}
+                  className="w-full bg-[#111411] border border-red-500/30 rounded-xl px-3 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-400"
+                />
+              </div>
+
+              {rejectPaymentModalParticipant.account_holder_name && (
+                <div className="text-xs text-gray-400">
+                  Account Holder: <span className="text-white font-medium">{rejectPaymentModalParticipant.account_holder_name}</span>
+                </div>
+              )}
+            </div>
+
+            <div className="px-5 py-3.5 border-t border-white/10 bg-black/40 flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setRejectPaymentModalParticipant(null)}
+                className="px-4 py-2 rounded-xl border border-white/20 text-gray-300 hover:bg-white/10 text-sm font-medium"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleRejectPayment}
+                disabled={resolvingPaymentId === rejectPaymentModalParticipant.id}
+                className="px-5 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white text-sm font-bold inline-flex items-center gap-1.5 disabled:opacity-50"
+              >
+                <X size={15} />
+                {resolvingPaymentId === rejectPaymentModalParticipant.id ? 'Rejecting...' : 'Confirm Reject Payment'}
               </button>
             </div>
           </motion.div>
