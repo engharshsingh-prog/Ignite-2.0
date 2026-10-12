@@ -17,6 +17,14 @@ function isGmailEmail(email) {
   return /^[^\s@]+@gmail\.com$/.test(String(email || '').trim().toLowerCase());
 }
 
+function parseUtcTimestamp(ts) {
+  if (!ts) return 0;
+  const s = String(ts).trim();
+  if (s.endsWith('Z')) return new Date(s).getTime();
+  if (s.includes('T')) return new Date(s.endsWith('Z') ? s : s + 'Z').getTime();
+  return new Date(s.replace(' ', 'T') + 'Z').getTime();
+}
+
 function validateStep1Input(payload) {
   const { email, full_name, roll_number, branch, year, skills, whatsapp_number } = payload;
   if (!email || !full_name || !roll_number || !branch || !year || skills === undefined || !whatsapp_number) {
@@ -101,17 +109,21 @@ export default async function handler(req, res) {
       const verifiedOtp = await db
         .prepare(
           `
-            SELECT id
+            SELECT id, expires_at
             FROM email_otp_sessions
-            WHERE email = ? AND verification_token = ? AND verified = 1 AND consumed = 0 AND expires_at > ?
+            WHERE email = ? AND verification_token = ? AND verified = 1 AND consumed = 0
             ORDER BY id DESC
             LIMIT 1
           `
         )
-        .get(normalizedEmail, otp_token, new Date().toISOString());
+        .get(normalizedEmail, String(otp_token).trim());
 
       if (!verifiedOtp) {
         return res.status(403).json({ error: 'Invalid or expired OTP verification. Please verify your email again.' });
+      }
+
+      if (parseUtcTimestamp(verifiedOtp.expires_at) < Date.now()) {
+        return res.status(403).json({ error: 'Your email verification session has expired. Please verify your email again.' });
       }
 
       const existingByEmail = await db.prepare('SELECT id, approval_status, payment_id FROM participants WHERE email = ? LIMIT 1').get(normalizedEmail);

@@ -185,6 +185,37 @@ export default function Register() {
     if (token) {
       verifyTokenAndLoadStep2(token);
     }
+
+    // Check if there is an active OTP verification session in sessionStorage
+    try {
+      const raw = sessionStorage.getItem('ignite_otp_session');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed?.email && parsed?.token) {
+          fetch('/api/email-otp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'check', email: parsed.email, otp_token: parsed.token }),
+          })
+            .then(res => res.json())
+            .then(data => {
+              if (data?.valid) {
+                setForm(f => ({ ...f, email: parsed.email }));
+                setFieldStates(s => ({ ...s, email: 'valid' }));
+                setOtpToken(parsed.token);
+                setOtpVerified(true);
+                setOtpSent(true);
+                setOtpMessage('Email verified successfully.');
+              } else {
+                sessionStorage.removeItem('ignite_otp_session');
+              }
+            })
+            .catch(() => {
+              sessionStorage.removeItem('ignite_otp_session');
+            });
+        }
+      }
+    } catch (_) {}
   }, []);
 
   const verifyTokenAndLoadStep2 = async (token: string) => {
@@ -248,6 +279,9 @@ export default function Register() {
       setOtpVerified(false);
       setOtpMessage('');
       setOtpCooldown(0);
+      try {
+        sessionStorage.removeItem('ignite_otp_session');
+      } catch (_) {}
     }
     setError('');
   };
@@ -284,6 +318,9 @@ export default function Register() {
       setOtpSent(true);
       setOtpVerified(false);
       setOtpToken('');
+      try {
+        sessionStorage.removeItem('ignite_otp_session');
+      } catch (_) {}
       setOtpCooldown(data?.cooldown_seconds || 45);
       setOtpMessage(data?.message || 'OTP sent. Please check your Gmail inbox (and Spam or Updates folder).');
     } catch (err: unknown) {
@@ -314,14 +351,25 @@ export default function Register() {
       });
       const data = await readJsonSafe<{ error?: string; otp_token?: string }>(res);
       if (!res.ok) throw new Error(getErrorMessage(data, 'OTP verification failed'));
-      if (!data?.otp_token) throw new Error('OTP verification token missing');
+      if (!data?.otp_token) throw new Error('OTP verification token missing from server response');
 
       setOtpVerified(true);
       setOtpToken(data.otp_token);
       setOtpMessage('Email verified successfully.');
+      setError('');
+      try {
+        sessionStorage.setItem(
+          'ignite_otp_session',
+          JSON.stringify({ email: form.email.trim().toLowerCase(), token: data.otp_token })
+        );
+      } catch (_) {}
     } catch (err: unknown) {
       setOtpVerified(false);
       setOtpToken('');
+      setOtpMessage('');
+      try {
+        sessionStorage.removeItem('ignite_otp_session');
+      } catch (_) {}
       setError(err instanceof Error ? err.message : 'OTP verification failed');
     } finally {
       setOtpLoading(false);
@@ -376,6 +424,10 @@ export default function Register() {
       const data = await readJsonSafe<{ success?: boolean; participant?: SubmittedParticipant; error?: string }>(res);
       if (!res.ok) throw new Error(getErrorMessage(data, 'Registration submission failed'));
 
+      try {
+        sessionStorage.removeItem('ignite_otp_session');
+      } catch (_) {}
+
       if (data?.participant) {
         setActiveParticipant(data.participant);
         setViewState('pending');
@@ -384,6 +436,15 @@ export default function Register() {
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Registration submission failed';
       setError(message);
+      // Synchronize frontend OTP state if backend reports an OTP verification error
+      if (message.toLowerCase().includes('otp') || message.toLowerCase().includes('verification')) {
+        setOtpVerified(false);
+        setOtpToken('');
+        setOtpMessage('');
+        try {
+          sessionStorage.removeItem('ignite_otp_session');
+        } catch (_) {}
+      }
     } finally {
       setLoading(false);
     }
@@ -1021,7 +1082,12 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
                   <div className="flex-1 flex gap-2">
                     <input
                       value={otp}
-                      onChange={e => setOtp(e.target.value)}
+                      onChange={e => {
+                        setOtp(e.target.value);
+                        if (error && (error.toLowerCase().includes('otp') || error.toLowerCase().includes('verification'))) {
+                          setError('');
+                        }
+                      }}
                       maxLength={6}
                       placeholder="Enter 6-digit OTP"
                       className="flex-1 bg-[#191e1b]/90 border border-[#303a32] rounded-lg px-3 py-2 text-white placeholder-gray-600 focus:outline-none focus:border-[#3b82f6]"
@@ -1030,13 +1096,17 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
                       type="button"
                       onClick={handleVerifyOtp}
                       disabled={otpLoading || !otpSent || otpVerified}
-                      className="px-4 py-2 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-sm hover:bg-emerald-500/30 transition-colors disabled:opacity-50"
+                      className={`px-4 py-2 rounded-lg text-sm transition-colors disabled:opacity-50 ${
+                        otpVerified
+                          ? 'bg-emerald-500/20 border border-emerald-500/30 text-emerald-300'
+                          : 'bg-blue-600/20 border border-blue-500/30 text-blue-300 hover:bg-blue-600/30'
+                      }`}
                     >
                       {otpLoading ? '...' : otpVerified ? 'Verified' : 'Verify'}
                     </button>
                   </div>
                 </div>
-                {otpMessage && (
+                {otpMessage && (!error || (!error.toLowerCase().includes('otp') && !error.toLowerCase().includes('verification'))) && (
                   <p className={`text-xs mt-1.5 ${otpVerified ? 'text-emerald-400' : 'text-amber-300'}`}>
                     {otpMessage}
                   </p>

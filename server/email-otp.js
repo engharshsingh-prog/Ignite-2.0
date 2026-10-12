@@ -83,6 +83,11 @@ export default async function handler(req, res) {
         }
       }
 
+      // Invalidate any previous unconsumed OTP sessions for this email so previous OTPs cannot be reused
+      await db
+        .prepare('UPDATE email_otp_sessions SET consumed = 1 WHERE email = ? AND consumed = 0')
+        .run(normalizedEmail);
+
       const code = randomOtp();
       const expiresAt = new Date(Date.now() + OTP_TTL_MINUTES * 60 * 1000).toISOString();
       const createdAt = new Date().toISOString();
@@ -115,60 +120,80 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'OTP must be 6 digits' });
       }
 
-      // Retrieve recent unconsumed sessions to accommodate minor delivery delay races
-      const activeSessions = await db
+      const session = await db
         .prepare(
           `
             SELECT * FROM email_otp_sessions
             WHERE email = ? AND consumed = 0
             ORDER BY id DESC
-            LIMIT 5
+            LIMIT 1
           `
         )
-        .all(normalizedEmail);
+        .get(normalizedEmail);
 
-      if (!activeSessions || activeSessions.length === 0) {
-        return res.status(404).json({ error: 'No active OTP session found. Please request a new OTP.' });
+      if (!session) {
+        return res.status(404).json({ error: 'No active OTP request found. Please request an OTP first.' });
       }
 
-      const latestSession = activeSessions[0];
       const now = Date.now();
-
-      // Check if any recent active session matches
-      const matchedSession = activeSessions.find(
-        (s) => parseUtcTimestamp(s.expires_at) > now && s.attempts < MAX_ATTEMPTS && s.otp_hash === hashOtp(providedOtp)
-      );
-
-      if (matchedSession) {
-        const verificationToken = crypto.randomUUID();
-        await db
-          .prepare('UPDATE email_otp_sessions SET verified = 1, verification_token = ? WHERE id = ?')
-          .run(verificationToken, matchedSession.id);
-
-        // Mark all active sessions for this email as consumed
-        await db
-          .prepare('UPDATE email_otp_sessions SET consumed = 1 WHERE email = ?')
-          .run(normalizedEmail);
-
-        return res.status(200).json({ ok: true, otp_token: verificationToken });
-      }
-
-      if (parseUtcTimestamp(latestSession.expires_at) < now) {
+      if (parseUtcTimestamp(session.expires_at) < now) {
         return res.status(400).json({ error: 'OTP expired. Please request a new OTP.' });
       }
 
-      if (latestSession.attempts >= MAX_ATTEMPTS) {
+      if (session.attempts >= MAX_ATTEMPTS) {
         return res.status(429).json({ error: 'Maximum attempts reached. Please request a new OTP.' });
       }
 
-      await db.prepare('UPDATE email_otp_sessions SET attempts = attempts + 1 WHERE id = ?').run(latestSession.id);
-      const remaining = MAX_ATTEMPTS - (latestSession.attempts + 1);
+      if (session.otp_hash !== hashOtp(providedOtp)) {
+        await db.prepare('UPDATE email_otp_sessions SET attempts = attempts + 1 WHERE id = ?').run(session.id);
+        const remaining = MAX_ATTEMPTS - (session.attempts + 1);
+        return res.status(400).json({
+          error: remaining > 0
+            ? `Invalid OTP. ${remaining} attempt${remaining === 1 ? '' : 's'} remaining.`
+            : 'Invalid OTP. Maximum attempts reached. Please request a new OTP.'
+        });
+      }
 
-      return res.status(400).json({
-        error: remaining > 0
-          ? `Invalid OTP. ${remaining} attempt${remaining === 1 ? '' : 's'} remaining.`
-          : 'Invalid OTP. Maximum attempts reached. Please request a new OTP.'
-      });
+      const verificationToken = crypto.randomUUID();
+      // Allow 30 minutes from verification for the participant to fill and submit the registration form
+      const tokenExpiresAt = new Date(Date.now() + 30 * 60 * 1000).toISOString();
+
+      // Mark the session as verified with its verification token. Leave consumed = 0 so participants API can consume it.
+      await db
+        .prepare('UPDATE email_otp_sessions SET verified = 1, verification_token = ?, expires_at = ? WHERE id = ?')
+        .run(verificationToken, tokenExpiresAt, session.id);
+
+      // Invalidate any older sessions for this email
+      await db
+        .prepare('UPDATE email_otp_sessions SET consumed = 1 WHERE email = ? AND id != ?')
+        .run(normalizedEmail, session.id);
+
+      return res.status(200).json({ ok: true, otp_token: verificationToken });
+    }
+
+    if (action === 'check') {
+      const { otp_token } = req.body || {};
+      if (!otp_token || typeof otp_token !== 'string') {
+        return res.status(200).json({ valid: false });
+      }
+
+      const session = await db
+        .prepare(
+          `
+            SELECT id, expires_at
+            FROM email_otp_sessions
+            WHERE email = ? AND verification_token = ? AND verified = 1 AND consumed = 0
+            ORDER BY id DESC
+            LIMIT 1
+          `
+        )
+        .get(normalizedEmail, otp_token.trim());
+
+      if (!session || parseUtcTimestamp(session.expires_at) < Date.now()) {
+        return res.status(200).json({ valid: false });
+      }
+
+      return res.status(200).json({ valid: true });
     }
 
     return res.status(400).json({ error: 'Invalid action' });
