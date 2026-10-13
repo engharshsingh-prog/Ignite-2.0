@@ -56,10 +56,6 @@ Required for local dev:
 - `SQLITE_DB_PATH` (example: `./data/ignite26.db`)
 - `ADMIN_CREDENTIALS_JSON` maps the three authorized admin emails to unique passwords (minimum 12 characters each). Only those three addresses are eligible. Keep this JSON in deployment secrets, not source control.
 
-Firebase participant sign-in:
-
-- Configure the Google provider and authorized domains in the Firebase Console.
-- Set the `VITE_FIREBASE_*` values for the frontend build and `FIREBASE_WEB_API_KEY` for the API. The API uses Firebase to verify the signed-in user's ID token before returning a profile by email.
 - `ADMIN_EMAIL` and `ADMIN_PASSWORD` remain available for provisioning one allowlisted account in older deployments; the email must be one of the three approved addresses and the password must be at least 12 characters.
 
 Optional:

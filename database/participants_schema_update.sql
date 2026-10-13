@@ -1,5 +1,5 @@
 -- Participants schema migration for updated registration fields
--- Run in Supabase SQL editor.
+-- Run using a PostgreSQL SQL client.
 
 alter table if exists public.participants
   rename column name to full_name;
