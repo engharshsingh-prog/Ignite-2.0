@@ -1,0 +1,85 @@
+Ignite 2.0 - separate frontend and backend deployment
+=====================================================
+
+What is included
+----------------
+frontend/ is the Vite + React website. Deploy it as a Vercel project with
+frontend/ as the project root.
+
+backend/ is the Express API. Deploy it as a Render Web Service with backend/
+as the root directory. It keeps the existing API routes and libSQL database
+logic, and adds GET /health for a service health check.
+
+The original application in the repository root is left intact. Local database
+files, .env files, and generated uploads are intentionally not in either ZIP.
+Those can contain private participant and payment information. Import/migrate
+any existing records separately before pointing a live website at the backend.
+
+Deploy the backend on Render
+----------------------------
+1. Create a new Web Service from the repository and set Root Directory to
+   backend.
+2. Use these commands:
+   Build Command: npm install
+   Start Command: npm start
+3. Set Health Check Path to /health.
+4. Add the environment variables below in Render's Environment settings.
+   Set PORT only if the platform does not supply it (the app uses PORT).
+5. Set CORS_ALLOWED_ORIGINS to the exact deployed frontend origin, for example
+   https://your-site.vercel.app. Add localhost origins too only if needed.
+
+Backend environment variables
+-----------------------------
+Required for a persistent production database:
+  TURSO_DATABASE_URL       libSQL/Turso database URL
+  TURSO_AUTH_TOKEN         token for that database
+
+Required to grant super-admin permissions:
+  SUPER_ADMIN_EMAILS       comma-separated admin email addresses
+  ADMIN_CREDENTIALS_JSON   JSON object mapping admin email to password
+
+Usually required by enabled features:
+  SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM
+  PUBLIC_SITE_URL          deployed frontend URL, used in generated links
+  CORS_ALLOWED_ORIGINS     comma-separated exact frontend origins
+
+Optional integrations:
+  GOOGLE_SHEET_SYNC_URL, SHEET_SYNC_SECRET
+  BLOB_READ_WRITE_TOKEN    Vercel Blob token for durable uploaded media
+  API_BODY_LIMIT           default is 25mb
+  LOGIN_APPROVAL_EXPIRY_MINUTES (default 10)
+  VALIDATION_HANDLER_PASSWORD
+
+For local development, SQLITE_DB_PATH defaults to backend/data/ignite26.db.
+Render's local filesystem may be temporary. Use Turso for production records.
+Uploaded files written to backend/public/uploads are also local files; configure
+BLOB_READ_WRITE_TOKEN for durable media in production.
+
+Deploy the frontend on Vercel
+-----------------------------
+1. Create a separate Vercel project from the repository and set Root Directory
+   to frontend.
+2. Vercel detects Vite. Use Build Command `npm run build` and Output Directory
+   `dist` (or leave the detected defaults).
+3. Add VITE_API_URL with the backend origin, for example
+   https://your-api.onrender.com. Do not add /api to the end.
+4. Optionally add VITE_EVENT_WHATSAPP_URL and VITE_EVENT_INSTAGRAM_URL.
+5. Deploy. If you use a custom frontend domain, add that exact origin to the
+   backend's CORS_ALLOWED_ORIGINS and redeploy/restart the backend.
+
+Local development
+-----------------
+1. In backend/, copy .env.example to .env and configure credentials. Run
+   `npm install`, then `npm run dev` (the API listens on port 8787 by default).
+2. In frontend/, copy .env.example to .env, leave VITE_API_URL blank, run
+   `npm install`, then `npm run dev`.
+3. Open http://127.0.0.1:5173. Vite forwards /api and /uploads to the API.
+
+Keep secrets in backend hosting environment settings. Never put database
+credentials, SMTP passwords, admin passwords, or integration tokens in Vercel's
+VITE_* variables; VITE_* values are included in the public browser bundle.
+
+Authentication uses the existing Bearer token flow; the frontend API helper
+also sends credentials for cross-origin requests. Backend CORS allows the
+configured frontend origins. The API routes and request/response contracts are
+preserved.

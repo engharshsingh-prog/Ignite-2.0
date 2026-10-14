@@ -1,0 +1,47 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+.vite/
+coverage/
+*.tsbuildinfo
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.vercel
+
+# Env files
+.env
+.env.*
+!.env.example
+
+# Local SQLite
+data/
+*.db
+*.db-shm
+*.db-wal
+
+# Generated media storage (runtime uploads/previews)
+public/uploads/**/original/**
+public/uploads/**/thumbs/**
+
+# Local scratch/temp files
+temp_*.html
+temp_*.css
