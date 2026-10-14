@@ -40,10 +40,6 @@ export const adminCredentials = (() => {
   if (legacyPassword.length >= 8 && !credentials.has(legacyEmail)) credentials.set(legacyEmail, legacyPassword);
   return credentials;
 })();
-const tursoUrl = String(process.env.TURSO_DATABASE_URL || '').trim();
-const tursoAuthToken = String(process.env.TURSO_AUTH_TOKEN || '').trim() || undefined;
-const isVercelRuntime = Boolean(process.env.VERCEL);
-
 export function hashPassword(password) {
   const salt = crypto.randomBytes(16);
   const key = crypto.pbkdf2Sync(password, salt, 100000, 64, 'sha256');
@@ -64,26 +60,7 @@ function resolveLocalDatabaseUrl() {
 }
 
 const localDatabaseUrl = resolveLocalDatabaseUrl();
-let activeDatabaseUrl = tursoUrl || localDatabaseUrl;
-let activeClient = createClient({
-  url: activeDatabaseUrl,
-  authToken: activeDatabaseUrl === tursoUrl ? tursoAuthToken : undefined,
-});
-
-function switchToLocalDatabase(error) {
-  // Vercel functions can run in separate instances with ephemeral /tmp storage.
-  // Falling back there can save a login session in one invocation and lose it
-  // on the next request, so production must fail clearly instead.
-  if (isVercelRuntime) {
-    console.error(`[db] Turso database unavailable (${error?.cause?.code || error?.code || error?.message || 'unknown error'}). Local SQLite fallback is disabled on Vercel.`);
-    return false;
-  }
-  if (activeDatabaseUrl === localDatabaseUrl || !tursoUrl) return false;
-  console.warn(`[db] Remote database unavailable (${error?.cause?.code || error?.code || error?.message || 'unknown error'}). Falling back to local SQLite at ${localDatabaseUrl}`);
-  activeDatabaseUrl = localDatabaseUrl;
-  activeClient = createClient({ url: localDatabaseUrl });
-  return true;
-}
+const activeClient = createClient({ url: localDatabaseUrl });
 
 function normalizeRow(row) {
   if (!row) return null;
@@ -95,16 +72,7 @@ function normalizeRows(rows) {
 }
 
 async function executeStatement(sql, args = []) {
-  if (isVercelRuntime && (!tursoUrl || !tursoAuthToken)) {
-    throw new Error('TURSO_DATABASE_URL and TURSO_AUTH_TOKEN are required for database access on Vercel. Configure both in the Vercel project settings.');
-  }
-  let result;
-  try {
-    result = await activeClient.execute({ sql, args });
-  } catch (error) {
-    if (!switchToLocalDatabase(error)) throw error;
-    result = await activeClient.execute({ sql, args });
-  }
+  const result = await activeClient.execute({ sql, args });
   return {
     rows: normalizeRows(result.rows),
     rowsAffected: Number(result.rowsAffected || 0),
