@@ -383,16 +383,18 @@ export async function handleSubmitStep2Payment(req, res) {
   }
 
   // Securely store the uploaded payment screenshot file using existing storage architecture
-  let storedScreenshotUrl = null;
+  let storedScreenshotUrl = cleanScreenshotUrl;
   try {
     const uploadResult = await storeMediaUpload({
       category: 'payment-screenshots',
       originalDataUrl: cleanScreenshotUrl,
     });
-    storedScreenshotUrl = uploadResult?.url || null;
+    if (uploadResult?.url) {
+      storedScreenshotUrl = uploadResult.url;
+    }
   } catch (uploadErr) {
-    console.error('Error saving payment screenshot:', uploadErr);
-    return res.status(500).json({ error: 'Failed to process payment screenshot upload.' });
+    console.error('Error saving payment screenshot, falling back to data URL:', uploadErr);
+    storedScreenshotUrl = cleanScreenshotUrl;
   }
 
   // Update participant with payment_id, account_holder_name, screenshot URL, and initial pending_verification status

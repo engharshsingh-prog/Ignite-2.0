@@ -1194,11 +1194,13 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
 
               {/* Full Name */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1.5">Full Name *</label>
+                <label htmlFor="reg-fullname" className="block text-sm font-medium text-gray-300 mb-1.5">Full Name *</label>
                 <div className="relative">
                   <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500" />
                   <input
+                    id="reg-fullname"
                     name="full_name"
+                    autoComplete="name"
                     value={form.full_name}
                     onChange={handleChange}
                     placeholder="Your complete full name"
@@ -1209,10 +1211,11 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
 
               {/* Roll / Enrolment Number */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1.5">Roll Number / Enrolment Number *</label>
+                <label htmlFor="reg-rollno" className="block text-sm font-medium text-gray-300 mb-1.5">Roll Number / Enrolment Number *</label>
                 <div className="relative">
                   <Hash size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500" />
                   <input
+                    id="reg-rollno"
                     name="roll_number"
                     value={form.roll_number}
                     onChange={handleChange}
@@ -1225,7 +1228,7 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
 
               {/* WhatsApp Number (Present in Our Group) */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                <label htmlFor="reg-whatsapp" className="block text-sm font-medium text-gray-300 mb-1.5">
                   WhatsApp Number / Phone Number (Present in Our Group) *
                 </label>
                 <div className="relative flex">
@@ -1234,7 +1237,10 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
                     <span>+91</span>
                   </div>
                   <input
+                    id="reg-whatsapp"
                     name="whatsapp_number"
+                    type="tel"
+                    autoComplete="tel"
                     value={form.whatsapp_number}
                     onChange={handleChange}
                     placeholder="10-digit WhatsApp phone number"
@@ -1250,10 +1256,11 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
 
               {/* Branch */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1.5">Branch *</label>
+                <label htmlFor="reg-branch" className="block text-sm font-medium text-gray-300 mb-1.5">Branch *</label>
                 <div className="relative">
                   <BookOpen size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500" />
                   <select
+                    id="reg-branch"
                     name="branch"
                     value={form.branch}
                     onChange={handleChange}
@@ -1271,10 +1278,11 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
 
               {/* Year */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1.5">Year *</label>
+                <label htmlFor="reg-year" className="block text-sm font-medium text-gray-300 mb-1.5">Year *</label>
                 <div className="relative">
                   <BookOpen size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500" />
                   <select
+                    id="reg-year"
                     name="year"
                     value={form.year}
                     onChange={handleChange}
@@ -1371,11 +1379,13 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
 
               {/* Account Holder Name */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1.5">Account Holder Name *</label>
+                <label htmlFor="reg-account-holder" className="block text-sm font-medium text-gray-300 mb-1.5">Account Holder Name *</label>
                 <div className="relative">
                   <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500" />
                   <input
+                    id="reg-account-holder"
                     name="account_holder_name"
+                    autoComplete="name"
                     value={accountHolderName}
                     onChange={e => {
                       setAccountHolderName(e.target.value);
@@ -1399,17 +1409,20 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
 
               {/* Upload Payment Screenshot */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                <label htmlFor="reg-payment-screenshot" className="block text-sm font-medium text-gray-300 mb-1.5">
                   Upload Payment Screenshot *
                 </label>
                 <div className="relative">
                   {!screenshotPreview ? (
-                    <label className={`flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-white/[0.04] transition-colors ${screenshotError ? 'border-red-500/60 bg-red-500/5' : 'border-white/15 bg-white/5'}`}>
+                    <label htmlFor="reg-payment-screenshot" className={`flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-white/[0.04] transition-colors ${screenshotError ? 'border-red-500/60 bg-red-500/5' : 'border-white/15 bg-white/5'}`}>
                       <Upload size={30} className={`mb-2 ${screenshotError ? 'text-red-400' : 'text-gray-400'}`} />
                       <p className="text-sm font-semibold text-gray-200">Click to upload payment screenshot</p>
                       <p className="text-xs text-gray-400 mt-1">PNG, JPG, JPEG, or WEBP (Max 10MB)</p>
                       <input
+                        id="reg-payment-screenshot"
+                        name="payment_screenshot"
                         type="file"
+                        aria-label="Upload payment screenshot"
                         accept="image/png,image/jpeg,image/jpg,image/webp"
                         onChange={handleScreenshotChange}
                         className="hidden"
@@ -1432,10 +1445,13 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
                           <p className="text-[11px] text-gray-500">{(screenshotFile.size / 1024).toFixed(1)} KB</p>
                         )}
                         <div className="flex items-center gap-2 mt-3 justify-center sm:justify-start">
-                          <label className="px-3 py-1.5 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 text-xs font-medium cursor-pointer border border-blue-500/30 transition-colors">
+                          <label htmlFor="reg-payment-screenshot-replace" className="px-3 py-1.5 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 text-xs font-medium cursor-pointer border border-blue-500/30 transition-colors">
                             Replace Screenshot
                             <input
+                              id="reg-payment-screenshot-replace"
+                              name="payment_screenshot_replace"
                               type="file"
+                              aria-label="Replace payment screenshot"
                               accept="image/png,image/jpeg,image/jpg,image/webp"
                               onChange={handleScreenshotChange}
                               className="hidden"
@@ -1461,10 +1477,11 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1.5">Registration Payment ID *</label>
+                <label htmlFor="reg-payment-id" className="block text-sm font-medium text-gray-300 mb-1.5">Registration Payment ID *</label>
                 <div className="relative">
                   <CreditCard size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500" />
                   <input
+                    id="reg-payment-id"
                     name="payment_id"
                     value={paymentId}
                     onChange={e => {
