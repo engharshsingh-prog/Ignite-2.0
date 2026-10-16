@@ -93,7 +93,7 @@ export default function Home() {
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-blue-500/40 bg-blue-500/10 backdrop-blur-sm text-blue-300 text-sm font-medium mb-8"
           >
             <Sparkles size={14} />
-            Institute of Engineering and Technology | Batch 2024
+            Institute of Engineering and Technology | Batch 2026
           </motion.div>
 
           <motion.h1 variants={fadeUp} className="text-5xl sm:text-7xl md:text-8xl font-black tracking-tight mb-4">
