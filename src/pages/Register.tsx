@@ -1097,12 +1097,14 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
             <form onSubmit={handleSubmitStep1} className="space-y-5">
               {/* Email Address with OTP */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1.5">Email Address *</label>
+                <label htmlFor="reg-email" className="block text-sm font-medium text-gray-300 mb-1.5">Email Address *</label>
                 <div className="relative">
                   <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500" />
                   <input
+                    id="reg-email"
                     name="email"
                     type="email"
+                    autoComplete="email"
                     value={form.email}
                     onChange={handleChange}
                     readOnly={otpVerified}
@@ -1153,6 +1155,11 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
                   </button>
                   <div className="flex-1 flex gap-2">
                     <input
+                      id="reg-otp"
+                      name="otp"
+                      type="text"
+                      inputMode="numeric"
+                      autoComplete="one-time-code"
                       value={otp}
                       onChange={e => {
                         setOtp(e.target.value);

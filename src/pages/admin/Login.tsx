@@ -251,9 +251,12 @@ export default function AdminLogin() {
 
               <form onSubmit={handleLogin} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1.5">Email</label>
+                  <label htmlFor="admin-email" className="block text-sm font-medium text-gray-300 mb-1.5">Email</label>
                   <input
+                    id="admin-email"
+                    name="email"
                     type="email"
+                    autoComplete="email"
                     value={email}
                     onChange={e => setEmail(e.target.value)}
                     placeholder="name@example.com"
@@ -262,10 +265,13 @@ export default function AdminLogin() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1.5">Password</label>
+                  <label htmlFor="admin-password" className="block text-sm font-medium text-gray-300 mb-1.5">Password</label>
                   <div className="relative">
                     <input
+                      id="admin-password"
+                      name="password"
                       type={showPw ? 'text' : 'password'}
+                      autoComplete="current-password"
                       value={password}
                       onChange={e => setPassword(e.target.value)}
                       placeholder="••••••••••••"
@@ -275,6 +281,7 @@ export default function AdminLogin() {
                     <button
                       type="button"
                       onClick={() => setShowPw(!showPw)}
+                      aria-label={showPw ? 'Hide password' : 'Show password'}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300"
                     >
                       {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
