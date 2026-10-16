@@ -117,7 +117,7 @@ export const supabase = isSupabaseConfigured
   : null;
 
 const secondaryDbName = isTursoConfigured ? 'Turso' : 'local SQLite';
-let activeBackend = isSupabaseConfigured ? 'supabase' : (isTursoConfigured ? 'turso' : 'sqlite');
+let activeBackend = isTursoConfigured ? 'turso' : (isSupabaseConfigured ? 'supabase' : 'sqlite');
 let healthCheckPromise = null;
 
 export async function checkSupabaseHealth() {
@@ -131,7 +131,7 @@ export async function checkSupabaseHealth() {
         const { error } = await supabase.rpc('exec_sql', { sql_query: 'SELECT 1', params: [] });
         if (!error) {
           console.log(`[db] Connected successfully to Supabase: ${supabaseUrl}`);
-          activeBackend = 'supabase';
+          activeBackend = isTursoConfigured ? 'turso' : 'supabase';
         } else {
           console.warn(`[db] Supabase RPC check returned error (${error.message}). Operating using ${secondaryDbName} database.`);
           activeBackend = isTursoConfigured ? 'turso' : 'sqlite';
@@ -183,11 +183,29 @@ function convertToPgSql(sql, args = []) {
   const insertBoolIndices = new Set();
   if (insertMatch) {
     const cols = insertMatch[1].split(',').map((c) => c.trim().toLowerCase());
+    const valTokens = insertMatch[2].split(',').map((v) => v.trim());
+    let tokensChanged = false;
     cols.forEach((col, idx) => {
       if (BOOLEAN_COLUMNS.includes(col)) {
         insertBoolIndices.add(idx);
+        if (valTokens[idx] === '1') {
+          valTokens[idx] = 'TRUE';
+          tokensChanged = true;
+        } else if (valTokens[idx] === '0') {
+          valTokens[idx] = 'FALSE';
+          tokensChanged = true;
+        }
       }
     });
+    if (tokensChanged) {
+      const tableMatch = insertMatch[0].match(/INSERT\s+INTO\s+([^\(]+)/i);
+      if (tableMatch) {
+        converted = converted.replace(
+          insertMatch[0],
+          `INSERT INTO ${tableMatch[1].trim()} (${cols.join(', ')}) VALUES (${valTokens.join(', ')})`
+        );
+      }
+    }
   }
 
   // 4. Replace ? with $1, $2... and convert corresponding arg if it targets a boolean column
@@ -239,6 +257,57 @@ function normalizeRows(rows) {
 }
 
 async function executeStatement(sql, args = []) {
+  const upperSql = sql.trim().toUpperCase();
+  const isWrite = upperSql.startsWith('INSERT') || upperSql.startsWith('UPDATE') || upperSql.startsWith('DELETE') || upperSql.startsWith('REPLACE');
+
+  // When Turso is configured, operate with Turso as primary database
+  if (isTursoConfigured) {
+    let result;
+    try {
+      result = await localClient.execute({ sql, args });
+    } catch (tursoErr) {
+      // If Turso fails and Supabase is available, attempt fallback
+      if (supabase) {
+        console.warn(`[db] Turso query failed (${tursoErr.message}). Attempting fallback to Supabase.`);
+        const { sql: pgSql, args: pgArgs } = convertToPgSql(sql, args);
+        const { data, error } = await supabase.rpc('exec_sql', {
+          sql_query: pgSql,
+          params: pgArgs,
+        });
+        if (error) throw error;
+        const rows = normalizeRows(data || []);
+        const firstRow = rows[0];
+        const lastInsertRowid = firstRow && firstRow.id ? Number(firstRow.id) : undefined;
+        return {
+          rows,
+          rowsAffected: rows.length,
+          lastInsertRowid,
+        };
+      }
+      throw tursoErr;
+    }
+
+    // Dual-write: asynchronously replicate writes to Supabase so both stays synchronized
+    if (isWrite && supabase) {
+      try {
+        const { sql: pgSql, args: pgArgs } = convertToPgSql(sql, args);
+        await supabase.rpc('exec_sql', {
+          sql_query: pgSql,
+          params: pgArgs,
+        });
+      } catch (sbErr) {
+        console.warn('[db] Supabase replication sync notice:', sbErr?.message || sbErr);
+      }
+    }
+
+    return {
+      rows: normalizeRows(result.rows),
+      rowsAffected: Number(result.rowsAffected || 0),
+      lastInsertRowid: result.lastInsertRowid !== undefined ? Number(result.lastInsertRowid) : undefined,
+    };
+  }
+
+  // Fallback when Turso is not configured: use Supabase or local SQLite
   const backend = await checkSupabaseHealth();
 
   if (backend === 'supabase' && supabase) {

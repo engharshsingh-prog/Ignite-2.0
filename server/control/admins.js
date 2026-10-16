@@ -80,14 +80,23 @@ export default async function handler(req, res) {
       }
 
       const hashedPassword = hashPassword(password);
-      const result = await db
-        .prepare(
-          `
-            INSERT INTO auth_users (email, password_hash, role, status, is_approved, added_by, created_at)
-            VALUES (?, ?, 'admin', 'active', 1, ?, datetime('now'))
-          `
-        )
-        .run(normalizedEmail, hashedPassword, superAdmin.email);
+      let result;
+      try {
+        result = await db
+          .prepare(
+            `
+              INSERT INTO auth_users (email, password_hash, role, status, is_approved, added_by, created_at)
+              VALUES (?, ?, 'admin', 'active', ?, ?, datetime('now'))
+            `
+          )
+          .run(normalizedEmail, hashedPassword, 1, superAdmin.email);
+      } catch (insertErr) {
+        const msg = String(insertErr?.message || insertErr);
+        if (msg.includes('UNIQUE constraint failed') || msg.includes('duplicate key') || msg.includes('23505')) {
+          return res.status(409).json({ error: 'An admin with this email already exists.' });
+        }
+        throw insertErr;
+      }
 
       await writeActivity({
         entity_type: 'admin_management',

@@ -1194,6 +1194,9 @@ export default function SuperAdminControl() {
                 <div className="relative">
                   <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
                   <input
+                    id="search-admins"
+                    name="search_admins"
+                    aria-label="Search admins by email or role"
                     type="text"
                     value={adminSearch}
                     onChange={(e) => setAdminSearch(e.target.value)}
@@ -1370,6 +1373,9 @@ export default function SuperAdminControl() {
                 <div className="relative flex-1">
                   <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
                   <input
+                    id="search-logs"
+                    name="search_logs"
+                    aria-label="Filter logs by admin, action, or details"
                     type="text"
                     value={logSearch}
                     onChange={(e) => setLogSearch(e.target.value)}
@@ -1484,8 +1490,11 @@ export default function SuperAdminControl() {
 
             <form onSubmit={handleAddAdminSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-gray-300 mb-1">Gmail Address</label>
+                <label htmlFor="provision-admin-email" className="block text-xs font-semibold text-gray-300 mb-1">Gmail Address</label>
                 <input
+                  id="provision-admin-email"
+                  name="email"
+                  autoComplete="email"
                   type="email"
                   required
                   value={newAdminEmail}
@@ -1496,9 +1505,12 @@ export default function SuperAdminControl() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-300 mb-1">Password</label>
+                <label htmlFor="provision-admin-password" className="block text-xs font-semibold text-gray-300 mb-1">Password</label>
                 <div className="relative">
                   <input
+                    id="provision-admin-password"
+                    name="password"
+                    autoComplete="new-password"
                     type={showNewAdminPw ? 'text' : 'password'}
                     required
                     minLength={8}
@@ -1509,6 +1521,7 @@ export default function SuperAdminControl() {
                   />
                   <button
                     type="button"
+                    aria-label={showNewAdminPw ? "Hide password" : "Show password"}
                     onClick={() => setShowNewAdminPw(!showNewAdminPw)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
                   >
@@ -1568,9 +1581,12 @@ export default function SuperAdminControl() {
 
             <form onSubmit={handleResetPasswordSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-gray-300 mb-1">New Password</label>
+                <label htmlFor="reset-admin-password" className="block text-xs font-semibold text-gray-300 mb-1">New Password</label>
                 <div className="relative">
                   <input
+                    id="reset-admin-password"
+                    name="new_password"
+                    autoComplete="new-password"
                     type={showResetPw ? 'text' : 'password'}
                     required
                     minLength={8}
@@ -1581,6 +1597,7 @@ export default function SuperAdminControl() {
                   />
                   <button
                     type="button"
+                    aria-label={showResetPw ? "Hide password" : "Show password"}
                     onClick={() => setShowResetPw(!showResetPw)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
                   >
