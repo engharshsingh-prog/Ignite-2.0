@@ -421,12 +421,42 @@ export default function Register() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...form, otp_token: otpToken }),
       });
-      const data = await readJsonSafe<{ success?: boolean; participant?: SubmittedParticipant; error?: string }>(res);
+      const data = await readJsonSafe<{ success?: boolean; participant?: SubmittedParticipant; error?: string; redirectToStep2?: boolean; step2_token?: string; step2_token_expires_at?: string }>(res);
       if (!res.ok) throw new Error(getErrorMessage(data, 'Registration submission failed'));
 
       try {
         sessionStorage.removeItem('ignite_otp_session');
       } catch (_) {}
+
+      // Handle case where email is already registered but approved and payment not submitted
+      if (data?.redirectToStep2 && data?.participant) {
+        setActiveParticipant(data.participant);
+        // Use the step2_token returned directly from the backend
+        if (data.step2_token) {
+          setStep2Token(data.step2_token);
+          setStep(2);
+          setViewState('step2');
+        } else {
+          // Fallback: fetch token via status lookup
+          const regId = data.participant.registration_id;
+          if (!regId) {
+            setViewState('pending');
+            setStep(1);
+            return;
+          }
+          const statusRes = await fetch(`/api/registration-status?registration_id=${encodeURIComponent(regId)}`);
+          const statusData = await readJsonSafe<{ token?: string | null }>(statusRes);
+          if (statusData?.token) {
+            setStep2Token(statusData.token);
+            setStep(2);
+            setViewState('step2');
+          } else {
+            setViewState('pending');
+            setStep(1);
+          }
+        }
+        return;
+      }
 
       if (data?.participant) {
         setActiveParticipant(data.participant);
@@ -1036,9 +1066,19 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
           )}
 
           {error && (
-            <div className="flex items-center gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 mb-6">
-              <AlertCircle size={18} className="flex-shrink-0" />
-              <p className="text-sm">{error}</p>
+            <div className="flex items-start gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 mb-6">
+              <AlertCircle size={18} className="flex-shrink-0 mt-0.5" />
+              <div className="text-sm flex-1">
+                <p>{error}</p>
+                {error.toLowerCase().includes('already registered') && (
+                  <a
+                    href="/my-profile"
+                    className="inline-block mt-1.5 text-xs text-blue-400 font-semibold underline hover:text-blue-300"
+                  >
+                    View your registration & entry pass in My Profile →
+                  </a>
+                )}
+              </div>
             </div>
           )}
 

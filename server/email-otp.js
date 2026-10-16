@@ -63,9 +63,36 @@ export default async function handler(req, res) {
         return res.status(403).json({ error: 'Registrations are currently closed by admin.' });
       }
 
-      const existing = await db.prepare('SELECT id FROM participants WHERE email = ? LIMIT 1').get(normalizedEmail);
-      if (existing) {
-        return res.status(409).json({ error: 'This email address is already registered' });
+      const existing = await db.prepare('SELECT id, approval_status, payment_id FROM participants WHERE lower(trim(email)) = ? LIMIT 1').get(normalizedEmail);
+      if (existing && existing.id) {
+        if (existing.approval_status === 'approved' && existing.payment_id) {
+          return res.status(409).json({
+            error: 'This email address is already registered and payment submitted. You can access your pass in My Profile.',
+            alreadyRegistered: true,
+            status: 'completed'
+          });
+        }
+        if (existing.approval_status === 'approved' && !existing.payment_id) {
+          return res.status(409).json({
+            error: 'This email address is already registered and approved! Please complete your payment.',
+            alreadyRegistered: true,
+            status: 'approved'
+          });
+        }
+        if (existing.approval_status === 'pending_approval') {
+          return res.status(409).json({
+            error: 'Your registration has already been submitted and is currently pending admin verification.',
+            alreadyRegistered: true,
+            status: 'pending_approval'
+          });
+        }
+        if (existing.approval_status !== 'rejected') {
+          return res.status(409).json({
+            error: 'This email address is already registered',
+            alreadyRegistered: true
+          });
+        }
+        // If rejected, allow proceeding to send OTP for re-application
       }
 
       const recent = await db

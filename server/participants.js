@@ -126,18 +126,30 @@ export default async function handler(req, res) {
         return res.status(403).json({ error: 'Your email verification session has expired. Please verify your email again.' });
       }
 
-      const existingByEmail = await db.prepare('SELECT id, approval_status, payment_id FROM participants WHERE email = ? LIMIT 1').get(normalizedEmail);
-      if (existingByEmail) {
+      const existingByEmail = await db.prepare('SELECT id, approval_status, payment_id, step2_token, step2_token_expires_at FROM participants WHERE lower(trim(email)) = ? LIMIT 1').get(normalizedEmail);
+      if (existingByEmail && existingByEmail.id) {
         if (existingByEmail.approval_status === 'approved' && existingByEmail.payment_id) {
-          return res.status(409).json({ error: 'This email address is already registered and payment submitted.' });
+          return res.status(409).json({ error: 'This email address is already registered and payment submitted. You can check your pass in My Profile.' });
+        }
+        if (existingByEmail.approval_status === 'approved' && !existingByEmail.payment_id) {
+          // Approved but payment not yet submitted - return existing participant info so frontend can continue to Step 2
+          const participant = toParticipant(await db.prepare('SELECT * FROM participants WHERE id = ?').get(existingByEmail.id));
+          return res.status(409).json({ 
+            error: 'This email address is already registered and approved. Please complete your payment.',
+            participant,
+            redirectToStep2: true,
+            step2_token: existingByEmail.step2_token,
+            step2_token_expires_at: existingByEmail.step2_token_expires_at
+          });
         }
         if (existingByEmail.approval_status === 'pending_approval') {
           return res.status(409).json({ error: 'Your registration has already been submitted and is currently pending admin verification.' });
         }
+        // Note: 'rejected' status is handled below for re-submission
       }
 
-      const existingByRoll = await db.prepare('SELECT id, approval_status, payment_id FROM participants WHERE roll_number = ? LIMIT 1').get(cleanRoll);
-      if (existingByRoll && existingByRoll.id !== existingByEmail?.id) {
+      const existingByRoll = await db.prepare('SELECT id, approval_status, payment_id FROM participants WHERE lower(trim(roll_number)) = ? LIMIT 1').get(cleanRoll.toLowerCase());
+      if (existingByRoll && existingByRoll.id && existingByRoll.id !== existingByEmail?.id) {
         if (existingByRoll.approval_status !== 'rejected') {
           return res.status(409).json({ error: 'This roll number/enrolment number is already registered.' });
         }

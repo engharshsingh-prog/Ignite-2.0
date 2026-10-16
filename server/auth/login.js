@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import db from '../_db.js';
+import db, { adminCredentials, hashPassword } from '../_db.js';
 import { isSuperAdmin, getSuperAdminEmails } from '../_auth.js';
 import { sendLoginApprovalNotification } from '../_mailer.js';
 import { writeActivity } from '../_activity.js';
@@ -69,12 +69,20 @@ export default async function handler(req, res) {
       .get(normalizedEmail);
 
     // If not super admin and not an active DB user, fail securely without revealing admin status
-    if (!superAdmin && (!user || user.status !== 'active')) {
+    if (!superAdmin && (!user || !user.id || user.status !== 'active')) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    // Verify password
-    if (!user || !verifyPassword(password, user.password_hash)) {
+    // Verify password against DB hash or configured adminCredentials
+    let passwordValid = user && user.id && verifyPassword(password, user.password_hash);
+    const envPassword = adminCredentials.get(normalizedEmail);
+    if (!passwordValid && user && user.id && envPassword && password === envPassword) {
+      passwordValid = true;
+      const newHash = hashPassword(password);
+      db.prepare('UPDATE auth_users SET password_hash = ? WHERE id = ?').run(newHash, user.id).catch(() => {});
+    }
+
+    if (!passwordValid) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
@@ -84,8 +92,8 @@ export default async function handler(req, res) {
 
     // 1. SUPER ADMIN OR PREVIOUSLY APPROVED ADMIN FLOW: Direct Active Login
     // Super admins always log in directly.
-    // Once a super admin approves an admin once (is_approved === 1), they never need approval again!
-    if (superAdmin || user.is_approved === 1) {
+    // Once a super admin approves an admin once (is_approved === 1 or true), they never need approval again!
+    if (superAdmin || Boolean(user.is_approved)) {
       await db
         .prepare(
           "INSERT INTO auth_sessions (id, user_id, expires_at, status, ip, user_agent, last_seen_at) VALUES (?, ?, ?, ?, ?, ?, datetime('now'))"

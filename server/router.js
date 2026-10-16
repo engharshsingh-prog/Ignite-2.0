@@ -148,5 +148,12 @@ export default async function dispatchApiRequest(req, res) {
     return res.status(404).json({ error: 'API route not found' });
   }
 
-  return handler(req, res);
+  try {
+    return await handler(req, res);
+  } catch (err) {
+    console.error(`[api-router] Error handling ${req.method} ${path}:`, err?.message || err);
+    if (!res.headersSent) {
+      return res.status(500).json({ error: err?.message || 'Internal server error occurred' });
+    }
+  }
 }

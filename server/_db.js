@@ -1,6 +1,8 @@
 import 'dotenv/config';
 import crypto from 'crypto';
-import { createClient } from '@supabase/supabase-js';
+import path from 'path';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
+import { createClient as createLibsqlClient } from '@libsql/client';
 
 export function getSuperAdminEmails() {
   const raw = String(process.env.SUPER_ADMIN_EMAILS || '');
@@ -44,165 +46,237 @@ export function hashPassword(password) {
   return `${salt.toString('hex')}:${key.toString('hex')}`;
 }
 
-// Supabase client (service role for server-side operations)
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+// -------------------------------------------------------------
+// Database Clients Setup (Supabase with Local SQLite fallback)
+// -------------------------------------------------------------
+const supabaseUrl = process.env.SUPABASE_URL || 'https://yrkempqqaxjapkurhxwg.supabase.co';
+const supabaseSecretKey = (
+  process.env.SUPABASE_SECRET_KEY ||
+  process.env.SUPABASE_SERVICE_ROLE_KEY ||
+  ''
+).trim();
+const supabasePublishableKey = (
+  process.env.SUPABASE_PUBLISHABLE_KEY ||
+  process.env.SUPABASE_ANON_KEY ||
+  ''
+).trim();
 
-if (!supabaseUrl || !supabaseServiceKey) {
-  console.error('[db] FATAL: SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set in environment');
+function resolveLocalDatabaseUrl() {
+  const rawPath = String(process.env.SQLITE_DB_PATH || './data/ignite26.db').trim();
+  const normalized = rawPath.replace(/\\/g, '/');
+  if (normalized.startsWith('file:')) return normalized;
+  const resolved = path.resolve(process.cwd(), normalized);
+  return `file:${resolved.replace(/\\/g, '/')}`;
 }
 
-export const supabase = createClient(supabaseUrl, supabaseServiceKey, {
-  auth: { persistSession: false }
-});
+const localClient = createLibsqlClient({ url: resolveLocalDatabaseUrl() });
 
-// Helper to convert SQLite-style ? params to PostgreSQL $1, $2, ...
-function convertParams(sql, args) {
+function isPlaceholderOrOldKey(key) {
+  if (!key) return true;
+  if (key.includes('your-') || key.includes('placeholder')) return true;
+  if (key.includes('Q2LKrKLhYxHj3grBZyRkAw_ZTGyboaw')) return true;
+  if (key.includes('1Y8d9iSTtWpnNyfn2cAW9Q_THmrRExY')) return true;
+  return false;
+}
+
+const isSupabaseConfigured = Boolean(
+  supabaseUrl &&
+  !isPlaceholderOrOldKey(supabaseSecretKey) &&
+  !supabaseUrl.includes('ihwxebxdwcrswxjfgrqv')
+);
+
+export const supabase = isSupabaseConfigured
+  ? createSupabaseClient(supabaseUrl, supabaseSecretKey, { auth: { persistSession: false } })
+  : null;
+
+let activeBackend = 'sqlite';
+let supabaseChecked = false;
+
+async function checkSupabaseHealth() {
+  if (supabaseChecked) return activeBackend;
+  supabaseChecked = true;
+  if (!supabase) {
+    console.log('[db] Operating on local SQLite database (Supabase secret key not configured or using placeholder).');
+    activeBackend = 'sqlite';
+    return activeBackend;
+  }
+  try {
+    const { error } = await supabase.rpc('exec_sql', { sql_query: 'SELECT 1', params: [] });
+    if (!error) {
+      console.log(`[db] Connected successfully to Supabase: ${supabaseUrl}`);
+      activeBackend = 'supabase';
+    } else {
+      console.warn(`[db] Supabase RPC check returned error (${error.message}). Operating using local SQLite database.`);
+      activeBackend = 'sqlite';
+    }
+  } catch (err) {
+    console.warn(`[db] Supabase unavailable (${err.message}). Operating using local SQLite database.`);
+    activeBackend = 'sqlite';
+  }
+  return activeBackend;
+}
+
+checkSupabaseHealth().catch(() => {});
+
+const BOOLEAN_COLUMNS = [
+  'verified',
+  'consumed',
+  'is_approved',
+  'payment_verified',
+  'check_in_status',
+  'enabled',
+  'approval_email_sent',
+];
+
+function convertToPgSql(sql, args = []) {
+  const pgArgs = [...args];
+  let converted = String(sql);
+
+  // 1. Convert boolean literal comparisons / assignments in text: e.g. "check_in_status = 1" -> "check_in_status = TRUE"
+  for (const col of BOOLEAN_COLUMNS) {
+    const eq1 = new RegExp(`\\b${col}\\s*=\\s*1\\b`, 'gi');
+    const eq0 = new RegExp(`\\b${col}\\s*=\\s*0\\b`, 'gi');
+    const ne1 = new RegExp(`\\b${col}\\s*(!=|<>)\\s*1\\b`, 'gi');
+    const ne0 = new RegExp(`\\b${col}\\s*(!=|<>)\\s*0\\b`, 'gi');
+    converted = converted
+      .replace(eq1, `${col} = TRUE`)
+      .replace(eq0, `${col} = FALSE`)
+      .replace(ne1, `${col} != TRUE`)
+      .replace(ne0, `${col} != FALSE`);
+  }
+
+  // 2. Convert datetime('now') to NOW()
+  converted = converted.replace(/datetime\('now'\)/gi, 'NOW()');
+
+  // 3. Check for INSERT INTO table (cols...) VALUES (?...)
+  const insertMatch = converted.match(/INSERT\s+INTO\s+[^\(]+\(([^)]+)\)\s*VALUES\s*\(([^)]+)\)/i);
+  const insertBoolIndices = new Set();
+  if (insertMatch) {
+    const cols = insertMatch[1].split(',').map((c) => c.trim().toLowerCase());
+    cols.forEach((col, idx) => {
+      if (BOOLEAN_COLUMNS.includes(col)) {
+        insertBoolIndices.add(idx);
+      }
+    });
+  }
+
+  // 4. Replace ? with $1, $2... and convert corresponding arg if it targets a boolean column
   let paramIndex = 0;
-  const newSql = sql.replace(/\?/g, () => {
+  let resultSql = '';
+  let lastIdx = 0;
+  const qRegex = /\?/g;
+  let match;
+  const boolColAssignRegex = new RegExp(`\\b(${BOOLEAN_COLUMNS.join('|')})\\s*(=|!=|<>)\\s*$`, 'i');
+
+  while ((match = qRegex.exec(converted)) !== null) {
+    const qPos = match.index;
+    resultSql += converted.substring(lastIdx, qPos);
+
+    const beforeQuestion = converted.substring(Math.max(0, qPos - 50), qPos).trim();
+    const isBoolAssignment = boolColAssignRegex.test(beforeQuestion);
+    const isBoolInsert = insertBoolIndices.has(paramIndex);
+
+    if ((isBoolAssignment || isBoolInsert) && paramIndex < pgArgs.length) {
+      const val = pgArgs[paramIndex];
+      if (val === 1 || val === '1' || val === true) {
+        pgArgs[paramIndex] = true;
+      } else if (val === 0 || val === '0' || val === false) {
+        pgArgs[paramIndex] = false;
+      }
+    }
+
     paramIndex++;
-    return `$${paramIndex}`;
-  });
-  return { sql: newSql, args };
+    resultSql += `$${paramIndex}`;
+    lastIdx = qPos + 1;
+  }
+  resultSql += converted.substring(lastIdx);
+
+  return { sql: resultSql, args: pgArgs };
 }
 
-// Normalize row from Supabase (snake_case keys)
 function normalizeRow(row) {
-  if (!row) return null;
-  return Object.fromEntries(Object.entries(row));
+  if (!row || typeof row !== 'object') return undefined;
+  const entries = Object.entries(row);
+  if (entries.length === 0) return undefined;
+  const hasValidValue = entries.some(([_, v]) => v !== null && v !== undefined);
+  if (!hasValidValue) return undefined;
+  return Object.fromEntries(entries);
 }
 
 function normalizeRows(rows) {
-  return Array.isArray(rows) ? rows.map(normalizeRow) : [];
+  if (!Array.isArray(rows)) return [];
+  return rows.map(normalizeRow).filter(Boolean);
 }
 
-// Execute raw SQL via RPC function (created in supabase-setup.sql)
-async function executeRaw(sql, args = []) {
-  const { sql: pgSql, args: pgArgs } = convertParams(sql, args);
-  
-  const { data, error } = await supabase.rpc('exec_sql', {
-    sql_query: pgSql,
-    params: pgArgs
-  });
-  
-  if (error) {
-    // Log the actual SQL for debugging
-    console.error('[db] SQL Error:', error.message);
-    console.error('[db] Query:', pgSql);
-    console.error('[db] Args:', pgArgs);
-    throw error;
+async function executeStatement(sql, args = []) {
+  const backend = await checkSupabaseHealth();
+
+  if (backend === 'supabase' && supabase) {
+    try {
+      const { sql: pgSql, args: pgArgs } = convertToPgSql(sql, args);
+      const { data, error } = await supabase.rpc('exec_sql', {
+        sql_query: pgSql,
+        params: pgArgs,
+      });
+      if (error) throw error;
+      const rows = normalizeRows(data || []);
+      const firstRow = rows[0];
+      const lastInsertRowid = firstRow && firstRow.id ? Number(firstRow.id) : undefined;
+      return {
+        rows,
+        rowsAffected: rows.length,
+        lastInsertRowid,
+      };
+    } catch (err) {
+      console.warn(`[db] Supabase query failed (${err.message}). Falling back to local SQLite.`);
+    }
   }
-  
+
+  const result = await localClient.execute({ sql, args });
   return {
-    rows: normalizeRows(data || []),
-    rowsAffected: (data || []).length,
-    lastInsertRowid: data && data.length > 0 && data[0].id ? Number(data[0].id) : undefined,
+    rows: normalizeRows(result.rows),
+    rowsAffected: Number(result.rowsAffected || 0),
+    lastInsertRowid: result.lastInsertRowid !== undefined ? Number(result.lastInsertRowid) : undefined,
   };
 }
 
-async function executeRawSingle(sql, args = []) {
-  const { sql: pgSql, args: pgArgs } = convertParams(sql, args);
-  
-  const { data, error } = await supabase.rpc('exec_sql_single', {
-    sql_query: pgSql,
-    params: pgArgs
-  });
-  
-  if (error) {
-    console.error('[db] SQL Error:', error.message);
-    console.error('[db] Query:', pgSql);
-    console.error('[db] Args:', pgArgs);
-    throw error;
-  }
-  
-  return normalizeRow(data);
-}
-
-// Main db object with prepare() API compatible with SQLite version
 const db = {
   async exec(sql) {
     const statements = String(sql)
       .split(/;\s*(?:\r?\n|$)/)
-      .map((statement) => statement.trim())
+      .map((s) => s.trim())
       .filter(Boolean);
-    
-    for (const statement of statements) {
-      await this.prepare(statement).run();
+    for (const stmt of statements) {
+      await executeStatement(stmt);
     }
   },
 
   prepare(sql) {
     const upperSql = sql.trim().toUpperCase();
-    const isSelect = upperSql.startsWith('SELECT');
-    const isInsert = upperSql.startsWith('INSERT');
-    const isUpdate = upperSql.startsWith('UPDATE');
-    const isDelete = upperSql.startsWith('DELETE');
-    const isCreate = upperSql.startsWith('CREATE');
-    const isAlter = upperSql.startsWith('ALTER');
-    const isDrop = upperSql.startsWith('DROP');
     const isPragma = upperSql.startsWith('PRAGMA');
-    const isSavepoint = upperSql.startsWith('SAVEPOINT') || upperSql.startsWith('RELEASE') || upperSql.startsWith('ROLLBACK');
-    const isTransaction = upperSql.startsWith('BEGIN') || upperSql.startsWith('COMMIT');
+    const isTransaction = upperSql.startsWith('BEGIN') || upperSql.startsWith('COMMIT') || upperSql.startsWith('ROLLBACK');
 
-    // Handle PRAGMA (SQLite-specific) - no-op for PostgreSQL
-    if (isPragma) {
+    if (isPragma || isTransaction) {
       return {
-        async get(...args) { return undefined; },
-        async all(...args) { return []; },
-        async run(...args) { return { changes: 0, lastInsertRowid: undefined }; },
+        async get() { return undefined; },
+        async all() { return []; },
+        async run() { return { changes: 0, lastInsertRowid: undefined }; },
       };
     }
 
-    // Handle transaction statements
-    if (isTransaction || isSavepoint) {
-      return {
-        async get(...args) { return undefined; },
-        async all(...args) { return []; },
-        async run(...args) { return { changes: 0, lastInsertRowid: undefined }; },
-      };
-    }
-
-    // For DDL statements (CREATE, ALTER, DROP) - these should be run via Supabase SQL Editor
-    // In dev, we'll execute them via RPC; in production they should already exist
-    if (isCreate || isAlter || isDrop) {
-      return {
-        async get(...args) { return undefined; },
-        async all(...args) { return []; },
-        async run(...args) { 
-          try {
-            const result = await executeRaw(sql, args);
-            return { changes: result.rowsAffected, lastInsertRowid: result.lastInsertRowid };
-          } catch (err) {
-            // DDL might fail if already exists, log but don't throw
-            console.warn('[db] DDL execution warning:', err.message);
-            return { changes: 0, lastInsertRowid: undefined };
-          }
-        },
-      };
-    }
-
-    // For DML statements (SELECT, INSERT, UPDATE, DELETE)
     return {
       async get(...args) {
-        try {
-          return await executeRawSingle(sql, args);
-        } catch (err) {
-          // If exec_sql_single doesn't exist, fall back to exec_sql
-          if (err.message?.includes('function') && err.message?.includes('exec_sql_single')) {
-            const result = await executeRaw(sql, args);
-            return result.rows[0];
-          }
-          throw err;
-        }
+        const result = await executeStatement(sql, args);
+        return normalizeRow(result.rows[0]);
       },
 
       async all(...args) {
-        const result = await executeRaw(sql, args);
-        return result.rows;
+        const result = await executeStatement(sql, args);
+        return normalizeRows(result.rows);
       },
 
       async run(...args) {
-        const result = await executeRaw(sql, args);
+        const result = await executeStatement(sql, args);
         return {
           changes: result.rowsAffected,
           lastInsertRowid: result.lastInsertRowid,
