@@ -47,7 +47,8 @@ export function hashPassword(password) {
 }
 
 // -------------------------------------------------------------
-// Database Clients Setup (Supabase with Local SQLite fallback)
+// -------------------------------------------------------------
+// Database Clients Setup (Supabase & Turso cloud / local SQLite)
 // -------------------------------------------------------------
 const supabaseUrl = process.env.SUPABASE_URL || 'https://yrkempqqaxjapkurhxwg.supabase.co';
 const supabaseSecretKey = (
@@ -61,6 +62,9 @@ const supabasePublishableKey = (
   ''
 ).trim();
 
+const tursoDatabaseUrl = (process.env.TURSO_DATABASE_URL || '').trim();
+const tursoAuthToken = (process.env.TURSO_AUTH_TOKEN || '').trim();
+
 function resolveLocalDatabaseUrl() {
   const rawPath = String(process.env.SQLITE_DB_PATH || './data/ignite26.db').trim();
   const normalized = rawPath.replace(/\\/g, '/');
@@ -69,7 +73,30 @@ function resolveLocalDatabaseUrl() {
   return `file:${resolved.replace(/\\/g, '/')}`;
 }
 
-export const localClient = createLibsqlClient({ url: resolveLocalDatabaseUrl() });
+export const isTursoConfigured = Boolean(
+  tursoDatabaseUrl &&
+  !tursoDatabaseUrl.includes('your-database')
+);
+
+function createLibsqlInstance() {
+  if (isTursoConfigured) {
+    console.log(`[db] Connecting to Turso database: ${tursoDatabaseUrl}`);
+    return createLibsqlClient({
+      url: tursoDatabaseUrl,
+      authToken: tursoAuthToken || undefined,
+    });
+  }
+  try {
+    return createLibsqlClient({ url: resolveLocalDatabaseUrl() });
+  } catch (err) {
+    console.warn(`[db] Local SQLite file unavailable (${err.message}). Using in-memory fallback.`);
+    return createLibsqlClient({ url: ':memory:' });
+  }
+}
+
+export const localClient = createLibsqlInstance();
+export const tursoClient = isTursoConfigured ? localClient : null;
+export const client = localClient;
 
 function isPlaceholderOrOldKey(key) {
   if (!key) return true;
@@ -89,12 +116,13 @@ export const supabase = isSupabaseConfigured
   ? createSupabaseClient(supabaseUrl, supabaseSecretKey, { auth: { persistSession: false } })
   : null;
 
-let activeBackend = isSupabaseConfigured ? 'supabase' : 'sqlite';
+const secondaryDbName = isTursoConfigured ? 'Turso' : 'local SQLite';
+let activeBackend = isSupabaseConfigured ? 'supabase' : (isTursoConfigured ? 'turso' : 'sqlite');
 let healthCheckPromise = null;
 
 export async function checkSupabaseHealth() {
   if (!supabase) {
-    activeBackend = 'sqlite';
+    activeBackend = isTursoConfigured ? 'turso' : 'sqlite';
     return activeBackend;
   }
   if (!healthCheckPromise) {
@@ -105,12 +133,12 @@ export async function checkSupabaseHealth() {
           console.log(`[db] Connected successfully to Supabase: ${supabaseUrl}`);
           activeBackend = 'supabase';
         } else {
-          console.warn(`[db] Supabase RPC check returned error (${error.message}). Operating using local SQLite database.`);
-          activeBackend = 'sqlite';
+          console.warn(`[db] Supabase RPC check returned error (${error.message}). Operating using ${secondaryDbName} database.`);
+          activeBackend = isTursoConfigured ? 'turso' : 'sqlite';
         }
       } catch (err) {
-        console.warn(`[db] Supabase unavailable (${err.message}). Operating using local SQLite database.`);
-        activeBackend = 'sqlite';
+        console.warn(`[db] Supabase unavailable (${err.message}). Operating using ${secondaryDbName} database.`);
+        activeBackend = isTursoConfigured ? 'turso' : 'sqlite';
       }
       return activeBackend;
     })();
@@ -230,7 +258,7 @@ async function executeStatement(sql, args = []) {
         lastInsertRowid,
       };
     } catch (err) {
-      console.warn(`[db] Supabase query failed (${err.message}). Falling back to local SQLite.`);
+      console.warn(`[db] Supabase query failed (${err.message}). Falling back to ${secondaryDbName}.`);
     }
   }
 
