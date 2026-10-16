@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import crypto from 'crypto';
-import db from './_db.js';
+import db, { localClient } from './_db.js';
 import { sendOtpEmail } from './_mailer.js';
 
 const OTP_TTL_MINUTES = 10;
@@ -30,9 +30,10 @@ function randomOtp() {
 function parseUtcTimestamp(ts) {
   if (!ts) return 0;
   const s = String(ts).trim();
-  if (s.endsWith('Z')) return new Date(s).getTime();
-  if (s.includes('T')) return new Date(s.endsWith('Z') ? s : s + 'Z').getTime();
-  return new Date(s.replace(' ', 'T') + 'Z').getTime();
+  const d = new Date(s);
+  if (!Number.isNaN(d.getTime())) return d.getTime();
+  const fallback = new Date(s.replace(' ', 'T') + 'Z');
+  return Number.isNaN(fallback.getTime()) ? 0 : fallback.getTime();
 }
 
 async function registrationsEnabled() {
@@ -147,7 +148,7 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'OTP must be 6 digits' });
       }
 
-      const session = await db
+      let session = await db
         .prepare(
           `
             SELECT * FROM email_otp_sessions
@@ -158,11 +159,32 @@ export default async function handler(req, res) {
         )
         .get(normalizedEmail);
 
+      // Fallback: If not found in primary DB (e.g. was stored in local SQLite during startup race), check localClient
+      if (!session) {
+        try {
+          const localRes = await localClient.execute({
+            sql: 'SELECT * FROM email_otp_sessions WHERE email = ? AND consumed = 0 ORDER BY id DESC LIMIT 1',
+            args: [normalizedEmail],
+          });
+          if (localRes.rows && localRes.rows.length > 0) {
+            session = localRes.rows[0];
+          }
+        } catch (_) {}
+      }
+
       if (!session) {
         return res.status(404).json({ error: 'No active OTP request found. Please request an OTP first.' });
       }
 
       const now = Date.now();
+      console.log('[DEBUG VERIFY]', {
+        id: session.id,
+        email: session.email,
+        expires_at: session.expires_at,
+        parsed: parseUtcTimestamp(session.expires_at),
+        now,
+        isExpired: parseUtcTimestamp(session.expires_at) < now
+      });
       if (parseUtcTimestamp(session.expires_at) < now) {
         return res.status(400).json({ error: 'OTP expired. Please request a new OTP.' });
       }
@@ -204,7 +226,7 @@ export default async function handler(req, res) {
         return res.status(200).json({ valid: false });
       }
 
-      const session = await db
+      let session = await db
         .prepare(
           `
             SELECT id, expires_at
@@ -215,6 +237,18 @@ export default async function handler(req, res) {
           `
         )
         .get(normalizedEmail, otp_token.trim());
+
+      if (!session) {
+        try {
+          const localRes = await localClient.execute({
+            sql: 'SELECT id, expires_at FROM email_otp_sessions WHERE email = ? AND verification_token = ? AND verified = 1 AND consumed = 0 ORDER BY id DESC LIMIT 1',
+            args: [normalizedEmail, otp_token.trim()],
+          });
+          if (localRes.rows && localRes.rows.length > 0) {
+            session = localRes.rows[0];
+          }
+        } catch (_) {}
+      }
 
       if (!session || parseUtcTimestamp(session.expires_at) < Date.now()) {
         return res.status(200).json({ valid: false });

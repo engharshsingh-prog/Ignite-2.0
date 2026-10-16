@@ -49,6 +49,7 @@ BEGIN
     END LOOP;
   END IF;
 
+  final_query := rtrim(rtrim(final_query), ';');
   trimmed_sql := ltrim(upper(final_query));
 
   -- 1. Handle SELECT and CTE queries

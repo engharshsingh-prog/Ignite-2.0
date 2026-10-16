@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import path from 'path';
 import express from 'express';
 import dispatchApiRequest from './router.js';
 
@@ -6,8 +7,17 @@ const app = express();
 const port = Number(process.env.API_PORT || 8787);
 const bodyLimit = String(process.env.API_BODY_LIMIT || '25mb');
 
+app.use((req, res, next) => {
+  const start = Date.now();
+  res.on('finish', () => {
+    console.log(`[api] ${req.method} ${req.originalUrl} -> ${res.statusCode} (${Date.now() - start}ms)`);
+  });
+  next();
+});
+
 app.use(express.json({ limit: bodyLimit }));
 app.use(express.urlencoded({ extended: true, limit: bodyLimit }));
+app.use('/uploads', express.static(path.join(process.cwd(), 'public', 'uploads')));
 app.use('/api', dispatchApiRequest);
 
 app.use((err, _req, res, next) => {

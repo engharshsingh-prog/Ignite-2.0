@@ -140,6 +140,7 @@ export default function Register() {
   const [otp, setOtp] = useState('');
   const [otpToken, setOtpToken] = useState('');
   const [otpSent, setOtpSent] = useState(false);
+  const [otpSentEmail, setOtpSentEmail] = useState('');
   const [otpVerified, setOtpVerified] = useState(false);
   const [otpLoading, setOtpLoading] = useState(false);
   const [otpMessage, setOtpMessage] = useState('');
@@ -205,6 +206,7 @@ export default function Register() {
                 setOtpToken(parsed.token);
                 setOtpVerified(true);
                 setOtpSent(true);
+                setOtpSentEmail(parsed.email);
                 setOtpMessage('Email verified successfully.');
               } else {
                 sessionStorage.removeItem('ignite_otp_session');
@@ -276,6 +278,7 @@ export default function Register() {
       setOtp('');
       setOtpToken('');
       setOtpSent(false);
+      setOtpSentEmail('');
       setOtpVerified(false);
       setOtpMessage('');
       setOtpCooldown(0);
@@ -287,7 +290,8 @@ export default function Register() {
   };
 
   const handleSendOtp = async () => {
-    if (validateField('email', form.email) !== 'valid') {
+    const cleanEmail = form.email.trim().toLowerCase();
+    if (validateField('email', cleanEmail) !== 'valid') {
       setError('Enter a valid gmail.com address before requesting OTP.');
       return;
     }
@@ -305,7 +309,7 @@ export default function Register() {
       const res = await fetch('/api/email-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'send', email: form.email }),
+        body: JSON.stringify({ action: 'send', email: cleanEmail }),
       });
       const data = await readJsonSafe<{ error?: string; cooldown_seconds?: number; message?: string }>(res);
       if (!res.ok) {
@@ -316,6 +320,7 @@ export default function Register() {
       }
 
       setOtpSent(true);
+      setOtpSentEmail(cleanEmail);
       setOtpVerified(false);
       setOtpToken('');
       try {
@@ -331,8 +336,13 @@ export default function Register() {
   };
 
   const handleVerifyOtp = async () => {
-    if (!otpSent) {
-      setError('Please request OTP first.');
+    const cleanEmail = form.email.trim().toLowerCase();
+    if (!otpSent || !otpSentEmail) {
+      setError('Please click "Send OTP" to receive a verification code first.');
+      return;
+    }
+    if (otpSentEmail !== cleanEmail) {
+      setError(`Email was changed to "${cleanEmail}". Please click "Send OTP" for this email address.`);
       return;
     }
     if (!/^\d{6}$/.test(otp.trim())) {
@@ -347,7 +357,7 @@ export default function Register() {
       const res = await fetch('/api/email-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'verify', email: form.email, otp: otp.trim() }),
+        body: JSON.stringify({ action: 'verify', email: cleanEmail, otp: otp.trim() }),
       });
       const data = await readJsonSafe<{ error?: string; otp_token?: string }>(res);
       if (!res.ok) throw new Error(getErrorMessage(data, 'OTP verification failed'));
@@ -360,7 +370,7 @@ export default function Register() {
       try {
         sessionStorage.setItem(
           'ignite_otp_session',
-          JSON.stringify({ email: form.email.trim().toLowerCase(), token: data.otp_token })
+          JSON.stringify({ email: cleanEmail, token: data.otp_token })
         );
       } catch (_) {}
     } catch (err: unknown) {
@@ -1095,9 +1105,31 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
                     type="email"
                     value={form.email}
                     onChange={handleChange}
+                    readOnly={otpVerified}
                     placeholder="yourname@gmail.com"
-                    className={`w-full bg-white/5 border rounded-xl pl-10 pr-4 py-3 text-white placeholder-gray-600 focus:outline-none transition-colors ${borderClass('email')}`}
+                    className={`w-full bg-white/5 border rounded-xl pl-10 pr-20 py-3 text-white placeholder-gray-600 focus:outline-none transition-colors ${
+                      otpVerified ? 'opacity-80 cursor-not-allowed border-emerald-500/50' : borderClass('email')
+                    }`}
                   />
+                  {otpVerified && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOtpVerified(false);
+                        setOtpSent(false);
+                        setOtpSentEmail('');
+                        setOtpToken('');
+                        setOtp('');
+                        setOtpMessage('');
+                        try {
+                          sessionStorage.removeItem('ignite_otp_session');
+                        } catch (_) {}
+                      }}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-blue-400 hover:text-blue-300 underline font-medium bg-black/50 px-2.5 py-1 rounded-lg border border-white/10"
+                    >
+                      Change
+                    </button>
+                  )}
                 </div>
                 <p className="text-xs text-gray-500 mt-1">
                   Only gmail.com addresses are accepted. Verification OTP will be sent here.

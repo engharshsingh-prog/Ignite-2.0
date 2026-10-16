@@ -69,7 +69,7 @@ function resolveLocalDatabaseUrl() {
   return `file:${resolved.replace(/\\/g, '/')}`;
 }
 
-const localClient = createLibsqlClient({ url: resolveLocalDatabaseUrl() });
+export const localClient = createLibsqlClient({ url: resolveLocalDatabaseUrl() });
 
 function isPlaceholderOrOldKey(key) {
   if (!key) return true;
@@ -89,31 +89,33 @@ export const supabase = isSupabaseConfigured
   ? createSupabaseClient(supabaseUrl, supabaseSecretKey, { auth: { persistSession: false } })
   : null;
 
-let activeBackend = 'sqlite';
-let supabaseChecked = false;
+let activeBackend = isSupabaseConfigured ? 'supabase' : 'sqlite';
+let healthCheckPromise = null;
 
-async function checkSupabaseHealth() {
-  if (supabaseChecked) return activeBackend;
-  supabaseChecked = true;
+export async function checkSupabaseHealth() {
   if (!supabase) {
-    console.log('[db] Operating on local SQLite database (Supabase secret key not configured or using placeholder).');
     activeBackend = 'sqlite';
     return activeBackend;
   }
-  try {
-    const { error } = await supabase.rpc('exec_sql', { sql_query: 'SELECT 1', params: [] });
-    if (!error) {
-      console.log(`[db] Connected successfully to Supabase: ${supabaseUrl}`);
-      activeBackend = 'supabase';
-    } else {
-      console.warn(`[db] Supabase RPC check returned error (${error.message}). Operating using local SQLite database.`);
-      activeBackend = 'sqlite';
-    }
-  } catch (err) {
-    console.warn(`[db] Supabase unavailable (${err.message}). Operating using local SQLite database.`);
-    activeBackend = 'sqlite';
+  if (!healthCheckPromise) {
+    healthCheckPromise = (async () => {
+      try {
+        const { error } = await supabase.rpc('exec_sql', { sql_query: 'SELECT 1', params: [] });
+        if (!error) {
+          console.log(`[db] Connected successfully to Supabase: ${supabaseUrl}`);
+          activeBackend = 'supabase';
+        } else {
+          console.warn(`[db] Supabase RPC check returned error (${error.message}). Operating using local SQLite database.`);
+          activeBackend = 'sqlite';
+        }
+      } catch (err) {
+        console.warn(`[db] Supabase unavailable (${err.message}). Operating using local SQLite database.`);
+        activeBackend = 'sqlite';
+      }
+      return activeBackend;
+    })();
   }
-  return activeBackend;
+  return healthCheckPromise;
 }
 
 checkSupabaseHealth().catch(() => {});
@@ -130,7 +132,7 @@ const BOOLEAN_COLUMNS = [
 
 function convertToPgSql(sql, args = []) {
   const pgArgs = [...args];
-  let converted = String(sql);
+  let converted = String(sql).trim().replace(/;+\s*$/, '');
 
   // 1. Convert boolean literal comparisons / assignments in text: e.g. "check_in_status = 1" -> "check_in_status = TRUE"
   for (const col of BOOLEAN_COLUMNS) {
@@ -191,7 +193,7 @@ function convertToPgSql(sql, args = []) {
   }
   resultSql += converted.substring(lastIdx);
 
-  return { sql: resultSql, args: pgArgs };
+  return { sql: resultSql.trim().replace(/;+\s*$/, ''), args: pgArgs };
 }
 
 function normalizeRow(row) {

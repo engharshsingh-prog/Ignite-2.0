@@ -92,22 +92,22 @@ async function genericSuperAdminHandler(req, res) {
 }
 
 function normalizeApiPath(req) {
-  const rewrittenPath = req?.query?.path;
-  if (typeof rewrittenPath === 'string' && rewrittenPath) {
-    return `/${rewrittenPath.replace(/^\/+|\/+$/g, '')}`;
-  }
-
+  let rewrittenPath = req?.query?.path;
   if (Array.isArray(rewrittenPath) && rewrittenPath.length > 0) {
-    return `/${rewrittenPath.join('/').replace(/^\/+|\/+$/g, '')}`;
+    rewrittenPath = rewrittenPath[0];
+  }
+  if (typeof rewrittenPath === 'string' && rewrittenPath) {
+    const clean = rewrittenPath.split('?')[0].replace(/^\/+|\/+$/g, '');
+    return `/${clean}`;
   }
 
   if (req.baseUrl === '/api' && typeof req.path === 'string') {
-    const path = req.path || '/';
+    const path = (req.path || '/').split('?')[0];
     return path === '/' ? '/' : path.replace(/\/+$/, '') || '/';
   }
 
   const url = new URL(req.url || '/', 'http://localhost');
-  const pathname = url.pathname.replace(/^\/api/, '') || '/';
+  const pathname = (url.pathname.replace(/^\/api/, '') || '/').split('?')[0];
   return pathname === '/' ? '/' : pathname.replace(/\/+$/, '');
 }
 
@@ -145,7 +145,8 @@ export default async function dispatchApiRequest(req, res) {
   }
 
   if (!handler) {
-    return res.status(404).json({ error: 'API route not found' });
+    console.warn(`[api-router] 404 Not Found: ${req.method} "${path}" (originalUrl: ${req.originalUrl})`);
+    return res.status(404).json({ error: `API route not found: ${path}` });
   }
 
   try {

@@ -1,5 +1,5 @@
 import crypto from 'node:crypto';
-import db, { encodeSkills, toParticipant } from './_db.js';
+import db, { encodeSkills, toParticipant, localClient } from './_db.js';
 import { requireAdmin } from './_auth.js';
 import { writeActivity } from './_activity.js';
 import {
@@ -20,9 +20,10 @@ function isGmailEmail(email) {
 function parseUtcTimestamp(ts) {
   if (!ts) return 0;
   const s = String(ts).trim();
-  if (s.endsWith('Z')) return new Date(s).getTime();
-  if (s.includes('T')) return new Date(s.endsWith('Z') ? s : s + 'Z').getTime();
-  return new Date(s.replace(' ', 'T') + 'Z').getTime();
+  const d = new Date(s);
+  if (!Number.isNaN(d.getTime())) return d.getTime();
+  const fallback = new Date(s.replace(' ', 'T') + 'Z');
+  return Number.isNaN(fallback.getTime()) ? 0 : fallback.getTime();
 }
 
 function validateStep1Input(payload) {
@@ -106,7 +107,7 @@ export default async function handler(req, res) {
         return res.status(403).json({ error: 'Email OTP verification is required before registration' });
       }
 
-      const verifiedOtp = await db
+      let verifiedOtp = await db
         .prepare(
           `
             SELECT id, expires_at
@@ -117,6 +118,18 @@ export default async function handler(req, res) {
           `
         )
         .get(normalizedEmail, String(otp_token).trim());
+
+      if (!verifiedOtp) {
+        try {
+          const localRes = await localClient.execute({
+            sql: 'SELECT id, expires_at FROM email_otp_sessions WHERE email = ? AND verification_token = ? AND verified = 1 AND consumed = 0 ORDER BY id DESC LIMIT 1',
+            args: [normalizedEmail, String(otp_token).trim()],
+          });
+          if (localRes.rows && localRes.rows.length > 0) {
+            verifiedOtp = localRes.rows[0];
+          }
+        } catch (_) {}
+      }
 
       if (!verifiedOtp) {
         return res.status(403).json({ error: 'Invalid or expired OTP verification. Please verify your email again.' });
