@@ -456,7 +456,7 @@ export default function SuperAdminControl() {
         const res = await fetch(`/api/control/admins?email=${encodeURIComponent(admin.email)}`, {
           method: 'DELETE',
           headers: authHeaders(),
-          body: JSON.stringify({ email: admin.email }),
+          body: JSON.stringify({ email: admin.email, id: admin.id }),
         });
         const data = await readJsonSafe<{ ok?: boolean; error?: string }>(res);
         if (!res.ok) throw new Error(getErrorMessage(data, 'Failed to remove admin account'));

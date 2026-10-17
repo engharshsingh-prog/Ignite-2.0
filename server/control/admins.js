@@ -253,10 +253,10 @@ export default async function handler(req, res) {
         return res.status(403).json({ error: 'Super Admin accounts cannot be removed.' });
       }
 
-      // Revoke all sessions, clean up access requests, and delete user
-      await db.prepare("UPDATE auth_sessions SET status = 'revoked' WHERE user_id = ?").run(targetUser.id);
-      await db.prepare('DELETE FROM admin_access_requests WHERE user_id = ? OR lower(trim(email)) = ?').run(targetUser.id, targetEmail);
-      await db.prepare('DELETE FROM auth_users WHERE id = ?').run(targetUser.id);
+      // Revoke all sessions, clean up access requests, and delete user in foreign-key order
+      await db.prepare('DELETE FROM admin_access_requests WHERE user_id = ? OR lower(trim(email)) = ?').run(targetUser.id, targetEmail).catch(() => {});
+      await db.prepare('DELETE FROM auth_sessions WHERE user_id = ?').run(targetUser.id).catch(() => {});
+      await db.prepare('DELETE FROM auth_users WHERE id = ? OR lower(trim(email)) = ?').run(targetUser.id, targetEmail);
 
       await writeActivity({
         entity_type: 'admin_management',
