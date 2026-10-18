@@ -23,6 +23,17 @@ export default function SiteFooter() {
                 {' '}
                 <span className="text-[#3b82f6] font-medium">Code Dynamics</span>
               </p>
+              <p className="mt-1.5">
+                Guided by:{' '}
+                <a
+                  href="https://teamparadox.in"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-[#a3b46a] hover:text-[#c4d688] font-medium hover:underline transition-colors"
+                >
+                  Teamparadox.in
+                </a>
+              </p>
               <p className="mt-2">
                 Event Socials:
                 {' '}
@@ -64,7 +75,18 @@ export default function SiteFooter() {
 
           <div className="mt-6 pt-4 border-t border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs text-gray-500">
             <p>&copy; 2026 Ignite 2.O. All rights reserved.</p>
-            <p>Designed for a smooth and secure registration experience.</p>
+            <p>
+              Guided by{' '}
+              <a
+                href="https://teamparadox.in"
+                target="_blank"
+                rel="noreferrer"
+                className="text-[#a3b46a] hover:underline font-medium"
+              >
+                Teamparadox.in
+              </a>
+              {' '}&bull; Designed for a smooth and secure registration experience.
+            </p>
           </div>
         </div>
       </div>
