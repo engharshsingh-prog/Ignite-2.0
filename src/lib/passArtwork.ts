@@ -33,9 +33,9 @@ export async function drawPassEventDetails(ctx: CanvasRenderingContext2D) {
     // Keep the pass useful offline by rendering the unset state.
   }
 
-  const dateText = date || '24 OCT 2026';
-  const venueText = venue || 'MAIN AUDITORIUM';
-  const timeText = time || '10:00 AM';
+  const dateText = date || 'To Be Announced';
+  const venueText = venue || 'To Be Announced';
+  const timeText = time || 'To Be Announced';
 
   ctx.save();
   ctx.fillStyle = '#231e19';
