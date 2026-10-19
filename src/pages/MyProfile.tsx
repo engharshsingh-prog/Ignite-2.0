@@ -5,7 +5,7 @@ import { User, Hash, Phone, Mail, CheckCircle, XCircle, Search, QrCode, Download
 import QRCode from 'qrcode';
 import { getErrorMessage, readJsonSafe } from '../lib/http';
 import { useEventSettings } from '../lib/useEventSettings';
-import { drawPassEventDetails } from '../lib/passArtwork';
+import { drawPassEventDetails, drawPassParticipantDetails } from '../lib/passArtwork';
 
 interface Participant {
   id: number;
@@ -43,90 +43,7 @@ async function loadImage(src: string) {
   });
 }
 
-function ellipsizeToWidth(ctx: CanvasRenderingContext2D, text: string, maxWidth: number) {
-  const raw = String(text || '').trim();
-  if (!raw) return '';
-  if (ctx.measureText(raw).width <= maxWidth) return raw;
-  const ellipsis = '...';
-  let low = 0;
-  let high = raw.length;
-  while (low < high) {
-    const mid = Math.ceil((low + high) / 2);
-    const candidate = `${raw.slice(0, mid)}${ellipsis}`;
-    if (ctx.measureText(candidate).width <= maxWidth) low = mid;
-    else high = mid - 1;
-  }
-  return `${raw.slice(0, Math.max(0, low))}${ellipsis}`;
-}
 
-function wrapTwoLines(ctx: CanvasRenderingContext2D, text: string, maxWidth: number) {
-  const words = String(text || '').trim().split(/\s+/).filter(Boolean);
-  if (words.length === 0) return [] as string[];
-
-  const lines: string[] = [];
-  let current = '';
-  for (const word of words) {
-    const candidate = current ? `${current} ${word}` : word;
-    if (ctx.measureText(candidate).width <= maxWidth) {
-      current = candidate;
-      continue;
-    }
-
-    if (current) {
-      lines.push(current);
-      current = word;
-    } else {
-      lines.push(ellipsizeToWidth(ctx, word, maxWidth));
-      current = '';
-    }
-
-    if (lines.length === 2) break;
-  }
-
-  if (lines.length < 2 && current) lines.push(current);
-  if (lines.length > 2) return lines.slice(0, 2);
-
-  if (lines.length === 2) {
-    lines[1] = ellipsizeToWidth(ctx, lines[1], maxWidth);
-  }
-  return lines;
-}
-
-function drawFittedName(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, maxWidth: number) {
-  const maxFont = 56;
-  const minFont = 22;
-
-  ctx.save();
-  ctx.textAlign = 'center';
-  ctx.fillStyle = '#bdca91';
-  ctx.textBaseline = 'top';
-
-  let fontSize = maxFont;
-  let lines: string[] = [];
-  for (; fontSize >= minFont; fontSize -= 2) {
-    ctx.font = `700 ${fontSize}px Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial`;
-    lines = wrapTwoLines(ctx, text, maxWidth);
-    if (lines.length === 1) {
-      if (ctx.measureText(lines[0]).width <= maxWidth) break;
-    } else if (lines.length === 2) {
-      const w1 = ctx.measureText(lines[0]).width;
-      const w2 = ctx.measureText(lines[1]).width;
-      if (w1 <= maxWidth && w2 <= maxWidth) break;
-    }
-  }
-
-  ctx.font = `700 ${Math.max(minFont, fontSize)}px Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial`;
-  lines = wrapTwoLines(ctx, text, maxWidth);
-  if (lines.length === 0) {
-    ctx.restore();
-    return;
-  }
-
-  const lineHeight = Math.round((Math.max(minFont, fontSize) || minFont) * 1.08);
-  ctx.fillText(lines[0], x, y);
-  if (lines.length > 1) ctx.fillText(lines[1], x, y + lineHeight);
-  ctx.restore();
-}
 
 export default function MyProfile() {
   const { settings } = useEventSettings();
@@ -259,45 +176,21 @@ export default function MyProfile() {
       ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
       await drawPassEventDetails(ctx);
 
-      const qrY = 195;
-      const qrSize = 208;
-      const qrRightOffset = 143;
-      const qrX = canvas.width - qrRightOffset - qrSize;
+      const qrSize = 316;
+      const qrX = 1617;
+      const qrY = 480;
 
       const qrCanvas = document.createElement('canvas');
       await QRCode.toCanvas(qrCanvas, qrPayload, {
         width: qrSize,
-        margin: 4,
+        margin: 1,
         errorCorrectionLevel: 'M',
-        color: { dark: '#111411', light: '#f4f6ed' },
+        color: { dark: '#1a1815', light: '#f0e9e1' },
       });
-
-      ctx.save();
-      ctx.lineWidth = 6;
-      ctx.strokeStyle = '#3b82f6';
-      ctx.strokeRect(qrX - 3, qrY - 3, qrSize + 6, qrSize + 6);
-      ctx.restore();
 
       ctx.drawImage(qrCanvas, qrX, qrY, qrSize, qrSize);
 
-      const rollTextY = qrY + qrSize + 28;
-      const rollToNameGap = 18;
-
-      ctx.save();
-      ctx.textAlign = 'center';
-      ctx.fillStyle = '#bdca91';
-      ctx.font = '700 20px Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial';
-      ctx.textBaseline = 'top';
-      ctx.fillText(String(participant.roll_number || '').trim(), qrX + qrSize / 2, rollTextY);
-      ctx.restore();
-
-      drawFittedName(
-        ctx,
-        String(participant.full_name || '').trim(),
-        qrX + qrSize / 2,
-        rollTextY + 20 + rollToNameGap,
-        394
-      );
+      drawPassParticipantDetails(ctx, participant);
 
       const blob: Blob | null = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
       if (!blob) throw new Error('Failed to generate pass image');
