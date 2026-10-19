@@ -73,8 +73,8 @@ const YEAR_FEES: Record<string, number> = {
   '1st Year': 1,
   '2nd Year': 1,
 };
-const UPI_ID = 'harikesh40-1@oksbi';
-const UPI_PAYEE_NAME = 'harikesh bahadur singh';
+const UPI_ID = 'ysamarjeetyadav2334@okaxis';
+const UPI_PAYEE_NAME = 'Samarjeet Yadav';
 const UPI_NOTE = 'Ignite 2.O Registration';
 
 function validateField(name: string, value: string): FieldState {
@@ -170,13 +170,13 @@ export default function Register() {
       am: Number(registrationFee || 1).toFixed(2),
       cu: 'INR',
       tn: UPI_NOTE,
-      aid: 'uGICAgIC1tYyuJw',
+      aid: 'uGICAgIC399eLdg',
     });
     return `upi://pay?${params.toString()}`;
   }, [registrationFee]);
 
   const qrSrc = useMemo(() => {
-    return '/payment-qr.jpg';
+    return '/payment-qr.png';
   }, []);
 
   // Check URL query on mount for continuation token (?token=... or ?step=2&token=...)
