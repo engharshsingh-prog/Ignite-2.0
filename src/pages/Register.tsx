@@ -70,8 +70,8 @@ const YEARS = ['1st Year', '2nd Year'];
 const SKILLS = ['Singing', 'Games/Fun Activities', 'Dance', 'Comedy/Standup', 'Others'];
 
 const YEAR_FEES: Record<string, number> = {
-  '1st Year': 1,
-  '2nd Year': 1,
+  '1st Year': 599,
+  '2nd Year': 599,
 };
 const UPI_ID = 'ysamarjeetyadav2334@okaxis';
 const UPI_PAYEE_NAME = 'Samarjeet Yadav';
@@ -161,13 +161,13 @@ export default function Register() {
   const [lookupLoading, setLookupLoading] = useState(false);
   const [lookupError, setLookupError] = useState('');
 
-  const registrationFee = YEAR_FEES[activeParticipant?.year || form.year] ?? 1;
+  const registrationFee = YEAR_FEES[activeParticipant?.year || form.year] ?? 599;
 
   const upiLink = useMemo(() => {
     const params = new URLSearchParams({
       pa: UPI_ID,
       pn: UPI_PAYEE_NAME,
-      am: Number(registrationFee || 1).toFixed(2),
+      am: Number(registrationFee || 599).toFixed(2),
       cu: 'INR',
       tn: UPI_NOTE,
       aid: 'uGICAgIC399eLdg',
