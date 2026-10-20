@@ -1,6 +1,7 @@
 import db, { toParticipant } from './_db.js';
 import { requireSuperAdmin } from './_auth.js';
 import { writeActivity } from './_activity.js';
+import { ensureEventSettingsColumns } from './event-settings.js';
 
 let tableEnsured = false;
 
@@ -463,5 +464,88 @@ export async function handleSuperAdminGetLockAuditLogs(req, res) {
   } catch (err) {
     console.error('handleSuperAdminGetLockAuditLogs error:', err);
     return res.status(500).json({ error: 'Failed to load lock audit logs' });
+  }
+}
+
+// 5. GET /api/super-admin/year-registration-control - Super Admin: get status of academic year registration gateways
+export async function handleSuperAdminGetYearRegistrationControl(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  if (req.method === 'OPTIONS') return res.status(204).end();
+
+  const superAdmin = await requireSuperAdmin(req, res);
+  if (!superAdmin) return;
+
+  try {
+    await ensureEventSettingsColumns();
+    const row = await db.prepare('SELECT registration_1st_year_enabled, registration_2nd_year_enabled, registration_updated_by, updated_at FROM event_settings WHERE id = 1').get();
+    return res.status(200).json({
+      enabled_1st_year: row?.registration_1st_year_enabled !== undefined && row?.registration_1st_year_enabled !== null ? Boolean(row.registration_1st_year_enabled) : true,
+      enabled_2nd_year: row?.registration_2nd_year_enabled !== undefined && row?.registration_2nd_year_enabled !== null ? Boolean(row.registration_2nd_year_enabled) : true,
+      updated_at: row?.updated_at || null,
+      updated_by: row?.registration_updated_by || null,
+    });
+  } catch (err) {
+    console.error('handleSuperAdminGetYearRegistrationControl error:', err);
+    return res.status(500).json({ error: 'Failed to fetch registration gateway status' });
+  }
+}
+
+// 6. PUT /api/super-admin/year-registration-control - Super Admin: enable or disable year registrations
+export async function handleSuperAdminSetYearRegistrationControl(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'PUT, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  if (req.method === 'OPTIONS') return res.status(204).end();
+
+  const superAdmin = await requireSuperAdmin(req, res);
+  if (!superAdmin) return;
+
+  try {
+    await ensureEventSettingsColumns();
+    const { year, enabled } = req.body || {};
+    if (year !== '1st Year' && year !== '2nd Year') {
+      return res.status(400).json({ error: 'year must be "1st Year" or "2nd Year"' });
+    }
+    if (typeof enabled !== 'boolean') {
+      return res.status(400).json({ error: 'enabled must be a boolean' });
+    }
+
+    const nowIso = new Date().toISOString();
+    const colName = year === '2nd Year' ? 'registration_2nd_year_enabled' : 'registration_1st_year_enabled';
+
+    await db.prepare(`
+      UPDATE event_settings
+      SET ${colName} = ?, registration_updated_by = ?, updated_at = ?
+      WHERE id = 1
+    `).run(enabled ? 1 : 0, superAdmin.email, nowIso);
+
+    await writeActivity({
+      entity_type: 'registration_gateway',
+      entity_id: year === '2nd Year' ? 2 : 1,
+      action: enabled ? `${year.toLowerCase().replace(' ', '_')}_registration_enabled` : `${year.toLowerCase().replace(' ', '_')}_registration_disabled`,
+      actor_email: superAdmin.email,
+      details: {
+        year,
+        enabled,
+        updated_by: superAdmin.email,
+        timestamp: nowIso,
+      },
+    });
+
+    const updatedRow = await db.prepare('SELECT registration_1st_year_enabled, registration_2nd_year_enabled, registration_updated_by, updated_at FROM event_settings WHERE id = 1').get();
+
+    return res.status(200).json({
+      success: true,
+      message: `${year} registration is now ${enabled ? 'OPEN' : 'PAUSED'} by Super Admin.`,
+      enabled_1st_year: updatedRow?.registration_1st_year_enabled !== undefined && updatedRow?.registration_1st_year_enabled !== null ? Boolean(updatedRow.registration_1st_year_enabled) : true,
+      enabled_2nd_year: updatedRow?.registration_2nd_year_enabled !== undefined && updatedRow?.registration_2nd_year_enabled !== null ? Boolean(updatedRow.registration_2nd_year_enabled) : true,
+      updated_at: nowIso,
+      updated_by: superAdmin.email,
+    });
+  } catch (err) {
+    console.error('handleSuperAdminSetYearRegistrationControl error:', err);
+    return res.status(500).json({ error: 'Failed to update registration gateway: ' + (err?.message || err) });
   }
 }

@@ -42,6 +42,8 @@ import {
   handleSuperAdminGetLocks,
   handleSuperAdminToggleLock,
   handleSuperAdminGetLockAuditLogs,
+  handleSuperAdminGetYearRegistrationControl,
+  handleSuperAdminSetYearRegistrationControl,
 } from './registration-locks.js';
 import { getAdminFromRequest, requireSuperAdmin } from './_auth.js';
 import { writeActivity } from './_activity.js';
@@ -93,6 +95,11 @@ const routeHandlers = new Map([
   ['/super-admin/registration-locks', handleSuperAdminGetLocks],
   ['/super-admin/registration-locks/toggle', handleSuperAdminToggleLock],
   ['/super-admin/registration-locks/audit-logs', handleSuperAdminGetLockAuditLogs],
+  ['/super-admin/year-registration-control', async (req, res) => {
+    if (req.method === 'GET') return handleSuperAdminGetYearRegistrationControl(req, res);
+    if (req.method === 'PUT') return handleSuperAdminSetYearRegistrationControl(req, res);
+    return res.status(405).json({ error: 'Method not allowed' });
+  }],
 ]);
 
 async function genericSuperAdminHandler(req, res) {

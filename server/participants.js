@@ -103,6 +103,20 @@ export default async function handler(req, res) {
 
       const normalizedEmail = String(email).trim().toLowerCase();
       const cleanRoll = String(roll_number).trim();
+      const registrationYear = year === '2nd Year' ? '2nd Year' : '1st Year';
+
+      // Check Super Admin Year-Wise Registration Gateway status
+      try {
+        const settingsRow = await db.prepare('SELECT registration_1st_year_enabled, registration_2nd_year_enabled FROM event_settings WHERE id = 1').get();
+        if (settingsRow) {
+          if (registrationYear === '2nd Year' && Number(settingsRow.registration_2nd_year_enabled) === 0) {
+            return res.status(403).json({ error: '2nd Year registrations are currently closed by Super Admin.' });
+          }
+          if (registrationYear === '1st Year' && Number(settingsRow.registration_1st_year_enabled) === 0) {
+            return res.status(403).json({ error: '1st Year registrations are currently closed by Super Admin.' });
+          }
+        }
+      } catch (_) {}
 
       if (!otp_token) {
         return res.status(403).json({ error: 'Email OTP verification is required before registration' });

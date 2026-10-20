@@ -413,6 +413,12 @@ export default function Register() {
     if (valid && !otpVerified) {
       valid = false;
       setError('Email OTP verification is mandatory before submitting Step 1.');
+    } else if (valid && form.year === '2nd Year' && settings.registration2ndYearEnabled === false) {
+      valid = false;
+      setError('2nd Year registrations are currently closed by Super Admin.');
+    } else if (valid && form.year === '1st Year' && settings.registration1stYearEnabled === false) {
+      valid = false;
+      setError('1st Year registrations are currently closed by Super Admin.');
     } else if (!valid) {
       setError('Please fill all required details correctly before continuing.');
     }
@@ -1302,16 +1308,29 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
                     className={`w-full bg-[#1a1530] border rounded-xl pl-10 pr-4 py-3 text-white focus:outline-none transition-colors appearance-none ${borderClass('year')}`}
                   >
                     <option value="" className="text-gray-600">Select year</option>
-                    <option value="1st Year">
-                      1st Year (INR {settings.fee1stYear ?? 599})
+                    <option value="1st Year" disabled={settings.registration1stYearEnabled === false}>
+                      1st Year (INR {settings.fee1stYear ?? 599}) {settings.registration1stYearEnabled === false ? '🔒 [Registrations Closed]' : ''}
                     </option>
-                    <option value="2nd Year">
-                      2nd Year (INR {settings.fee2ndYear ?? 699})
+                    <option value="2nd Year" disabled={settings.registration2ndYearEnabled === false}>
+                      2nd Year (INR {settings.fee2ndYear ?? 699}) {settings.registration2ndYearEnabled === false ? '🔒 [Registrations Closed]' : ''}
                     </option>
                   </select>
                 </div>
 
-                {form.year && (
+                {form.year === '2nd Year' && settings.registration2ndYearEnabled === false && (
+                  <div className="mt-2.5 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-center gap-2">
+                    <AlertCircle size={15} className="flex-shrink-0 text-amber-400" />
+                    <span>2nd Year registrations are currently closed by Super Admin.</span>
+                  </div>
+                )}
+                {form.year === '1st Year' && settings.registration1stYearEnabled === false && (
+                  <div className="mt-2.5 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-center gap-2">
+                    <AlertCircle size={15} className="flex-shrink-0 text-amber-400" />
+                    <span>1st Year registrations are currently closed by Super Admin.</span>
+                  </div>
+                )}
+
+                {form.year && !((form.year === '2nd Year' && settings.registration2ndYearEnabled === false) || (form.year === '1st Year' && settings.registration1stYearEnabled === false)) && (
                   <p className="text-xs text-blue-300 mt-1.5 font-medium">
                     Applicable Registration Fee: <span className="text-emerald-400 font-bold">INR {form.year === '2nd Year' ? (settings.fee2ndYear ?? 699) : (settings.fee1stYear ?? 599)}</span>
                   </p>
@@ -1350,10 +1369,20 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
               {/* Submit Step 1 Button */}
               <button
                 type="submit"
-                disabled={loading}
+                disabled={
+                  loading ||
+                  (form.year === '2nd Year' && settings.registration2ndYearEnabled === false) ||
+                  (form.year === '1st Year' && settings.registration1stYearEnabled === false)
+                }
                 className="w-full py-4 rounded-xl bg-gradient-to-r from-[#3b82f6] to-[#718044] text-white font-bold text-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2 glow-box-olive disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? 'Submitting Step 1...' : 'Submit for Admin Approval'} <ArrowRight size={18} />
+                {loading
+                  ? 'Submitting Step 1...'
+                  : form.year === '2nd Year' && settings.registration2ndYearEnabled === false
+                  ? '2nd Year Registrations Closed'
+                  : form.year === '1st Year' && settings.registration1stYearEnabled === false
+                  ? '1st Year Registrations Closed'
+                  : 'Submit for Admin Approval'} <ArrowRight size={18} />
               </button>
 
               <div className="pt-2 text-center">

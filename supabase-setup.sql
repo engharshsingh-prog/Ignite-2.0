@@ -481,6 +481,9 @@ ALTER TABLE event_settings ADD COLUMN IF NOT EXISTS upi_id_1st_year TEXT DEFAULT
 ALTER TABLE event_settings ADD COLUMN IF NOT EXISTS upi_id_2nd_year TEXT DEFAULT 'ysamarjeetyadav2334@okaxis';
 ALTER TABLE event_settings ADD COLUMN IF NOT EXISTS upi_name_1st_year TEXT DEFAULT 'Samarjeet Yadav';
 ALTER TABLE event_settings ADD COLUMN IF NOT EXISTS upi_name_2nd_year TEXT DEFAULT 'Samarjeet Yadav';
+ALTER TABLE event_settings ADD COLUMN IF NOT EXISTS registration_1st_year_enabled INTEGER DEFAULT 1;
+ALTER TABLE event_settings ADD COLUMN IF NOT EXISTS registration_2nd_year_enabled INTEGER DEFAULT 1;
+ALTER TABLE event_settings ADD COLUMN IF NOT EXISTS registration_updated_by TEXT DEFAULT NULL;
 
 -- ============================================================
 -- 8. VERIFICATION QUERY

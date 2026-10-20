@@ -24,6 +24,9 @@ export interface EventSettings {
   upiId2ndYear: string;
   upiName1stYear: string;
   upiName2ndYear: string;
+  registration1stYearEnabled: boolean;
+  registration2ndYearEnabled: boolean;
+  registrationUpdatedBy: string | null;
   updatedAt: string | null;
 }
 
@@ -45,6 +48,9 @@ export const defaultEventSettings: EventSettings = {
   upiId2ndYear: 'ysamarjeetyadav2334@okaxis',
   upiName1stYear: 'Samarjeet Yadav',
   upiName2ndYear: 'Samarjeet Yadav',
+  registration1stYearEnabled: true,
+  registration2ndYearEnabled: true,
+  registrationUpdatedBy: null,
   updatedAt: null,
 };
 
@@ -79,6 +85,9 @@ export function normalizeEventSettings(payload: any): EventSettings {
     upiId2ndYear: typeof payload?.upi_id_2nd_year === 'string' && payload.upi_id_2nd_year.trim() ? payload.upi_id_2nd_year.trim() : defaultEventSettings.upiId2ndYear,
     upiName1stYear: typeof payload?.upi_name_1st_year === 'string' && payload.upi_name_1st_year.trim() ? payload.upi_name_1st_year.trim() : defaultEventSettings.upiName1stYear,
     upiName2ndYear: typeof payload?.upi_name_2nd_year === 'string' && payload.upi_name_2nd_year.trim() ? payload.upi_name_2nd_year.trim() : defaultEventSettings.upiName2ndYear,
+    registration1stYearEnabled: payload?.registration_1st_year_enabled !== undefined ? Boolean(payload.registration_1st_year_enabled) : defaultEventSettings.registration1stYearEnabled,
+    registration2ndYearEnabled: payload?.registration_2nd_year_enabled !== undefined ? Boolean(payload.registration_2nd_year_enabled) : defaultEventSettings.registration2ndYearEnabled,
+    registrationUpdatedBy: typeof payload?.registration_updated_by === 'string' ? payload.registration_updated_by : null,
     updatedAt: typeof payload?.updated_at === 'string' ? payload.updated_at : null,
   };
 }

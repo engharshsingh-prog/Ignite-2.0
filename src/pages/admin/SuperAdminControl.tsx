@@ -119,6 +119,13 @@ interface LockAuditLogItem {
   };
 }
 
+interface YearRegistrationGateways {
+  enabled_1st_year: boolean;
+  enabled_2nd_year: boolean;
+  updated_at: string | null;
+  updated_by: string | null;
+}
+
 interface ConfirmDialogState {
   title: string;
   message: string;
@@ -139,6 +146,11 @@ export default function SuperAdminControl() {
   const [mediaControl, setMediaControl] = useState<{ enabled: boolean; updated_at: string | null } | null>(null);
   const [mediaControlLoading, setMediaControlLoading] = useState(false);
   const [mediaToggleLoading, setMediaToggleLoading] = useState(false);
+
+  // Public Year Registration gate controls
+  const [yearGateways, setYearGateways] = useState<YearRegistrationGateways | null>(null);
+  const [yearGatewaysLoading, setYearGatewaysLoading] = useState(false);
+  const [gatewayToggleLoading, setGatewayToggleLoading] = useState<string | null>(null);
 
   // Requests data
   const [pendingRequests, setPendingRequests] = useState<PendingRequest[]>([]);
@@ -231,6 +243,22 @@ export default function SuperAdminControl() {
       console.error('Fetch public media control error:', err);
     } finally {
       setMediaControlLoading(false);
+    }
+  }, []);
+
+  // Fetch public year registration gateways
+  const fetchYearGateways = useCallback(async () => {
+    try {
+      setYearGatewaysLoading(true);
+      const res = await fetch('/api/super-admin/year-registration-control', { headers: authHeaders() });
+      if (res.ok) {
+        const data = await readJsonSafe<YearRegistrationGateways>(res);
+        if (data) setYearGateways(data);
+      }
+    } catch (err) {
+      console.error('Fetch year registration gateways error:', err);
+    } finally {
+      setYearGatewaysLoading(false);
     }
   }, []);
 
@@ -372,12 +400,14 @@ export default function SuperAdminControl() {
     fetchSummary();
     fetchRequests();
     fetchMediaControl();
-  }, [fetchSummary, fetchRequests, fetchMediaControl]);
+    fetchYearGateways();
+  }, [fetchSummary, fetchRequests, fetchMediaControl, fetchYearGateways]);
 
   useEffect(() => {
     if (activeTab === 'overview') {
       fetchSummary();
       fetchMediaControl();
+      fetchYearGateways();
     } else if (activeTab === 'requests') {
       fetchRequests();
     } else if (activeTab === 'admins') {
@@ -385,10 +415,11 @@ export default function SuperAdminControl() {
     } else if (activeTab === 'locks') {
       fetchLocks();
       fetchLockAuditLogs();
+      fetchYearGateways();
     } else if (activeTab === 'activity') {
       fetchActivityLogs();
     }
-  }, [activeTab, fetchSummary, fetchRequests, fetchAdmins, fetchActivityLogs, fetchMediaControl, fetchLocks, fetchLockAuditLogs]);
+  }, [activeTab, fetchSummary, fetchRequests, fetchAdmins, fetchActivityLogs, fetchMediaControl, fetchYearGateways, fetchLocks, fetchLockAuditLogs]);
 
   // Auto-refresh requests every 5s while on requests tab or overview
   useEffect(() => {
@@ -397,10 +428,11 @@ export default function SuperAdminControl() {
       if (activeTab === 'overview') {
         fetchSummary();
         fetchMediaControl();
+        fetchYearGateways();
       }
     }, 5000);
     return () => clearInterval(interval);
-  }, [fetchRequests, fetchSummary, fetchMediaControl, activeTab]);
+  }, [fetchRequests, fetchSummary, fetchMediaControl, fetchYearGateways, activeTab]);
 
   // Toggle public media upload gate
   const handleToggleMediaControl = (targetEnabled: boolean) => {
@@ -438,6 +470,64 @@ export default function SuperAdminControl() {
         } finally {
           setConfirmWorking(false);
           setMediaToggleLoading(false);
+          setConfirmDialog(null);
+        }
+      },
+    });
+  };
+
+  // Toggle public year registration gateway (Super Admin exclusive authority)
+  const handleToggleYearGateway = (year: '1st Year' | '2nd Year', targetEnabled: boolean) => {
+    setConfirmDialog({
+      title: targetEnabled ? `Enable ${year} Registration?` : `Pause ${year} Registration?`,
+      message: targetEnabled
+        ? `Are you sure you want to open and enable public registrations for ${year}? Students will be able to select ${year} on the registration page and proceed to the ${year === '2nd Year' ? '₹699' : '₹599'} UPI payment step.`
+        : `Are you sure you want to pause and close public registrations for ${year}? The ${year} option on the registration page will be disabled with a 'Registrations Closed' notice, and submissions will be rejected by the server.`,
+      confirmLabel: targetEnabled ? `Yes, Enable ${year}` : `Yes, Pause ${year}`,
+      confirmVariant: targetEnabled ? 'primary' : 'warning',
+      onConfirm: async () => {
+        try {
+          setConfirmWorking(true);
+          setGatewayToggleLoading(year);
+          const res = await fetch('/api/super-admin/year-registration-control', {
+            method: 'PUT',
+            headers: {
+              ...authHeaders(),
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ year, enabled: targetEnabled }),
+          });
+          const data = await readJsonSafe<{
+            success?: boolean;
+            message?: string;
+            enabled_1st_year?: boolean;
+            enabled_2nd_year?: boolean;
+            updated_at?: string | null;
+            updated_by?: string | null;
+            error?: string;
+          }>(res);
+
+          if (!res.ok) throw new Error(getErrorMessage(data, `Failed to update ${year} registration gateway`));
+
+          setYearGateways({
+            enabled_1st_year: data?.enabled_1st_year ?? (year === '1st Year' ? targetEnabled : (yearGateways?.enabled_1st_year ?? true)),
+            enabled_2nd_year: data?.enabled_2nd_year ?? (year === '2nd Year' ? targetEnabled : (yearGateways?.enabled_2nd_year ?? true)),
+            updated_at: data?.updated_at || new Date().toISOString(),
+            updated_by: data?.updated_by || currentUser?.email || null,
+          });
+
+          setActionMessage({
+            type: 'success',
+            text: data?.message || `${year} registration gateway is now ${targetEnabled ? 'OPEN' : 'PAUSED'}.`,
+          });
+        } catch (err: unknown) {
+          setActionMessage({
+            type: 'error',
+            text: err instanceof Error ? err.message : `Failed to update ${year} registration gateway`,
+          });
+        } finally {
+          setConfirmWorking(false);
+          setGatewayToggleLoading(null);
           setConfirmDialog(null);
         }
       },
@@ -978,91 +1068,250 @@ export default function SuperAdminControl() {
                     Public Gateway & Submission Controls
                   </h2>
                   <p className="text-xs text-gray-400 mt-1">
-                    Manage real-time access to public-facing portals and community upload gates.
+                    Manage real-time access to public registration year gateways and community upload portals. Only Super Admins have authority to toggle these gates.
                   </p>
                 </div>
               </div>
 
-              {/* Public Media Upload Gateway */}
-              <div className="p-4 sm:p-5 rounded-xl bg-[#212823] border border-[#303a32] flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="flex items-start gap-3.5">
-                  <div
-                    className={`p-3 rounded-xl border mt-0.5 shrink-0 ${
-                      mediaControl?.enabled
-                        ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
-                        : 'bg-rose-500/10 border-rose-500/30 text-rose-400'
-                    }`}
-                  >
-                    <UploadCloud size={22} />
-                  </div>
-                  <div>
-                    <div className="flex flex-wrap items-center gap-2.5">
-                      <h3 className="text-sm sm:text-base font-bold text-white">Public Media Upload Portal</h3>
-                      <span
-                        className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-                          mediaControlLoading
-                            ? 'bg-gray-700/50 text-gray-400'
-                            : mediaControl?.enabled
-                              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                              : 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
-                        }`}
-                      >
-                        <span
-                          className={`w-1.5 h-1.5 rounded-full ${
-                            mediaControl?.enabled ? 'bg-emerald-400 animate-pulse' : 'bg-rose-400'
-                          }`}
-                        />
-                        {mediaControlLoading
-                          ? 'Checking...'
-                          : mediaControl?.enabled
-                            ? 'OPEN (Accepting Submissions)'
-                            : 'CLOSED (Submissions Paused)'}
-                      </span>
+              <div className="space-y-4">
+                {/* 2nd Year Registration Gateway */}
+                <div className="p-4 sm:p-5 rounded-xl bg-[#212823] border border-[#303a32] flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div className="flex items-start gap-3.5">
+                    <div
+                      className={`p-3 rounded-xl border mt-0.5 shrink-0 ${
+                        (yearGateways?.enabled_2nd_year ?? true)
+                          ? 'bg-amber-500/10 border-amber-500/30 text-amber-400'
+                          : 'bg-rose-500/10 border-rose-500/30 text-rose-400'
+                      }`}
+                    >
+                      <Crown size={22} />
                     </div>
-                    <p className="text-xs text-gray-400 mt-1 max-w-xl leading-relaxed">
-                      Controls access to the public community upload page (<code className="text-xs text-gray-300 bg-white/5 px-1.5 py-0.5 rounded">/upload-media</code>).
-                      When turned OFF, public visitors cannot submit photos or videos. Admins can still upload media anytime via the admin panel.
-                    </p>
-                    {mediaControl?.updated_at && (
-                      <p className="text-[11px] text-gray-500 mt-1.5 flex items-center gap-1">
-                        <Clock size={12} />
-                        Last changed: {new Date(mediaControl.updated_at).toLocaleString()}
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2.5">
+                        <h3 className="text-sm sm:text-base font-bold text-white">2nd Year Registration Gateway (₹699)</h3>
+                        <span
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                            yearGatewaysLoading
+                              ? 'bg-gray-700/50 text-gray-400'
+                              : (yearGateways?.enabled_2nd_year ?? true)
+                                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                                : 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                          }`}
+                        >
+                          <span
+                            className={`w-1.5 h-1.5 rounded-full ${
+                              (yearGateways?.enabled_2nd_year ?? true) ? 'bg-emerald-400 animate-pulse' : 'bg-rose-400'
+                            }`}
+                          />
+                          {yearGatewaysLoading
+                            ? 'Checking...'
+                            : (yearGateways?.enabled_2nd_year ?? true)
+                              ? 'OPEN (Accepting 2nd Year)'
+                              : 'PAUSED (Registrations Closed)'}
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-1 max-w-xl leading-relaxed">
+                        Controls whether students can select <strong className="text-amber-300">2nd Year (₹699)</strong> and register with the 2nd Year QR code on <code className="text-xs text-gray-300 bg-white/5 px-1.5 py-0.5 rounded">/register</code>.
+                        When paused, the 2nd Year option is locked and marked closed, preventing both form submission and API bypass.
                       </p>
-                    )}
+                      {yearGateways?.updated_at && (
+                        <p className="text-[11px] text-gray-500 mt-1.5 flex items-center gap-1">
+                          <Clock size={12} />
+                          Last changed: {new Date(yearGateways.updated_at).toLocaleString()}
+                          {yearGateways.updated_by ? ` by ${yearGateways.updated_by}` : ''}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 self-end md:self-center shrink-0">
+                    <Link
+                      to="/register"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white text-xs font-medium border border-[#303a32] flex items-center gap-1.5 transition-colors"
+                    >
+                      <ExternalLink size={14} /> View Register
+                    </Link>
+
+                    <button
+                      onClick={() => handleToggleYearGateway('2nd Year', !(yearGateways?.enabled_2nd_year ?? true))}
+                      disabled={yearGatewaysLoading || gatewayToggleLoading === '2nd Year'}
+                      className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all shadow-sm ${
+                        (yearGateways?.enabled_2nd_year ?? true)
+                          ? 'bg-rose-600/90 hover:bg-rose-600 text-white shadow-rose-600/20'
+                          : 'bg-emerald-600/90 hover:bg-emerald-600 text-white shadow-emerald-600/20'
+                      } disabled:opacity-50`}
+                    >
+                      {gatewayToggleLoading === '2nd Year' ? (
+                        <RefreshCw size={15} className="animate-spin" />
+                      ) : (yearGateways?.enabled_2nd_year ?? true) ? (
+                        <>
+                          <Lock size={15} /> Pause 2nd Year
+                        </>
+                      ) : (
+                        <>
+                          <Unlock size={15} /> Enable 2nd Year
+                        </>
+                      )}
+                    </button>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 self-end md:self-center shrink-0">
-                  <Link
-                    to="/upload-media"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white text-xs font-medium border border-[#303a32] flex items-center gap-1.5 transition-colors"
-                  >
-                    <ExternalLink size={14} /> View Page
-                  </Link>
+                {/* 1st Year Registration Gateway */}
+                <div className="p-4 sm:p-5 rounded-xl bg-[#212823] border border-[#303a32] flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div className="flex items-start gap-3.5">
+                    <div
+                      className={`p-3 rounded-xl border mt-0.5 shrink-0 ${
+                        (yearGateways?.enabled_1st_year ?? true)
+                          ? 'bg-blue-500/10 border-blue-500/30 text-blue-400'
+                          : 'bg-rose-500/10 border-rose-500/30 text-rose-400'
+                      }`}
+                    >
+                      <Users size={22} />
+                    </div>
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2.5">
+                        <h3 className="text-sm sm:text-base font-bold text-white">1st Year Registration Gateway (₹599)</h3>
+                        <span
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                            yearGatewaysLoading
+                              ? 'bg-gray-700/50 text-gray-400'
+                              : (yearGateways?.enabled_1st_year ?? true)
+                                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                                : 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                          }`}
+                        >
+                          <span
+                            className={`w-1.5 h-1.5 rounded-full ${
+                              (yearGateways?.enabled_1st_year ?? true) ? 'bg-emerald-400 animate-pulse' : 'bg-rose-400'
+                            }`}
+                          />
+                          {yearGatewaysLoading
+                            ? 'Checking...'
+                            : (yearGateways?.enabled_1st_year ?? true)
+                              ? 'OPEN (Accepting 1st Year)'
+                              : 'PAUSED (Registrations Closed)'}
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-1 max-w-xl leading-relaxed">
+                        Controls whether students can select <strong className="text-blue-300">1st Year (₹599)</strong> and register with the 1st Year QR code on <code className="text-xs text-gray-300 bg-white/5 px-1.5 py-0.5 rounded">/register</code>.
+                      </p>
+                      {yearGateways?.updated_at && (
+                        <p className="text-[11px] text-gray-500 mt-1.5 flex items-center gap-1">
+                          <Clock size={12} />
+                          Last changed: {new Date(yearGateways.updated_at).toLocaleString()}
+                        </p>
+                      )}
+                    </div>
+                  </div>
 
-                  <button
-                    onClick={() => handleToggleMediaControl(!mediaControl?.enabled)}
-                    disabled={mediaControlLoading || mediaToggleLoading}
-                    className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all shadow-sm ${
-                      mediaControl?.enabled
-                        ? 'bg-rose-600/90 hover:bg-rose-600 text-white shadow-rose-600/20'
-                        : 'bg-emerald-600/90 hover:bg-emerald-600 text-white shadow-emerald-600/20'
-                    } disabled:opacity-50`}
-                  >
-                    {mediaToggleLoading ? (
-                      <RefreshCw size={15} className="animate-spin" />
-                    ) : mediaControl?.enabled ? (
-                      <>
-                        <Lock size={15} /> Turn OFF Uploads
-                      </>
-                    ) : (
-                      <>
-                        <Unlock size={15} /> Turn ON Uploads
-                      </>
-                    )}
-                  </button>
+                  <div className="flex items-center gap-3 self-end md:self-center shrink-0">
+                    <button
+                      onClick={() => handleToggleYearGateway('1st Year', !(yearGateways?.enabled_1st_year ?? true))}
+                      disabled={yearGatewaysLoading || gatewayToggleLoading === '1st Year'}
+                      className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all shadow-sm ${
+                        (yearGateways?.enabled_1st_year ?? true)
+                          ? 'bg-rose-600/90 hover:bg-rose-600 text-white shadow-rose-600/20'
+                          : 'bg-emerald-600/90 hover:bg-emerald-600 text-white shadow-emerald-600/20'
+                      } disabled:opacity-50`}
+                    >
+                      {gatewayToggleLoading === '1st Year' ? (
+                        <RefreshCw size={15} className="animate-spin" />
+                      ) : (yearGateways?.enabled_1st_year ?? true) ? (
+                        <>
+                          <Lock size={15} /> Pause 1st Year
+                        </>
+                      ) : (
+                        <>
+                          <Unlock size={15} /> Enable 1st Year
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Public Media Upload Gateway */}
+                <div className="p-4 sm:p-5 rounded-xl bg-[#212823] border border-[#303a32] flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div className="flex items-start gap-3.5">
+                    <div
+                      className={`p-3 rounded-xl border mt-0.5 shrink-0 ${
+                        mediaControl?.enabled
+                          ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+                          : 'bg-rose-500/10 border-rose-500/30 text-rose-400'
+                      }`}
+                    >
+                      <UploadCloud size={22} />
+                    </div>
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2.5">
+                        <h3 className="text-sm sm:text-base font-bold text-white">Public Media Upload Portal</h3>
+                        <span
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                            mediaControlLoading
+                              ? 'bg-gray-700/50 text-gray-400'
+                              : mediaControl?.enabled
+                                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                                : 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                          }`}
+                        >
+                          <span
+                            className={`w-1.5 h-1.5 rounded-full ${
+                              mediaControl?.enabled ? 'bg-emerald-400 animate-pulse' : 'bg-rose-400'
+                            }`}
+                          />
+                          {mediaControlLoading
+                            ? 'Checking...'
+                            : mediaControl?.enabled
+                              ? 'OPEN (Accepting Submissions)'
+                              : 'CLOSED (Submissions Paused)'}
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-1 max-w-xl leading-relaxed">
+                        Controls access to the public community upload page (<code className="text-xs text-gray-300 bg-white/5 px-1.5 py-0.5 rounded">/upload-media</code>).
+                        When turned OFF, public visitors cannot submit photos or videos. Admins can still upload media anytime via the admin panel.
+                      </p>
+                      {mediaControl?.updated_at && (
+                        <p className="text-[11px] text-gray-500 mt-1.5 flex items-center gap-1">
+                          <Clock size={12} />
+                          Last changed: {new Date(mediaControl.updated_at).toLocaleString()}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 self-end md:self-center shrink-0">
+                    <Link
+                      to="/upload-media"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white text-xs font-medium border border-[#303a32] flex items-center gap-1.5 transition-colors"
+                    >
+                      <ExternalLink size={14} /> View Page
+                    </Link>
+
+                    <button
+                      onClick={() => handleToggleMediaControl(!mediaControl?.enabled)}
+                      disabled={mediaControlLoading || mediaToggleLoading}
+                      className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all shadow-sm ${
+                        mediaControl?.enabled
+                          ? 'bg-rose-600/90 hover:bg-rose-600 text-white shadow-rose-600/20'
+                          : 'bg-emerald-600/90 hover:bg-emerald-600 text-white shadow-emerald-600/20'
+                      } disabled:opacity-50`}
+                    >
+                      {mediaToggleLoading ? (
+                        <RefreshCw size={15} className="animate-spin" />
+                      ) : mediaControl?.enabled ? (
+                        <>
+                          <Lock size={15} /> Turn OFF Uploads
+                        </>
+                      ) : (
+                        <>
+                          <Unlock size={15} /> Turn ON Uploads
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1577,6 +1826,78 @@ export default function SuperAdminControl() {
                 <div className="mt-2 text-2xl font-black text-emerald-400">
                   {locksLoading ? '—' : lockStats.unlockedCount}
                 </div>
+              </div>
+            </div>
+
+            {/* Quick Year Registration Gateways Control */}
+            <div className="p-4 sm:p-5 rounded-2xl bg-[#191e1b] border border-[#303a32] flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-xl bg-[#3b82f6]/10 border border-[#3b82f6]/20 text-[#3b82f6]">
+                  <Shield size={20} />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                    Public Registration Gateways
+                    <span className="text-[11px] font-normal text-gray-400">(Super Admin Only)</span>
+                  </h3>
+                  <div className="flex flex-wrap items-center gap-3 mt-1 text-xs">
+                    <span className="flex items-center gap-1.5 text-gray-300">
+                      <span className={`w-2 h-2 rounded-full ${(yearGateways?.enabled_1st_year ?? true) ? 'bg-blue-400' : 'bg-rose-400'}`} />
+                      1st Year (₹599): <strong className={(yearGateways?.enabled_1st_year ?? true) ? 'text-blue-400' : 'text-rose-400'}>{(yearGateways?.enabled_1st_year ?? true) ? 'OPEN' : 'PAUSED'}</strong>
+                    </span>
+                    <span className="text-gray-600">•</span>
+                    <span className="flex items-center gap-1.5 text-gray-300">
+                      <span className={`w-2 h-2 rounded-full ${(yearGateways?.enabled_2nd_year ?? true) ? 'bg-amber-400' : 'bg-rose-400'}`} />
+                      2nd Year (₹699): <strong className={(yearGateways?.enabled_2nd_year ?? true) ? 'text-amber-400' : 'text-rose-400'}>{(yearGateways?.enabled_2nd_year ?? true) ? 'OPEN' : 'PAUSED'}</strong>
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handleToggleYearGateway('1st Year', !(yearGateways?.enabled_1st_year ?? true))}
+                  disabled={yearGatewaysLoading || gatewayToggleLoading === '1st Year'}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${
+                    (yearGateways?.enabled_1st_year ?? true)
+                      ? 'bg-rose-600/80 hover:bg-rose-600 text-white'
+                      : 'bg-blue-600/90 hover:bg-blue-600 text-white'
+                  } disabled:opacity-50`}
+                >
+                  {gatewayToggleLoading === '1st Year' ? (
+                    <RefreshCw size={13} className="animate-spin" />
+                  ) : (yearGateways?.enabled_1st_year ?? true) ? (
+                    <>
+                      <Lock size={13} /> Pause 1st Year
+                    </>
+                  ) : (
+                    <>
+                      <Unlock size={13} /> Enable 1st Year
+                    </>
+                  )}
+                </button>
+
+                <button
+                  onClick={() => handleToggleYearGateway('2nd Year', !(yearGateways?.enabled_2nd_year ?? true))}
+                  disabled={yearGatewaysLoading || gatewayToggleLoading === '2nd Year'}
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${
+                    (yearGateways?.enabled_2nd_year ?? true)
+                      ? 'bg-rose-600/80 hover:bg-rose-600 text-white'
+                      : 'bg-amber-600/90 hover:bg-amber-600 text-white'
+                  } disabled:opacity-50`}
+                >
+                  {gatewayToggleLoading === '2nd Year' ? (
+                    <RefreshCw size={13} className="animate-spin" />
+                  ) : (yearGateways?.enabled_2nd_year ?? true) ? (
+                    <>
+                      <Lock size={13} /> Pause 2nd Year
+                    </>
+                  ) : (
+                    <>
+                      <Unlock size={13} /> Enable 2nd Year
+                    </>
+                  )}
+                </button>
               </div>
             </div>
 

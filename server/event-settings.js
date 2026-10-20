@@ -21,6 +21,9 @@ const DEFAULT_SETTINGS = {
   upi_id_2nd_year: 'ysamarjeetyadav2334@okaxis',
   upi_name_1st_year: 'Samarjeet Yadav',
   upi_name_2nd_year: 'Samarjeet Yadav',
+  registration_1st_year_enabled: 1,
+  registration_2nd_year_enabled: 1,
+  registration_updated_by: null,
 };
 
 const safeText = (value, fallback) => {
@@ -51,7 +54,7 @@ const parseFlowJson = (value) => {
 };
 
 let columnsEnsured = false;
-async function ensureColumns() {
+export async function ensureEventSettingsColumns() {
   if (columnsEnsured) return;
   const cols = [
     { name: 'fee_1st_year', sql: 'ALTER TABLE event_settings ADD COLUMN fee_1st_year INTEGER DEFAULT 599' },
@@ -62,6 +65,9 @@ async function ensureColumns() {
     { name: 'upi_id_2nd_year', sql: "ALTER TABLE event_settings ADD COLUMN upi_id_2nd_year TEXT DEFAULT 'ysamarjeetyadav2334@okaxis'" },
     { name: 'upi_name_1st_year', sql: "ALTER TABLE event_settings ADD COLUMN upi_name_1st_year TEXT DEFAULT 'Samarjeet Yadav'" },
     { name: 'upi_name_2nd_year', sql: "ALTER TABLE event_settings ADD COLUMN upi_name_2nd_year TEXT DEFAULT 'Samarjeet Yadav'" },
+    { name: 'registration_1st_year_enabled', sql: 'ALTER TABLE event_settings ADD COLUMN registration_1st_year_enabled INTEGER DEFAULT 1' },
+    { name: 'registration_2nd_year_enabled', sql: 'ALTER TABLE event_settings ADD COLUMN registration_2nd_year_enabled INTEGER DEFAULT 1' },
+    { name: 'registration_updated_by', sql: 'ALTER TABLE event_settings ADD COLUMN registration_updated_by TEXT DEFAULT NULL' },
   ];
   for (const c of cols) {
     try {
@@ -75,7 +81,7 @@ async function ensureColumns() {
 }
 
 async function ensureRow() {
-  await ensureColumns();
+  await ensureEventSettingsColumns();
   let row = await db.prepare('SELECT * FROM event_settings WHERE id = 1').get();
   if (!row) {
     await db
@@ -135,6 +141,9 @@ function toEventSettings(row) {
     upi_id_2nd_year: row.upi_id_2nd_year || DEFAULT_SETTINGS.upi_id_2nd_year,
     upi_name_1st_year: row.upi_name_1st_year || DEFAULT_SETTINGS.upi_name_1st_year,
     upi_name_2nd_year: row.upi_name_2nd_year || DEFAULT_SETTINGS.upi_name_2nd_year,
+    registration_1st_year_enabled: row.registration_1st_year_enabled !== undefined && row.registration_1st_year_enabled !== null ? Boolean(row.registration_1st_year_enabled) : true,
+    registration_2nd_year_enabled: row.registration_2nd_year_enabled !== undefined && row.registration_2nd_year_enabled !== null ? Boolean(row.registration_2nd_year_enabled) : true,
+    registration_updated_by: row.registration_updated_by || null,
     updated_at: row.updated_at || null,
   };
 }
