@@ -120,6 +120,7 @@ CREATE TABLE IF NOT EXISTS participants (
   approval_email_error TEXT,
   account_holder_name TEXT,
   payment_screenshot_url TEXT,
+  payment_amount INTEGER DEFAULT NULL,
   payment_status TEXT NOT NULL DEFAULT 'pending_verification',
   payment_rejected_reason TEXT,
   payment_verified_at TIMESTAMPTZ,
@@ -260,6 +261,14 @@ CREATE TABLE IF NOT EXISTS event_settings (
   countdown_iso TIMESTAMPTZ,
   flow_json JSONB NOT NULL DEFAULT '[]'::jsonb,
   support_note TEXT NOT NULL DEFAULT '',
+  fee_1st_year INTEGER DEFAULT 599,
+  fee_2nd_year INTEGER DEFAULT 699,
+  qr_1st_year_url TEXT DEFAULT '/payment-qr-1st-year.png',
+  qr_2nd_year_url TEXT DEFAULT '/payment-qr-2nd-year.png',
+  upi_id_1st_year TEXT DEFAULT 'ysamarjeetyadav2334@okaxis',
+  upi_id_2nd_year TEXT DEFAULT 'ysamarjeetyadav2334@okaxis',
+  upi_name_1st_year TEXT DEFAULT 'Samarjeet Yadav',
+  upi_name_2nd_year TEXT DEFAULT 'Samarjeet Yadav',
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
@@ -426,6 +435,17 @@ SELECT setval(pg_get_serial_sequence('media', 'id'), coalesce((SELECT max(id) FR
 SELECT setval(pg_get_serial_sequence('winners', 'id'), coalesce((SELECT max(id) FROM winners), 0) + 1, false);
 SELECT setval(pg_get_serial_sequence('management_team', 'id'), coalesce((SELECT max(id) FROM management_team), 0) + 1, false);
 SELECT setval(pg_get_serial_sequence('activity_logs', 'id'), coalesce((SELECT max(id) FROM activity_logs), 0) + 1, false);
+
+-- Safe migrations for existing databases
+ALTER TABLE participants ADD COLUMN IF NOT EXISTS payment_amount INTEGER DEFAULT NULL;
+ALTER TABLE event_settings ADD COLUMN IF NOT EXISTS fee_1st_year INTEGER DEFAULT 599;
+ALTER TABLE event_settings ADD COLUMN IF NOT EXISTS fee_2nd_year INTEGER DEFAULT 699;
+ALTER TABLE event_settings ADD COLUMN IF NOT EXISTS qr_1st_year_url TEXT DEFAULT '/payment-qr-1st-year.png';
+ALTER TABLE event_settings ADD COLUMN IF NOT EXISTS qr_2nd_year_url TEXT DEFAULT '/payment-qr-2nd-year.png';
+ALTER TABLE event_settings ADD COLUMN IF NOT EXISTS upi_id_1st_year TEXT DEFAULT 'ysamarjeetyadav2334@okaxis';
+ALTER TABLE event_settings ADD COLUMN IF NOT EXISTS upi_id_2nd_year TEXT DEFAULT 'ysamarjeetyadav2334@okaxis';
+ALTER TABLE event_settings ADD COLUMN IF NOT EXISTS upi_name_1st_year TEXT DEFAULT 'Samarjeet Yadav';
+ALTER TABLE event_settings ADD COLUMN IF NOT EXISTS upi_name_2nd_year TEXT DEFAULT 'Samarjeet Yadav';
 
 -- ============================================================
 -- 8. VERIFICATION QUERY

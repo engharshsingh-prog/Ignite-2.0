@@ -396,6 +396,7 @@ export function toParticipant(row) {
     registration_id: row.registration_id || (row.id ? `IGN26-${String(row.id).padStart(4, '0')}` : null),
     approval_email_sent: Boolean(row.approval_email_sent),
     account_holder_name: row.account_holder_name || null,
+    payment_amount: row.payment_amount != null ? Number(row.payment_amount) : (row.year === '2nd Year' ? 699 : 599),
     payment_screenshot_url: row.payment_screenshot_url || null,
     payment_status: row.payment_status || (row.payment_verified ? 'approved' : 'pending_verification'),
     payment_rejected_reason: row.payment_rejected_reason || null,

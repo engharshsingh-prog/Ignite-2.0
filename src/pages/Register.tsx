@@ -25,6 +25,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import { getErrorMessage, readJsonSafe } from '../lib/http';
+import { useEventSettings } from '../lib/useEventSettings';
 
 type FieldState = 'idle' | 'valid' | 'invalid';
 
@@ -46,6 +47,7 @@ interface SubmittedParticipant {
   roll_number: string;
   branch: string;
   year: string;
+  payment_amount?: number | null;
   whatsapp_number: string;
   skills?: string[];
   approval_status?: 'pending_approval' | 'approved' | 'rejected';
@@ -69,10 +71,6 @@ const BRANCHES = [
 const YEARS = ['1st Year', '2nd Year'];
 const SKILLS = ['Singing', 'Games/Fun Activities', 'Dance', 'Comedy/Standup', 'Others'];
 
-const YEAR_FEES: Record<string, number> = {
-  '1st Year': 599,
-  '2nd Year': 599,
-};
 const UPI_ID = 'ysamarjeetyadav2334@okaxis';
 const UPI_PAYEE_NAME = 'Samarjeet Yadav';
 const UPI_NOTE = 'Ignite 2.O Registration';
@@ -161,23 +159,43 @@ export default function Register() {
   const [lookupLoading, setLookupLoading] = useState(false);
   const [lookupError, setLookupError] = useState('');
 
-  const registrationFee = YEAR_FEES[activeParticipant?.year || form.year] ?? 599;
+  const { settings } = useEventSettings();
+
+  const [paymentYear, setPaymentYear] = useState<'1st Year' | '2nd Year'>('1st Year');
+  const [qrImageError, setQrImageError] = useState(false);
+
+  useEffect(() => {
+    if (activeParticipant?.year === '2nd Year') {
+      setPaymentYear('2nd Year');
+    } else if (activeParticipant?.year === '1st Year') {
+      setPaymentYear('1st Year');
+    } else if (form.year === '2nd Year') {
+      setPaymentYear('2nd Year');
+    } else if (form.year === '1st Year') {
+      setPaymentYear('1st Year');
+    }
+  }, [activeParticipant?.year, form.year]);
+
+  useEffect(() => {
+    setQrImageError(false);
+  }, [paymentYear, settings.qr1stYearUrl, settings.qr2ndYearUrl]);
+
+  const activeFee = paymentYear === '2nd Year' ? (settings.fee2ndYear ?? 699) : (settings.fee1stYear ?? 599);
+  const activeUpiId = paymentYear === '2nd Year' ? (settings.upiId2ndYear || UPI_ID) : (settings.upiId1stYear || UPI_ID);
+  const activeUpiName = paymentYear === '2nd Year' ? (settings.upiName2ndYear || UPI_PAYEE_NAME) : (settings.upiName1stYear || UPI_PAYEE_NAME);
+  const activeQrUrl = paymentYear === '2nd Year' ? (settings.qr2ndYearUrl || '/payment-qr-2nd-year.png') : (settings.qr1stYearUrl || '/payment-qr-1st-year.png');
 
   const upiLink = useMemo(() => {
     const params = new URLSearchParams({
-      pa: UPI_ID,
-      pn: UPI_PAYEE_NAME,
-      am: Number(registrationFee || 599).toFixed(2),
+      pa: activeUpiId,
+      pn: activeUpiName,
+      am: Number(activeFee).toFixed(2),
       cu: 'INR',
-      tn: UPI_NOTE,
+      tn: `${UPI_NOTE} - ${paymentYear}`,
       aid: 'uGICAgIC399eLdg',
     });
     return `upi://pay?${params.toString()}`;
-  }, [registrationFee]);
-
-  const qrSrc = useMemo(() => {
-    return '/payment-qr.png';
-  }, []);
+  }, [activeUpiId, activeUpiName, activeFee, paymentYear]);
 
   // Check URL query on mount for continuation token (?token=... or ?step=2&token=...)
   useEffect(() => {
@@ -570,6 +588,7 @@ export default function Register() {
           payment_id: paymentId.trim(),
           account_holder_name: accountHolderName.trim(),
           screenshot_data_url: screenshotDataUrl,
+          year: paymentYear,
         }),
       });
       const data = await readJsonSafe<{ success?: boolean; participant?: SubmittedParticipant; error?: string }>(res);
@@ -685,6 +704,7 @@ export default function Register() {
         payment_rejected_reason?: string | null;
         account_holder_name?: string | null;
         payment_screenshot_url?: string | null;
+        payment_amount?: number | null;
         error?: string;
       }>(res);
 
@@ -700,6 +720,7 @@ export default function Register() {
         roll_number: data.roll_number || '',
         branch: data.branch || '',
         year: data.year || '',
+        payment_amount: data.payment_amount,
         whatsapp_number: data.whatsapp_number || '',
         approval_status: data.approval_status,
         rejection_reason: data.rejection_reason,
@@ -797,6 +818,12 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
             <div className="flex justify-between gap-3">
               <span className="text-gray-400 text-sm">Branch & Year</span>
               <span className="text-white font-medium text-right text-xs sm:text-sm">{activeParticipant.branch} ({activeParticipant.year})</span>
+            </div>
+            <div className="flex justify-between gap-3">
+              <span className="text-gray-400 text-sm">Registration Amount</span>
+              <span className="text-emerald-400 font-bold text-sm">
+                INR {activeParticipant.payment_amount || (activeParticipant.year === '2nd Year' ? (settings.fee2ndYear ?? 699) : (settings.fee1stYear ?? 599))}
+              </span>
             </div>
             {activeParticipant.payment_id && (
               <div className="flex justify-between gap-3 border-t border-white/5 pt-2">
@@ -1291,11 +1318,16 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
                     <option value="" className="text-gray-600">Select year</option>
                     {YEARS.map(y => (
                       <option key={y} value={y}>
-                        {y}
+                        {y} {y === '1st Year' ? `(INR ${settings.fee1stYear ?? 599})` : `(INR ${settings.fee2ndYear ?? 699})`}
                       </option>
                     ))}
                   </select>
                 </div>
+                {form.year && (
+                  <p className="text-xs text-blue-300 mt-1.5 font-medium">
+                    Applicable Registration Fee: <span className="text-emerald-400 font-bold">INR {form.year === '2nd Year' ? (settings.fee2ndYear ?? 699) : (settings.fee1stYear ?? 599)}</span>
+                  </p>
+                )}
               </div>
 
               {/* Skills */}
@@ -1352,28 +1384,82 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
           {step === 2 && activeParticipant && (
             <form onSubmit={handleSubmitStep2Payment} className="space-y-5">
               <div className="bg-[#191e1b]/90 border border-[#303a32] rounded-2xl p-5">
-                <div className="flex items-center gap-2 mb-3">
-                  <QrCode size={18} className="text-olive-400" />
-                  <h3 className="font-semibold text-white">Pay Registration Fee</h3>
+                <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+                  <div className="flex items-center gap-2">
+                    <QrCode size={18} className="text-olive-400" />
+                    <h3 className="font-semibold text-white">Pay Registration Fee</h3>
+                  </div>
+                  <span className="text-xs px-2.5 py-1 rounded-full bg-blue-500/20 text-blue-300 font-medium">
+                    Select Your Year
+                  </span>
                 </div>
-                <p className="text-sm text-gray-300 mb-4">
-                  Registration fee: <span className="text-emerald-400 font-bold text-base">INR {registrationFee}</span>
-                  {activeParticipant.year && <span className="text-gray-400 text-xs ml-1.5">({activeParticipant.year})</span>}
-                </p>
 
-                <div className="bg-white rounded-2xl p-3 w-fit mx-auto mb-4 shadow-xl">
-                  <img src={qrSrc} alt="UPI Payment QR" className="w-60 h-auto max-w-full rounded-xl object-contain mx-auto" />
+                {/* Academic Year Selection Tabs */}
+                <div className="mb-4">
+                  <label className="block text-xs font-semibold text-gray-300 mb-2">
+                    Select Academic Year for Payment QR & Fee:
+                  </label>
+                  <div className="grid grid-cols-2 gap-2 p-1 bg-black/40 border border-white/10 rounded-xl">
+                    <button
+                      type="button"
+                      onClick={() => setPaymentYear('1st Year')}
+                      className={`py-2 px-3 rounded-lg text-sm font-semibold transition-all flex flex-col items-center justify-center gap-0.5 ${
+                        paymentYear === '1st Year'
+                          ? 'bg-blue-600 text-white shadow-lg'
+                          : 'text-gray-400 hover:text-white hover:bg-white/5'
+                      }`}
+                    >
+                      <span>1st Year</span>
+                      <span className="text-xs font-normal opacity-90">₹{settings.fee1stYear ?? 599}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPaymentYear('2nd Year')}
+                      className={`py-2 px-3 rounded-lg text-sm font-semibold transition-all flex flex-col items-center justify-center gap-0.5 ${
+                        paymentYear === '2nd Year'
+                          ? 'bg-blue-600 text-white shadow-lg'
+                          : 'text-gray-400 hover:text-white hover:bg-white/5'
+                      }`}
+                    >
+                      <span>2nd Year</span>
+                      <span className="text-xs font-normal opacity-90">₹{settings.fee2ndYear ?? 699}</span>
+                    </button>
+                  </div>
+                  <p className="text-[11px] text-gray-400 mt-2 text-center">
+                    Selected Year: <span className="text-emerald-400 font-semibold">{paymentYear}</span> — Payment Amount: <span className="text-emerald-400 font-semibold">INR {activeFee}</span>
+                  </p>
                 </div>
+
+                {/* QR Code Display or Clear Error if Not Configured */}
+                {!activeQrUrl || qrImageError ? (
+                  <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-center my-4">
+                    <AlertCircle size={24} className="mx-auto mb-2 text-red-400" />
+                    <p className="text-sm font-semibold">No QR Code Configured for {paymentYear}</p>
+                    <p className="text-xs text-gray-400 mt-1">
+                      The payment QR code for {paymentYear} participants has not been configured yet. Please pay directly via UPI ID below or contact support.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="bg-white rounded-2xl p-3 w-fit mx-auto mb-4 shadow-xl">
+                    <img
+                      key={`${paymentYear}-${activeQrUrl}`}
+                      src={activeQrUrl}
+                      alt={`${paymentYear} Payment QR`}
+                      onError={() => setQrImageError(true)}
+                      className="w-60 h-auto max-w-full rounded-xl object-contain mx-auto"
+                    />
+                  </div>
+                )}
 
                 <a
                   href={upiLink}
                   className="block w-full text-center py-3 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-semibold hover:bg-emerald-500/30 transition-colors shadow-sm"
                 >
-                  Click to Pay (INR {registrationFee})
+                  Click to Pay (INR {activeFee})
                 </a>
 
                 <p className="text-xs text-gray-400 mt-3 break-all text-center">
-                  UPI ID: <span className="font-mono text-white font-medium">{UPI_ID}</span>
+                  Payee: <span className="text-gray-300 font-medium">{activeUpiName}</span> | UPI ID: <span className="font-mono text-white font-medium">{activeUpiId}</span>
                 </p>
               </div>
 

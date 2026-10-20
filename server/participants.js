@@ -172,6 +172,19 @@ export default async function handler(req, res) {
       const tokenExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
       let participantId;
 
+      const registrationYear = year === '2nd Year' ? '2nd Year' : '1st Year';
+      let feeForYear = registrationYear === '2nd Year' ? 699 : 599;
+      try {
+        const settingsRow = await db.prepare('SELECT fee_1st_year, fee_2nd_year FROM event_settings WHERE id = 1').get();
+        if (settingsRow) {
+          if (registrationYear === '2nd Year' && settingsRow.fee_2nd_year != null) {
+            feeForYear = Number(settingsRow.fee_2nd_year);
+          } else if (registrationYear === '1st Year' && settingsRow.fee_1st_year != null) {
+            feeForYear = Number(settingsRow.fee_1st_year);
+          }
+        }
+      } catch (_) {}
+
       if (existingByEmail?.id && existingByEmail.approval_status === 'rejected') {
         // Re-submit previously rejected participant
         await db
@@ -182,6 +195,7 @@ export default async function handler(req, res) {
                   approval_status = 'pending_approval',
                   step2_token = ?,
                   step2_token_expires_at = ?,
+                  payment_amount = ?,
                   rejected_at = NULL,
                   rejected_by = NULL,
                   rejection_reason = NULL,
@@ -189,7 +203,7 @@ export default async function handler(req, res) {
               WHERE id = ?
             `
           )
-          .run(full_name, cleanRoll, branch, year, encodeSkills(skills), whatsapp_number, token, tokenExpiresAt, existingByEmail.id);
+          .run(full_name, cleanRoll, branch, registrationYear, encodeSkills(skills), whatsapp_number, token, tokenExpiresAt, feeForYear, existingByEmail.id);
         participantId = existingByEmail.id;
       } else {
         const result = await db
@@ -197,12 +211,12 @@ export default async function handler(req, res) {
             `
               INSERT INTO participants (
                 email, full_name, roll_number, branch, year, skills, whatsapp_number,
-                approval_status, step2_token, step2_token_expires_at, registered_at
+                approval_status, step2_token, step2_token_expires_at, payment_amount, registered_at
               )
-              VALUES (?, ?, ?, ?, ?, ?, ?, 'pending_approval', ?, ?, datetime('now'))
+              VALUES (?, ?, ?, ?, ?, ?, ?, 'pending_approval', ?, ?, ?, datetime('now'))
             `
           )
-          .run(normalizedEmail, full_name, cleanRoll, branch, year, encodeSkills(skills), whatsapp_number, token, tokenExpiresAt);
+          .run(normalizedEmail, full_name, cleanRoll, branch, registrationYear, encodeSkills(skills), whatsapp_number, token, tokenExpiresAt, feeForYear);
         participantId = result.lastInsertRowid;
       }
 

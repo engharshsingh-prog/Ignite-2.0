@@ -1,6 +1,7 @@
 import db from './_db.js';
 import { requireAdmin } from './_auth.js';
 import { writeActivity } from './_activity.js';
+import { storeMediaUpload } from './_media-storage.js';
 
 const DEFAULT_SETTINGS = {
   title: 'Ignite 2.O',
@@ -12,6 +13,14 @@ const DEFAULT_SETTINGS = {
   countdown_iso: '',
   flow: [],
   support_note: 'Payment verification may take 2-3 days. Please wait for confirmation from the support team.',
+  fee_1st_year: 599,
+  fee_2nd_year: 699,
+  qr_1st_year_url: '/payment-qr-1st-year.png',
+  qr_2nd_year_url: '/payment-qr-2nd-year.png',
+  upi_id_1st_year: 'ysamarjeetyadav2334@okaxis',
+  upi_id_2nd_year: 'ysamarjeetyadav2334@okaxis',
+  upi_name_1st_year: 'Samarjeet Yadav',
+  upi_name_2nd_year: 'Samarjeet Yadav',
 };
 
 const safeText = (value, fallback) => {
@@ -41,7 +50,32 @@ const parseFlowJson = (value) => {
   }
 };
 
+let columnsEnsured = false;
+async function ensureColumns() {
+  if (columnsEnsured) return;
+  const cols = [
+    { name: 'fee_1st_year', sql: 'ALTER TABLE event_settings ADD COLUMN fee_1st_year INTEGER DEFAULT 599' },
+    { name: 'fee_2nd_year', sql: 'ALTER TABLE event_settings ADD COLUMN fee_2nd_year INTEGER DEFAULT 699' },
+    { name: 'qr_1st_year_url', sql: "ALTER TABLE event_settings ADD COLUMN qr_1st_year_url TEXT DEFAULT '/payment-qr-1st-year.png'" },
+    { name: 'qr_2nd_year_url', sql: "ALTER TABLE event_settings ADD COLUMN qr_2nd_year_url TEXT DEFAULT '/payment-qr-2nd-year.png'" },
+    { name: 'upi_id_1st_year', sql: "ALTER TABLE event_settings ADD COLUMN upi_id_1st_year TEXT DEFAULT 'ysamarjeetyadav2334@okaxis'" },
+    { name: 'upi_id_2nd_year', sql: "ALTER TABLE event_settings ADD COLUMN upi_id_2nd_year TEXT DEFAULT 'ysamarjeetyadav2334@okaxis'" },
+    { name: 'upi_name_1st_year', sql: "ALTER TABLE event_settings ADD COLUMN upi_name_1st_year TEXT DEFAULT 'Samarjeet Yadav'" },
+    { name: 'upi_name_2nd_year', sql: "ALTER TABLE event_settings ADD COLUMN upi_name_2nd_year TEXT DEFAULT 'Samarjeet Yadav'" },
+  ];
+  for (const c of cols) {
+    try {
+      await db.prepare(c.sql).run();
+    } catch (_) {}
+  }
+  try {
+    await db.prepare('ALTER TABLE participants ADD COLUMN payment_amount INTEGER DEFAULT NULL').run();
+  } catch (_) {}
+  columnsEnsured = true;
+}
+
 async function ensureRow() {
+  await ensureColumns();
   let row = await db.prepare('SELECT * FROM event_settings WHERE id = 1').get();
   if (!row) {
     await db
@@ -49,9 +83,11 @@ async function ensureRow() {
         `
           INSERT INTO event_settings (
             id, title, date_label, time_label, venue, dress_code_male, dress_code_female,
-            countdown_iso, flow_json, support_note, updated_at
+            countdown_iso, flow_json, support_note, fee_1st_year, fee_2nd_year,
+            qr_1st_year_url, qr_2nd_year_url, upi_id_1st_year, upi_id_2nd_year,
+            upi_name_1st_year, upi_name_2nd_year, updated_at
           )
-          VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `
       )
       .run(
@@ -64,6 +100,14 @@ async function ensureRow() {
         DEFAULT_SETTINGS.countdown_iso,
         JSON.stringify(DEFAULT_SETTINGS.flow),
         DEFAULT_SETTINGS.support_note,
+        DEFAULT_SETTINGS.fee_1st_year,
+        DEFAULT_SETTINGS.fee_2nd_year,
+        DEFAULT_SETTINGS.qr_1st_year_url,
+        DEFAULT_SETTINGS.qr_2nd_year_url,
+        DEFAULT_SETTINGS.upi_id_1st_year,
+        DEFAULT_SETTINGS.upi_id_2nd_year,
+        DEFAULT_SETTINGS.upi_name_1st_year,
+        DEFAULT_SETTINGS.upi_name_2nd_year,
         new Date().toISOString()
       );
     row = await db.prepare('SELECT * FROM event_settings WHERE id = 1').get();
@@ -83,6 +127,14 @@ function toEventSettings(row) {
     countdown_iso: row.countdown_iso,
     flow: parseFlowJson(row.flow_json),
     support_note: typeof row.support_note === 'string' ? row.support_note : DEFAULT_SETTINGS.support_note,
+    fee_1st_year: row.fee_1st_year != null ? Number(row.fee_1st_year) : DEFAULT_SETTINGS.fee_1st_year,
+    fee_2nd_year: row.fee_2nd_year != null ? Number(row.fee_2nd_year) : DEFAULT_SETTINGS.fee_2nd_year,
+    qr_1st_year_url: row.qr_1st_year_url || DEFAULT_SETTINGS.qr_1st_year_url,
+    qr_2nd_year_url: row.qr_2nd_year_url || DEFAULT_SETTINGS.qr_2nd_year_url,
+    upi_id_1st_year: row.upi_id_1st_year || DEFAULT_SETTINGS.upi_id_1st_year,
+    upi_id_2nd_year: row.upi_id_2nd_year || DEFAULT_SETTINGS.upi_id_2nd_year,
+    upi_name_1st_year: row.upi_name_1st_year || DEFAULT_SETTINGS.upi_name_1st_year,
+    upi_name_2nd_year: row.upi_name_2nd_year || DEFAULT_SETTINGS.upi_name_2nd_year,
     updated_at: row.updated_at || null,
   };
 }
@@ -93,6 +145,24 @@ function normalizeCountdown(value, fallback) {
   if (!trimmed) return '';
   const parsed = new Date(trimmed);
   if (Number.isNaN(parsed.getTime())) return null;
+  return trimmed;
+}
+
+async function handleQrImageUpload(possibleDataUrl, fallbackUrl) {
+  if (typeof possibleDataUrl !== 'string') return fallbackUrl;
+  const trimmed = possibleDataUrl.trim();
+  if (!trimmed) return fallbackUrl;
+  if (trimmed.startsWith('data:image/')) {
+    try {
+      const uploadResult = await storeMediaUpload({
+        category: 'payment-qr',
+        originalDataUrl: trimmed,
+      });
+      if (uploadResult?.url) return uploadResult.url;
+    } catch (uploadErr) {
+      console.error('Failed to store QR code upload:', uploadErr);
+    }
+  }
   return trimmed;
 }
 
@@ -119,6 +189,17 @@ export default async function handler(req, res) {
       const flow = normalizeFlow(req.body?.flow, parseFlowJson(current?.flow_json));
       const updated_at = new Date().toISOString();
 
+      const qr1st = await handleQrImageUpload(req.body?.qr_1st_year_url, current?.qr_1st_year_url || DEFAULT_SETTINGS.qr_1st_year_url);
+      const qr2nd = await handleQrImageUpload(req.body?.qr_2nd_year_url, current?.qr_2nd_year_url || DEFAULT_SETTINGS.qr_2nd_year_url);
+
+      const fee1st = req.body?.fee_1st_year != null && !isNaN(Number(req.body.fee_1st_year))
+        ? Math.max(0, Math.round(Number(req.body.fee_1st_year)))
+        : (current?.fee_1st_year != null ? Number(current.fee_1st_year) : DEFAULT_SETTINGS.fee_1st_year);
+
+      const fee2nd = req.body?.fee_2nd_year != null && !isNaN(Number(req.body.fee_2nd_year))
+        ? Math.max(0, Math.round(Number(req.body.fee_2nd_year)))
+        : (current?.fee_2nd_year != null ? Number(current.fee_2nd_year) : DEFAULT_SETTINGS.fee_2nd_year);
+
       const payload = {
         title: safeText(req.body?.title, current?.title || DEFAULT_SETTINGS.title),
         date_label: typeof req.body?.date_label === 'string' ? req.body.date_label.trim() : (current?.date_label || ''),
@@ -129,6 +210,14 @@ export default async function handler(req, res) {
         countdown_iso: countdown,
         flow_json: JSON.stringify(flow),
         support_note: safeText(req.body?.support_note, current?.support_note || DEFAULT_SETTINGS.support_note),
+        fee_1st_year: fee1st,
+        fee_2nd_year: fee2nd,
+        qr_1st_year_url: qr1st,
+        qr_2nd_year_url: qr2nd,
+        upi_id_1st_year: safeText(req.body?.upi_id_1st_year, current?.upi_id_1st_year || DEFAULT_SETTINGS.upi_id_1st_year),
+        upi_id_2nd_year: safeText(req.body?.upi_id_2nd_year, current?.upi_id_2nd_year || DEFAULT_SETTINGS.upi_id_2nd_year),
+        upi_name_1st_year: safeText(req.body?.upi_name_1st_year, current?.upi_name_1st_year || DEFAULT_SETTINGS.upi_name_1st_year),
+        upi_name_2nd_year: safeText(req.body?.upi_name_2nd_year, current?.upi_name_2nd_year || DEFAULT_SETTINGS.upi_name_2nd_year),
         updated_at,
       };
 
@@ -137,7 +226,10 @@ export default async function handler(req, res) {
           `
             UPDATE event_settings
             SET title = ?, date_label = ?, time_label = ?, venue = ?, dress_code_male = ?, dress_code_female = ?,
-                countdown_iso = ?, flow_json = ?, support_note = ?, updated_at = ?
+                countdown_iso = ?, flow_json = ?, support_note = ?,
+                fee_1st_year = ?, fee_2nd_year = ?, qr_1st_year_url = ?, qr_2nd_year_url = ?,
+                upi_id_1st_year = ?, upi_id_2nd_year = ?, upi_name_1st_year = ?, upi_name_2nd_year = ?,
+                updated_at = ?
             WHERE id = 1
           `
         )
@@ -151,6 +243,14 @@ export default async function handler(req, res) {
           payload.countdown_iso,
           payload.flow_json,
           payload.support_note,
+          payload.fee_1st_year,
+          payload.fee_2nd_year,
+          payload.qr_1st_year_url,
+          payload.qr_2nd_year_url,
+          payload.upi_id_1st_year,
+          payload.upi_id_2nd_year,
+          payload.upi_name_1st_year,
+          payload.upi_name_2nd_year,
           payload.updated_at
         );
 
@@ -162,8 +262,10 @@ export default async function handler(req, res) {
         details: {
           title: payload.title,
           date_label: payload.date_label,
-          time_label: payload.time_label,
-          venue: payload.venue,
+          fee_1st_year: payload.fee_1st_year,
+          fee_2nd_year: payload.fee_2nd_year,
+          qr_1st_year_url: payload.qr_1st_year_url,
+          qr_2nd_year_url: payload.qr_2nd_year_url,
         },
       });
 

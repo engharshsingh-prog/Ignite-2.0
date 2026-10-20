@@ -47,6 +47,7 @@ interface Participant {
   branch: string;
   email: string;
   year: string;
+  payment_amount?: number | null;
   whatsapp_number: string;
   skills: string[];
   payment_id: string | null;
@@ -2289,14 +2290,26 @@ export default function AdminDashboard() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs pt-1">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs pt-1">
+                  <div>
+                    <span className="text-gray-400 block text-[11px]">Academic Year:</span>
+                    <span className="text-white font-medium">
+                      {reviewingParticipant.year || '1st Year'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-gray-400 block text-[11px]">Applicable Fee:</span>
+                    <span className="text-emerald-400 font-bold">
+                      INR {reviewingParticipant.payment_amount != null ? reviewingParticipant.payment_amount : (reviewingParticipant.year === '2nd Year' ? 699 : 599)}
+                    </span>
+                  </div>
                   <div>
                     <span className="text-gray-400 block text-[11px]">Account Holder Name:</span>
                     <span className="text-white font-medium">
                       {reviewingParticipant.account_holder_name || <span className="text-gray-500 italic">Not provided</span>}
                     </span>
                   </div>
-                  <div>
+                  <div className="sm:col-span-3">
                     <span className="text-gray-400 block text-[11px]">Payment Reference / UTR ID:</span>
                     <span className="font-mono text-blue-300 font-medium">
                       {reviewingParticipant.payment_id || <span className="text-gray-500 italic">Not provided</span>}

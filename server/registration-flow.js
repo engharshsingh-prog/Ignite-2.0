@@ -312,6 +312,7 @@ export async function handleVerifyStep2Access(req, res) {
       roll_number: participant.roll_number,
       branch: participant.branch,
       year: participant.year,
+      payment_amount: participant.payment_amount != null ? Number(participant.payment_amount) : (participant.year === '2nd Year' ? 699 : 599),
       whatsapp_number: participant.whatsapp_number,
       skills: participant.skills,
     },
@@ -320,7 +321,7 @@ export async function handleVerifyStep2Access(req, res) {
 
 // 5. POST /api/registration-step2/submit-payment - Submit payment details & screenshot (Public, strictly validates approval status from DB)
 export async function handleSubmitStep2Payment(req, res) {
-  const { token, payment_id, account_holder_name, screenshot_data_url } = req.body || {};
+  const { token, payment_id, account_holder_name, screenshot_data_url, year: submittedYearRaw } = req.body || {};
 
   if (!token) {
     return res.status(400).json({ error: 'Continuation token is required to submit payment.' });
@@ -382,6 +383,22 @@ export async function handleSubmitStep2Payment(req, res) {
     return res.status(409).json({ error: 'This payment transaction ID has already been used by another participant.' });
   }
 
+  // Determine finalized academic year (validate strictly)
+  const finalYear = submittedYearRaw === '2nd Year' ? '2nd Year' : (submittedYearRaw === '1st Year' ? '1st Year' : (row.year || '1st Year'));
+
+  // Calculate authoritative server-side payment fee for the selected year
+  let finalAmount = finalYear === '2nd Year' ? 699 : 599;
+  try {
+    const settingsRow = await db.prepare('SELECT fee_1st_year, fee_2nd_year FROM event_settings WHERE id = 1').get();
+    if (settingsRow) {
+      if (finalYear === '2nd Year' && settingsRow.fee_2nd_year != null) {
+        finalAmount = Number(settingsRow.fee_2nd_year);
+      } else if (finalYear === '1st Year' && settingsRow.fee_1st_year != null) {
+        finalAmount = Number(settingsRow.fee_1st_year);
+      }
+    }
+  } catch (_) {}
+
   // Securely store the uploaded payment screenshot file using existing storage architecture
   let storedScreenshotUrl = cleanScreenshotUrl;
   try {
@@ -397,7 +414,7 @@ export async function handleSubmitStep2Payment(req, res) {
     storedScreenshotUrl = cleanScreenshotUrl;
   }
 
-  // Update participant with payment_id, account_holder_name, screenshot URL, and initial pending_verification status
+  // Update participant with payment_id, account_holder_name, screenshot URL, verified year & amount, and initial pending_verification status
   await db
     .prepare(
       `
@@ -407,11 +424,13 @@ export async function handleSubmitStep2Payment(req, res) {
             payment_screenshot_url = ?,
             payment_status = 'pending_verification',
             payment_verified = 0,
-            payment_rejected_reason = NULL
+            payment_rejected_reason = NULL,
+            year = ?,
+            payment_amount = ?
         WHERE id = ?
       `
     )
-    .run(cleanPaymentId, cleanAccountHolder, storedScreenshotUrl, row.id);
+    .run(cleanPaymentId, cleanAccountHolder, storedScreenshotUrl, finalYear, finalAmount, row.id);
 
   const updated = toParticipant(await db.prepare('SELECT * FROM participants WHERE id = ?').get(row.id));
 
@@ -427,7 +446,10 @@ export async function handleSubmitStep2Payment(req, res) {
       account_holder_name: cleanAccountHolder,
       screenshot_url: storedScreenshotUrl,
       full_name: updated.full_name,
+      year: finalYear,
+      payment_amount: finalAmount,
     },
+  });
   });
 
   // Send confirmation email
@@ -472,6 +494,7 @@ export async function handleGetRegistrationStatus(req, res) {
     roll_number: participant.roll_number,
     branch: participant.branch,
     year: participant.year,
+    payment_amount: participant.payment_amount != null ? Number(participant.payment_amount) : (participant.year === '2nd Year' ? 699 : 599),
     whatsapp_number: participant.whatsapp_number,
     approval_status: participant.approval_status,
     rejection_reason: participant.rejection_reason,
