@@ -165,10 +165,15 @@ export default async function handler(req, res) {
         'SELECT * FROM participants WHERE lower(trim(email)) = ? AND year = ? LIMIT 1'
       ).get(normalizedEmail, registrationYear);
 
-      const isLocked = lockRecord ? (Number(lockRecord.is_locked) === 1) : (existingForThisYear ? (existingForThisYear.is_locked !== 0) : false);
+      if (!existingForThisYear) {
+        // If no participant record exists in participants, clean up any orphan lock from previous deletions
+        if (lockRecord) {
+          await db.prepare('DELETE FROM registration_locks WHERE lower(trim(email)) = ? AND year = ?').run(normalizedEmail, registrationYear).catch(() => {});
+        }
+      } else {
+        const isLocked = lockRecord ? (Number(lockRecord.is_locked) === 1) : (existingForThisYear.is_locked !== 0);
 
-      if (isLocked) {
-        if (existingForThisYear && existingForThisYear.id) {
+        if (isLocked) {
           if (existingForThisYear.approval_status === 'approved' && existingForThisYear.payment_id) {
             return res.status(409).json({
               error: `Your registration for ${registrationYear} is already completed and payment submitted. You can check your pass in My Profile.`,
@@ -178,8 +183,9 @@ export default async function handler(req, res) {
           }
           if (existingForThisYear.approval_status === 'approved' && !existingForThisYear.payment_id) {
             const participant = toParticipant(existingForThisYear);
-            return res.status(409).json({ 
-              error: `Your registration for ${registrationYear} is approved. Please complete your payment.`,
+            return res.status(200).json({ 
+              success: true,
+              message: `Your registration for ${registrationYear} is approved. Redirecting to payment.`,
               participant,
               redirectToStep2: true,
               step2_token: existingForThisYear.step2_token,
@@ -202,12 +208,12 @@ export default async function handler(req, res) {
               year: registrationYear,
             });
           }
+          return res.status(409).json({
+            error: `Registration for ${registrationYear} is locked for this account. Contact Super Admin to request an unlock.`,
+            locked: true,
+            year: registrationYear,
+          });
         }
-        return res.status(409).json({
-          error: `Registration for ${registrationYear} is locked for this account. Contact Super Admin to request an unlock.`,
-          locked: true,
-          year: registrationYear,
-        });
       }
 
       // Check roll number for the same academic year
@@ -416,6 +422,13 @@ export default async function handler(req, res) {
       if (!existing) return res.status(404).json({ error: 'Participant not found' });
 
       await db.prepare('DELETE FROM participants WHERE id = ?').run(id);
+
+      // Clean up corresponding registration lock so user can register anew if needed
+      await db.prepare('DELETE FROM registration_locks WHERE participant_id = ? OR (lower(trim(email)) = ? AND year = ?)').run(
+        id,
+        String(existing.email).trim().toLowerCase(),
+        existing.year
+      ).catch(() => {});
 
       await writeActivity({
         entity_type: 'participant',
