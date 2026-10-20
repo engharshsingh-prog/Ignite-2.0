@@ -156,8 +156,6 @@ export default async function handler(req, res) {
 
       await ensureRegistrationLocksTable();
 
-      const registrationYear = year === '2nd Year' ? '2nd Year' : '1st Year';
-
       // 1. Check Year-Wise Registration Lock for this student and year
       const lockRecord = await db.prepare(
         'SELECT * FROM registration_locks WHERE lower(trim(email)) = ? AND year = ? LIMIT 1'
