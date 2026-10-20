@@ -450,7 +450,6 @@ export async function handleSubmitStep2Payment(req, res) {
       payment_amount: finalAmount,
     },
   });
-  });
 
   // Send confirmation email
   try {
