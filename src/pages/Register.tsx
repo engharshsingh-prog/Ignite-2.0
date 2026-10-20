@@ -23,6 +23,8 @@ import {
   User,
   X,
   XCircle,
+  Lock,
+  Unlock,
 } from 'lucide-react';
 import { getErrorMessage, readJsonSafe } from '../lib/http';
 import { useEventSettings } from '../lib/useEventSettings';
@@ -68,7 +70,6 @@ const BRANCHES = [
   'Electronics and Communication Engineering (ECE)',
   'Mechanical Engineering (ME)'
 ];
-const YEARS = ['1st Year', '2nd Year'];
 const SKILLS = ['Singing', 'Games/Fun Activities', 'Dance', 'Comedy/Standup', 'Others'];
 
 const UPI_ID = 'ysamarjeetyadav2334@okaxis';
@@ -163,6 +164,37 @@ export default function Register() {
   const [paymentYear, setPaymentYear] = useState<'1st Year' | '2nd Year'>('1st Year');
   const [qrImageError, setQrImageError] = useState(false);
 
+  const [yearLocks, setYearLocks] = useState<{
+    first_year: { locked: boolean; status: string | null; registration_id: string | null; unlocked: boolean; message: string | null };
+    second_year: { locked: boolean; status: string | null; registration_id: string | null; unlocked: boolean; message: string | null };
+  }>({
+    first_year: { locked: false, status: null, registration_id: null, unlocked: false, message: null },
+    second_year: { locked: false, status: null, registration_id: null, unlocked: false, message: null },
+  });
+
+  const checkLocksForEmail = async (emailToTest: string, rollToTest?: string) => {
+    const cleanEmail = String(emailToTest || '').trim().toLowerCase();
+    if (!cleanEmail || !cleanEmail.includes('@')) return;
+    try {
+      const params = new URLSearchParams({ email: cleanEmail });
+      if (rollToTest?.trim()) params.set('roll_number', rollToTest.trim());
+      const res = await fetch(`/api/registration-locks/status?${params.toString()}`);
+      if (res.ok) {
+        const data = await readJsonSafe<{
+          email: string;
+          first_year: { locked: boolean; status: string | null; registration_id: string | null; unlocked: boolean; message: string | null };
+          second_year: { locked: boolean; status: string | null; registration_id: string | null; unlocked: boolean; message: string | null };
+        }>(res);
+        if (data?.first_year && data?.second_year) {
+          setYearLocks({
+            first_year: data.first_year,
+            second_year: data.second_year,
+          });
+        }
+      }
+    } catch (_) {}
+  };
+
   useEffect(() => {
     if (activeParticipant?.year === '2nd Year') {
       setPaymentYear('2nd Year');
@@ -213,6 +245,7 @@ export default function Register() {
                 setOtpSent(true);
                 setOtpSentEmail(parsed.email);
                 setOtpMessage('Email verified successfully.');
+                checkLocksForEmail(parsed.email);
               } else {
                 sessionStorage.removeItem('ignite_otp_session');
               }
@@ -372,6 +405,7 @@ export default function Register() {
       setOtpToken(data.otp_token);
       setOtpMessage('Email verified successfully.');
       setError('');
+      checkLocksForEmail(cleanEmail, form.roll_number);
       try {
         sessionStorage.setItem(
           'ignite_otp_session',
@@ -416,6 +450,9 @@ export default function Register() {
     if (valid && !otpVerified) {
       valid = false;
       setError('Email OTP verification is mandatory before submitting Step 1.');
+    } else if (valid && ((form.year === '1st Year' && yearLocks.first_year.locked) || (form.year === '2nd Year' && yearLocks.second_year.locked))) {
+      valid = false;
+      setError(`Your ${form.year} registration has already been submitted and is locked. Please contact the administrator if you need to request changes.`);
     } else if (!valid) {
       setError('Please fill all required details correctly before continuing.');
     }
@@ -436,8 +473,13 @@ export default function Register() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...form, otp_token: otpToken }),
       });
-      const data = await readJsonSafe<{ success?: boolean; participant?: SubmittedParticipant; error?: string; redirectToStep2?: boolean; step2_token?: string; step2_token_expires_at?: string }>(res);
-      if (!res.ok) throw new Error(getErrorMessage(data, 'Registration submission failed'));
+      const data = await readJsonSafe<{ success?: boolean; participant?: SubmittedParticipant; error?: string; redirectToStep2?: boolean; step2_token?: string; step2_token_expires_at?: string; locked?: boolean }>(res);
+      if (!res.ok) {
+        checkLocksForEmail(form.email, form.roll_number);
+        throw new Error(getErrorMessage(data, 'Registration submission failed'));
+      }
+
+      checkLocksForEmail(form.email, form.roll_number);
 
       try {
         sessionStorage.removeItem('ignite_otp_session');
@@ -1121,6 +1163,7 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
                     autoComplete="email"
                     value={form.email}
                     onChange={handleChange}
+                    onBlur={() => checkLocksForEmail(form.email, form.roll_number)}
                     readOnly={otpVerified}
                     placeholder="yourname@gmail.com"
                     className={`w-full bg-white/5 border rounded-xl pl-10 pr-20 py-3 text-white placeholder-gray-600 focus:outline-none transition-colors ${
@@ -1233,6 +1276,7 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
                     name="roll_number"
                     value={form.roll_number}
                     onChange={handleChange}
+                    onBlur={() => checkLocksForEmail(form.email, form.roll_number)}
                     placeholder="e.g. 2614670010009 (up to 15 chars)"
                     maxLength={15}
                     className={`w-full bg-white/5 border rounded-xl pl-10 pr-4 py-3 text-white placeholder-gray-600 focus:outline-none transition-colors font-mono ${borderClass('roll_number')}`}
@@ -1292,7 +1336,14 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
 
               {/* Year */}
               <div>
-                <label htmlFor="reg-year" className="block text-sm font-medium text-gray-300 mb-1.5">Year *</label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label htmlFor="reg-year" className="block text-sm font-medium text-gray-300">Year *</label>
+                  {(yearLocks.first_year.locked || yearLocks.second_year.locked) && (
+                    <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-amber-500/15 border border-amber-500/30 text-amber-300 flex items-center gap-1">
+                      <Lock size={11} /> Registration Lock Active
+                    </span>
+                  )}
+                </div>
                 <div className="relative">
                   <BookOpen size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500" />
                   <select
@@ -1303,14 +1354,54 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
                     className={`w-full bg-[#1a1530] border rounded-xl pl-10 pr-4 py-3 text-white focus:outline-none transition-colors appearance-none ${borderClass('year')}`}
                   >
                     <option value="" className="text-gray-600">Select year</option>
-                    {YEARS.map(y => (
-                      <option key={y} value={y}>
-                        {y} {y === '1st Year' ? `(INR ${settings.fee1stYear ?? 599})` : `(INR ${settings.fee2ndYear ?? 699})`}
-                      </option>
-                    ))}
+                    <option value="1st Year" disabled={yearLocks.first_year.locked}>
+                      1st Year (INR {settings.fee1stYear ?? 599}) {yearLocks.first_year.locked ? '🔒 [Locked - Submitted]' : yearLocks.first_year.unlocked ? '🔓 [Unlocked by Admin]' : ''}
+                    </option>
+                    <option value="2nd Year" disabled={yearLocks.second_year.locked}>
+                      2nd Year (INR {settings.fee2ndYear ?? 699}) {yearLocks.second_year.locked ? '🔒 [Locked - Submitted]' : yearLocks.second_year.unlocked ? '🔓 [Unlocked by Admin]' : ''}
+                    </option>
                   </select>
                 </div>
-                {form.year && (
+
+                {/* 1st Year Lock / Unlock Banners */}
+                {form.year === '1st Year' && yearLocks.first_year.locked && (
+                  <div className="mt-2.5 p-3.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-200 text-xs flex items-start gap-2.5">
+                    <Lock size={16} className="text-amber-400 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-semibold text-amber-300">1st Year Registration Locked</p>
+                      <p className="mt-0.5 text-gray-300">
+                        {yearLocks.first_year.message || 'Your 1st Year registration is submitted and awaiting admin approval.'} If changes are needed, please contact the administrator to request an unlock.
+                      </p>
+                    </div>
+                  </div>
+                )}
+                {form.year === '1st Year' && yearLocks.first_year.unlocked && (
+                  <div className="mt-2.5 p-3 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-200 text-xs flex items-start gap-2">
+                    <Unlock size={16} className="text-emerald-400 flex-shrink-0 mt-0.5" />
+                    <p>1st Year registration has been unlocked by Super Admin. You may submit your registration details.</p>
+                  </div>
+                )}
+
+                {/* 2nd Year Lock / Unlock Banners */}
+                {form.year === '2nd Year' && yearLocks.second_year.locked && (
+                  <div className="mt-2.5 p-3.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-200 text-xs flex items-start gap-2.5">
+                    <Lock size={16} className="text-amber-400 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-semibold text-amber-300">2nd Year Registration Locked</p>
+                      <p className="mt-0.5 text-gray-300">
+                        {yearLocks.second_year.message || 'Your 2nd Year registration is submitted and awaiting admin approval.'} If changes are needed, please contact the administrator to request an unlock.
+                      </p>
+                    </div>
+                  </div>
+                )}
+                {form.year === '2nd Year' && yearLocks.second_year.unlocked && (
+                  <div className="mt-2.5 p-3 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-200 text-xs flex items-start gap-2">
+                    <Unlock size={16} className="text-emerald-400 flex-shrink-0 mt-0.5" />
+                    <p>2nd Year registration has been unlocked by Super Admin. You may submit your registration details.</p>
+                  </div>
+                )}
+
+                {form.year && !((form.year === '1st Year' && yearLocks.first_year.locked) || (form.year === '2nd Year' && yearLocks.second_year.locked)) && (
                   <p className="text-xs text-blue-300 mt-1.5 font-medium">
                     Applicable Registration Fee: <span className="text-emerald-400 font-bold">INR {form.year === '2nd Year' ? (settings.fee2ndYear ?? 699) : (settings.fee1stYear ?? 599)}</span>
                   </p>
@@ -1349,10 +1440,14 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
               {/* Submit Step 1 Button */}
               <button
                 type="submit"
-                disabled={loading}
-                className="w-full py-4 rounded-xl bg-gradient-to-r from-[#3b82f6] to-[#718044] text-white font-bold text-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2 glow-box-olive disabled:opacity-50"
+                disabled={loading || (form.year === '1st Year' && yearLocks.first_year.locked) || (form.year === '2nd Year' && yearLocks.second_year.locked)}
+                className="w-full py-4 rounded-xl bg-gradient-to-r from-[#3b82f6] to-[#718044] text-white font-bold text-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2 glow-box-olive disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? 'Submitting Step 1...' : 'Submit for Admin Approval'} <ArrowRight size={18} />
+                {loading
+                  ? 'Submitting Step 1...'
+                  : (form.year && ((form.year === '1st Year' && yearLocks.first_year.locked) || (form.year === '2nd Year' && yearLocks.second_year.locked)))
+                  ? `${form.year} Registration Locked`
+                  : 'Submit for Admin Approval'} <ArrowRight size={18} />
               </button>
 
               <div className="pt-2 text-center">

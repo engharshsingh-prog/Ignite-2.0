@@ -2,6 +2,7 @@ import crypto from 'node:crypto';
 import db, { encodeSkills, toParticipant, localClient } from './_db.js';
 import { requireAdmin } from './_auth.js';
 import { writeActivity } from './_activity.js';
+import { ensureRegistrationLocksTable } from './registration-locks.js';
 import {
   sendRegistrationConfirmationEmail,
   sendParticipantApprovalRequestToAdmin,
@@ -139,32 +140,75 @@ export default async function handler(req, res) {
         return res.status(403).json({ error: 'Your email verification session has expired. Please verify your email again.' });
       }
 
-      const existingByEmail = await db.prepare('SELECT id, approval_status, payment_id, step2_token, step2_token_expires_at FROM participants WHERE lower(trim(email)) = ? LIMIT 1').get(normalizedEmail);
-      if (existingByEmail && existingByEmail.id) {
-        if (existingByEmail.approval_status === 'approved' && existingByEmail.payment_id) {
-          return res.status(409).json({ error: 'This email address is already registered and payment submitted. You can check your pass in My Profile.' });
+      await ensureRegistrationLocksTable();
+
+      const registrationYear = year === '2nd Year' ? '2nd Year' : '1st Year';
+
+      // 1. Check Year-Wise Registration Lock for this student and year
+      const lockRecord = await db.prepare(
+        'SELECT * FROM registration_locks WHERE lower(trim(email)) = ? AND year = ? LIMIT 1'
+      ).get(normalizedEmail, registrationYear);
+
+      const existingForThisYear = await db.prepare(
+        'SELECT * FROM participants WHERE lower(trim(email)) = ? AND year = ? LIMIT 1'
+      ).get(normalizedEmail, registrationYear);
+
+      const isLocked = lockRecord ? (Number(lockRecord.is_locked) === 1) : (existingForThisYear ? (existingForThisYear.is_locked !== 0) : false);
+
+      if (isLocked) {
+        if (existingForThisYear && existingForThisYear.id) {
+          if (existingForThisYear.approval_status === 'approved' && existingForThisYear.payment_id) {
+            return res.status(409).json({
+              error: `Your registration for ${registrationYear} is already completed and payment submitted. You can check your pass in My Profile.`,
+              locked: true,
+              year: registrationYear,
+            });
+          }
+          if (existingForThisYear.approval_status === 'approved' && !existingForThisYear.payment_id) {
+            const participant = toParticipant(existingForThisYear);
+            return res.status(409).json({ 
+              error: `Your registration for ${registrationYear} is approved. Please complete your payment.`,
+              participant,
+              redirectToStep2: true,
+              step2_token: existingForThisYear.step2_token,
+              step2_token_expires_at: existingForThisYear.step2_token_expires_at,
+              locked: true,
+              year: registrationYear,
+            });
+          }
+          if (existingForThisYear.approval_status === 'pending_approval') {
+            return res.status(409).json({
+              error: `Your ${registrationYear} registration is submitted and awaiting admin approval. It is currently locked.`,
+              locked: true,
+              year: registrationYear,
+            });
+          }
+          if (existingForThisYear.approval_status === 'rejected') {
+            return res.status(409).json({
+              error: `Your ${registrationYear} registration was rejected and is currently locked. Please contact the Super Admin to request an unlock.`,
+              locked: true,
+              year: registrationYear,
+            });
+          }
         }
-        if (existingByEmail.approval_status === 'approved' && !existingByEmail.payment_id) {
-          // Approved but payment not yet submitted - return existing participant info so frontend can continue to Step 2
-          const participant = toParticipant(await db.prepare('SELECT * FROM participants WHERE id = ?').get(existingByEmail.id));
-          return res.status(409).json({ 
-            error: 'This email address is already registered and approved. Please complete your payment.',
-            participant,
-            redirectToStep2: true,
-            step2_token: existingByEmail.step2_token,
-            step2_token_expires_at: existingByEmail.step2_token_expires_at
-          });
-        }
-        if (existingByEmail.approval_status === 'pending_approval') {
-          return res.status(409).json({ error: 'Your registration has already been submitted and is currently pending admin verification.' });
-        }
-        // Note: 'rejected' status is handled below for re-submission
+        return res.status(409).json({
+          error: `Registration for ${registrationYear} is locked for this account. Contact Super Admin to request an unlock.`,
+          locked: true,
+          year: registrationYear,
+        });
       }
 
-      const existingByRoll = await db.prepare('SELECT id, approval_status, payment_id FROM participants WHERE lower(trim(roll_number)) = ? LIMIT 1').get(cleanRoll.toLowerCase());
-      if (existingByRoll && existingByRoll.id && existingByRoll.id !== existingByEmail?.id) {
+      // Check roll number for the same academic year
+      const existingByRoll = await db.prepare(
+        'SELECT id, approval_status FROM participants WHERE lower(trim(roll_number)) = ? AND year = ? LIMIT 1'
+      ).get(cleanRoll.toLowerCase(), registrationYear);
+      if (existingByRoll && existingByRoll.id && existingByRoll.id !== existingForThisYear?.id) {
         if (existingByRoll.approval_status !== 'rejected') {
-          return res.status(409).json({ error: 'This roll number/enrolment number is already registered.' });
+          return res.status(409).json({
+            error: `This roll number/enrolment number is already registered for ${registrationYear}.`,
+            locked: true,
+            year: registrationYear,
+          });
         }
       }
 
@@ -172,7 +216,6 @@ export default async function handler(req, res) {
       const tokenExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
       let participantId;
 
-      const registrationYear = year === '2nd Year' ? '2nd Year' : '1st Year';
       let feeForYear = registrationYear === '2nd Year' ? 699 : 599;
       try {
         const settingsRow = await db.prepare('SELECT fee_1st_year, fee_2nd_year FROM event_settings WHERE id = 1').get();
@@ -185,8 +228,8 @@ export default async function handler(req, res) {
         }
       } catch (_) {}
 
-      if (existingByEmail?.id && existingByEmail.approval_status === 'rejected') {
-        // Re-submit previously rejected participant
+      if (existingForThisYear?.id) {
+        // Re-submit unlocked or previously rejected participant for this year
         await db
           .prepare(
             `
@@ -196,6 +239,13 @@ export default async function handler(req, res) {
                   step2_token = ?,
                   step2_token_expires_at = ?,
                   payment_amount = ?,
+                  is_locked = 1,
+                  locked_at = datetime('now'),
+                  locked_by = 'system',
+                  lock_reason = NULL,
+                  unlocked_at = NULL,
+                  unlocked_by = NULL,
+                  unlock_reason = NULL,
                   rejected_at = NULL,
                   rejected_by = NULL,
                   rejection_reason = NULL,
@@ -203,21 +253,44 @@ export default async function handler(req, res) {
               WHERE id = ?
             `
           )
-          .run(full_name, cleanRoll, branch, registrationYear, encodeSkills(skills), whatsapp_number, token, tokenExpiresAt, feeForYear, existingByEmail.id);
-        participantId = existingByEmail.id;
+          .run(full_name, cleanRoll, branch, registrationYear, encodeSkills(skills), whatsapp_number, token, tokenExpiresAt, feeForYear, existingForThisYear.id);
+        participantId = existingForThisYear.id;
       } else {
         const result = await db
           .prepare(
             `
               INSERT INTO participants (
                 email, full_name, roll_number, branch, year, skills, whatsapp_number,
-                approval_status, step2_token, step2_token_expires_at, payment_amount, registered_at
+                approval_status, step2_token, step2_token_expires_at, payment_amount,
+                is_locked, locked_at, locked_by, registered_at
               )
-              VALUES (?, ?, ?, ?, ?, ?, ?, 'pending_approval', ?, ?, ?, datetime('now'))
+              VALUES (?, ?, ?, ?, ?, ?, ?, 'pending_approval', ?, ?, ?, 1, datetime('now'), 'system', datetime('now'))
             `
           )
           .run(normalizedEmail, full_name, cleanRoll, branch, registrationYear, encodeSkills(skills), whatsapp_number, token, tokenExpiresAt, feeForYear);
         participantId = result.lastInsertRowid;
+      }
+
+      // Record / update lock in registration_locks
+      try {
+        await db.prepare(`
+          INSERT INTO registration_locks (
+            email, roll_number, year, participant_id, is_locked, locked_at, locked_by, updated_at
+          )
+          VALUES (?, ?, ?, ?, 1, datetime('now'), 'system', datetime('now'))
+          ON CONFLICT (email, year) DO UPDATE SET
+            roll_number = excluded.roll_number,
+            participant_id = excluded.participant_id,
+            is_locked = 1,
+            locked_at = datetime('now'),
+            locked_by = 'system',
+            unlocked_at = NULL,
+            unlocked_by = NULL,
+            unlock_reason = NULL,
+            updated_at = datetime('now')
+        `).run(normalizedEmail, cleanRoll, registrationYear, participantId);
+      } catch (lockInsertErr) {
+        console.warn('[participants] Failed to upsert registration_locks:', lockInsertErr?.message || lockInsertErr);
       }
 
       // Generate formatted unique registration ID

@@ -438,6 +438,41 @@ SELECT setval(pg_get_serial_sequence('activity_logs', 'id'), coalesce((SELECT ma
 
 -- Safe migrations for existing databases
 ALTER TABLE participants ADD COLUMN IF NOT EXISTS payment_amount INTEGER DEFAULT NULL;
+ALTER TABLE participants ADD COLUMN IF NOT EXISTS is_locked INTEGER NOT NULL DEFAULT 1;
+ALTER TABLE participants ADD COLUMN IF NOT EXISTS locked_at TIMESTAMPTZ DEFAULT NOW();
+ALTER TABLE participants ADD COLUMN IF NOT EXISTS unlocked_at TIMESTAMPTZ DEFAULT NULL;
+ALTER TABLE participants ADD COLUMN IF NOT EXISTS unlocked_by TEXT DEFAULT NULL;
+ALTER TABLE participants ADD COLUMN IF NOT EXISTS unlock_reason TEXT DEFAULT NULL;
+ALTER TABLE participants ADD COLUMN IF NOT EXISTS locked_by TEXT DEFAULT 'system';
+ALTER TABLE participants ADD COLUMN IF NOT EXISTS lock_reason TEXT DEFAULT NULL;
+ALTER TABLE participants DROP CONSTRAINT IF EXISTS participants_email_key;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'participants_email_year_key'
+  ) THEN
+    ALTER TABLE participants ADD CONSTRAINT participants_email_year_key UNIQUE (email, year);
+  END IF;
+END $$;
+
+CREATE TABLE IF NOT EXISTS registration_locks (
+  id BIGSERIAL PRIMARY KEY,
+  email TEXT NOT NULL,
+  roll_number TEXT NOT NULL,
+  year TEXT NOT NULL,
+  participant_id BIGINT,
+  is_locked INTEGER NOT NULL DEFAULT 1,
+  locked_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  locked_by TEXT NOT NULL DEFAULT 'system',
+  lock_reason TEXT DEFAULT NULL,
+  unlocked_at TIMESTAMPTZ DEFAULT NULL,
+  unlocked_by TEXT DEFAULT NULL,
+  unlock_reason TEXT DEFAULT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  CONSTRAINT registration_locks_email_year_key UNIQUE (email, year)
+);
+
 ALTER TABLE event_settings ADD COLUMN IF NOT EXISTS fee_1st_year INTEGER DEFAULT 599;
 ALTER TABLE event_settings ADD COLUMN IF NOT EXISTS fee_2nd_year INTEGER DEFAULT 699;
 ALTER TABLE event_settings ADD COLUMN IF NOT EXISTS qr_1st_year_url TEXT DEFAULT '/payment-qr-1st-year.png';

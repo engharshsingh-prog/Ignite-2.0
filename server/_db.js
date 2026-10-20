@@ -402,6 +402,13 @@ export function toParticipant(row) {
     payment_rejected_reason: row.payment_rejected_reason || null,
     payment_verified_at: row.payment_verified_at || null,
     payment_verified_by: row.payment_verified_by || null,
+    is_locked: row.is_locked !== undefined && row.is_locked !== null ? (Boolean(row.is_locked) ? true : false) : true,
+    locked_at: row.locked_at || null,
+    unlocked_at: row.unlocked_at || null,
+    unlocked_by: row.unlocked_by || null,
+    unlock_reason: row.unlock_reason || null,
+    locked_by: row.locked_by || null,
+    lock_reason: row.lock_reason || null,
   };
 }
 

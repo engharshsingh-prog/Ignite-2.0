@@ -45,3 +45,4 @@ public/uploads/**/thumbs/**
 # Local scratch/temp files
 temp_*.html
 temp_*.css
+scratch/

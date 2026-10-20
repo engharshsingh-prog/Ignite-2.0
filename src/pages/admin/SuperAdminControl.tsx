@@ -78,7 +78,46 @@ interface SummaryData {
   activeSessions: number;
 }
 
-type TabType = 'overview' | 'requests' | 'admins' | 'activity';
+type TabType = 'overview' | 'requests' | 'admins' | 'locks' | 'activity';
+
+interface StudentRegistrationLockItem {
+  participant_id: number | null;
+  registration_id: string;
+  full_name: string;
+  email: string;
+  roll_number: string;
+  branch: string;
+  year: string;
+  approval_status: string;
+  payment_status: string;
+  payment_verified: boolean;
+  payment_id: string | null;
+  payment_amount: number;
+  account_holder_name: string | null;
+  registered_at: string;
+  is_locked: boolean;
+  locked_at: string | null;
+  locked_by: string | null;
+  lock_reason: string | null;
+  unlocked_at: string | null;
+  unlocked_by: string | null;
+  unlock_reason: string | null;
+}
+
+interface LockAuditLogItem {
+  id: number;
+  action: string;
+  actor_email: string;
+  created_at: string;
+  details: {
+    email?: string;
+    roll_number?: string;
+    year?: string;
+    reason?: string;
+    registration_id?: string;
+    [key: string]: any;
+  };
+}
 
 interface ConfirmDialogState {
   title: string;
@@ -129,6 +168,21 @@ export default function SuperAdminControl() {
   const [logsLoading, setLogsLoading] = useState(false);
   const [logSearch, setLogSearch] = useState('');
   const [logActionFilter, setLogActionFilter] = useState('all');
+
+  // Year-Wise Registration Lock Management state
+  const [locksList, setLocksList] = useState<StudentRegistrationLockItem[]>([]);
+  const [locksLoading, setLocksLoading] = useState(false);
+  const [locksSearch, setLocksSearch] = useState('');
+  const [locksYearFilter, setLocksYearFilter] = useState<'all' | '1st Year' | '2nd Year'>('all');
+  const [locksStatusFilter, setLocksStatusFilter] = useState<'all' | 'locked' | 'unlocked'>('all');
+  const [lockAuditLogs, setLockAuditLogs] = useState<LockAuditLogItem[]>([]);
+  const [auditLoading, setAuditLoading] = useState(false);
+  const [toggleTarget, setToggleTarget] = useState<{
+    item: StudentRegistrationLockItem;
+    action: 'unlock' | 'lock';
+  } | null>(null);
+  const [toggleReason, setToggleReason] = useState('');
+  const [toggleLoading, setToggleLoading] = useState(false);
 
   // Action feedback & confirm dialog
   const [actionMessage, setActionMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
@@ -237,6 +291,82 @@ export default function SuperAdminControl() {
     }
   }, []);
 
+  // Fetch registration locks
+  const fetchLocks = useCallback(async () => {
+    try {
+      setLocksLoading(true);
+      const res = await fetch('/api/super-admin/registration-locks', {
+        headers: authHeaders(),
+      });
+      if (res.ok) {
+        const data = await readJsonSafe<StudentRegistrationLockItem[]>(res);
+        if (Array.isArray(data)) setLocksList(data);
+      }
+    } catch (err) {
+      console.error('fetchLocks error:', err);
+    } finally {
+      setLocksLoading(false);
+    }
+  }, []);
+
+  // Fetch lock audit logs
+  const fetchLockAuditLogs = useCallback(async () => {
+    try {
+      setAuditLoading(true);
+      const res = await fetch('/api/super-admin/registration-locks/audit-logs', {
+        headers: authHeaders(),
+      });
+      if (res.ok) {
+        const data = await readJsonSafe<LockAuditLogItem[]>(res);
+        if (Array.isArray(data)) setLockAuditLogs(data);
+      }
+    } catch (err) {
+      console.error('fetchLockAuditLogs error:', err);
+    } finally {
+      setAuditLoading(false);
+    }
+  }, []);
+
+  // Handle lock / unlock submission
+  const handleToggleLockSubmit = async () => {
+    if (!toggleTarget) return;
+    setToggleLoading(true);
+    try {
+      const res = await fetch('/api/super-admin/registration-locks/toggle', {
+        method: 'POST',
+        headers: {
+          ...authHeaders(),
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: toggleTarget.item.email,
+          year: toggleTarget.item.year,
+          action: toggleTarget.action,
+          reason: toggleReason.trim(),
+          participant_id: toggleTarget.item.participant_id,
+        }),
+      });
+      const data = await readJsonSafe<{ success?: boolean; message?: string; error?: string }>(res);
+      if (!res.ok) throw new Error(getErrorMessage(data, 'Failed to update registration lock'));
+
+      setActionMessage({
+        type: 'success',
+        text: data?.message || `Successfully ${toggleTarget.action}ed ${toggleTarget.item.year} registration for ${toggleTarget.item.email}`,
+      });
+      setToggleTarget(null);
+      setToggleReason('');
+      fetchLocks();
+      fetchLockAuditLogs();
+    } catch (err) {
+      setActionMessage({
+        type: 'error',
+        text: err instanceof Error ? err.message : 'Failed to update lock',
+      });
+    } finally {
+      setToggleLoading(false);
+    }
+  };
+
   // Initial loads and tab triggers
   useEffect(() => {
     fetchSummary();
@@ -252,10 +382,13 @@ export default function SuperAdminControl() {
       fetchRequests();
     } else if (activeTab === 'admins') {
       fetchAdmins();
+    } else if (activeTab === 'locks') {
+      fetchLocks();
+      fetchLockAuditLogs();
     } else if (activeTab === 'activity') {
       fetchActivityLogs();
     }
-  }, [activeTab, fetchSummary, fetchRequests, fetchAdmins, fetchActivityLogs, fetchMediaControl]);
+  }, [activeTab, fetchSummary, fetchRequests, fetchAdmins, fetchActivityLogs, fetchMediaControl, fetchLocks, fetchLockAuditLogs]);
 
   // Auto-refresh requests every 5s while on requests tab or overview
   useEffect(() => {
@@ -533,6 +666,53 @@ export default function SuperAdminControl() {
     });
   }, [activityLogs, logSearch, logActionFilter]);
 
+  // Filtered registration locks
+  const filteredLocks = useMemo(() => {
+    const q = locksSearch.trim().toLowerCase();
+    return locksList.filter((item) => {
+      const matchesSearch =
+        !q ||
+        item.full_name?.toLowerCase().includes(q) ||
+        item.email?.toLowerCase().includes(q) ||
+        item.roll_number?.toLowerCase().includes(q) ||
+        item.registration_id?.toLowerCase().includes(q) ||
+        String(item.participant_id || '').toLowerCase().includes(q);
+
+      const matchesYear =
+        locksYearFilter === 'all' || item.year === locksYearFilter;
+
+      const matchesStatus =
+        locksStatusFilter === 'all' ||
+        (locksStatusFilter === 'locked' && item.is_locked) ||
+        (locksStatusFilter === 'unlocked' && !item.is_locked);
+
+      return matchesSearch && matchesYear && matchesStatus;
+    });
+  }, [locksList, locksSearch, locksYearFilter, locksStatusFilter]);
+
+  // Lock summary stats
+  const lockStats = useMemo(() => {
+    let firstYearCount = 0;
+    let secondYearCount = 0;
+    let unlockedCount = 0;
+    let lockedCount = 0;
+
+    locksList.forEach((item) => {
+      if (item.year === '1st Year') firstYearCount++;
+      if (item.year === '2nd Year') secondYearCount++;
+      if (item.is_locked) lockedCount++;
+      else unlockedCount++;
+    });
+
+    return {
+      total: locksList.length,
+      firstYearCount,
+      secondYearCount,
+      unlockedCount,
+      lockedCount,
+    };
+  }, [locksList]);
+
   // Format date helper
   const formatDate = (isoString?: string | null) => {
     if (!isoString) return '—';
@@ -669,6 +849,18 @@ export default function SuperAdminControl() {
                 {admins.length}
               </span>
             )}
+          </button>
+
+          <button
+            onClick={() => setActiveTab('locks')}
+            className={`px-4 py-2.5 min-h-[44px] rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-[#a3b46a] ${
+              activeTab === 'locks'
+                ? 'bg-[#3b82f6] text-white shadow-md shadow-blue-500/20'
+                : 'bg-[#191e1b] text-gray-400 hover:text-white border border-[#303a32] hover:bg-[#202722]'
+            }`}
+          >
+            <Lock size={16} />
+            Registration Locks
           </button>
 
           <button
@@ -1341,6 +1533,353 @@ export default function SuperAdminControl() {
         )}
 
         {/* ============================================================== */}
+        {/* YEAR-WISE REGISTRATION LOCK MANAGEMENT                          */}
+        {/* ============================================================== */}
+        {activeTab === 'locks' && (
+          <div className="space-y-6">
+            {/* Top Stat Cards */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div className="p-5 rounded-2xl bg-[#191e1b] border border-[#303a32] flex flex-col justify-between">
+                <div className="flex items-center justify-between text-gray-400 text-xs font-medium">
+                  <span>Total Registrations</span>
+                  <Users size={16} className="text-[#3b82f6]" />
+                </div>
+                <div className="mt-2 text-2xl font-black text-white">
+                  {locksLoading ? '—' : lockStats.total}
+                </div>
+              </div>
+
+              <div className="p-5 rounded-2xl bg-[#191e1b] border border-[#303a32] flex flex-col justify-between">
+                <div className="flex items-center justify-between text-gray-400 text-xs font-medium">
+                  <span>1st Year (₹599)</span>
+                  <span className="w-2.5 h-2.5 rounded-full bg-blue-400" />
+                </div>
+                <div className="mt-2 text-2xl font-black text-blue-400">
+                  {locksLoading ? '—' : lockStats.firstYearCount}
+                </div>
+              </div>
+
+              <div className="p-5 rounded-2xl bg-[#191e1b] border border-[#303a32] flex flex-col justify-between">
+                <div className="flex items-center justify-between text-gray-400 text-xs font-medium">
+                  <span>2nd Year (₹699)</span>
+                  <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
+                </div>
+                <div className="mt-2 text-2xl font-black text-amber-400">
+                  {locksLoading ? '—' : lockStats.secondYearCount}
+                </div>
+              </div>
+
+              <div className="p-5 rounded-2xl bg-[#191e1b] border border-[#303a32] flex flex-col justify-between">
+                <div className="flex items-center justify-between text-gray-400 text-xs font-medium">
+                  <span>Unlocked Records</span>
+                  <Unlock size={16} className="text-emerald-400" />
+                </div>
+                <div className="mt-2 text-2xl font-black text-emerald-400">
+                  {locksLoading ? '—' : lockStats.unlockedCount}
+                </div>
+              </div>
+            </div>
+
+            {/* Lock Management Section */}
+            <div className="bg-[#191e1b] border border-[#303a32] rounded-2xl p-6">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-5">
+                <div>
+                  <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                    <Lock size={20} className="text-[#3b82f6]" />
+                    Year-Wise Registration Lock Management
+                  </h2>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    Independently view, unlock, or lock student registrations for 1st Year (₹599) and 2nd Year (₹699).
+                  </p>
+                </div>
+
+                <button
+                  onClick={() => {
+                    fetchLocks();
+                    fetchLockAuditLogs();
+                  }}
+                  disabled={locksLoading || auditLoading}
+                  aria-label="Refresh registration locks"
+                  className="px-3.5 py-2 min-h-[44px] rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-xs font-semibold flex items-center gap-1.5 transition-colors self-start md:self-auto focus:outline-none focus:ring-2 focus:ring-[#a3b46a]"
+                >
+                  <RefreshCw size={13} className={locksLoading || auditLoading ? 'animate-spin' : ''} />
+                  Refresh
+                </button>
+              </div>
+
+              {/* Filters */}
+              <div className="flex flex-col sm:flex-row gap-3 mb-5">
+                <div className="relative flex-1">
+                  <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input
+                    id="search-locks"
+                    name="search_locks"
+                    aria-label="Filter locks by name, email, roll number, or reg ID"
+                    type="text"
+                    value={locksSearch}
+                    onChange={(e) => setLocksSearch(e.target.value)}
+                    placeholder="Search by student name, email, roll number, or registration ID..."
+                    className="w-full bg-[#141815] border border-[#303a32] rounded-xl pl-10 pr-4 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#a3b46a] focus:ring-1 focus:ring-[#a3b46a]"
+                  />
+                </div>
+
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Filter size={16} className="text-gray-400 hidden sm:inline-block" />
+                  <select
+                    value={locksYearFilter}
+                    onChange={(e) => setLocksYearFilter(e.target.value as any)}
+                    aria-label="Filter locks by academic year"
+                    className="bg-[#141815] border border-[#303a32] rounded-xl px-3 py-2 text-xs font-medium text-white focus:outline-none focus:border-[#a3b46a]"
+                  >
+                    <option value="all">All Academic Years</option>
+                    <option value="1st Year">1st Year (₹599)</option>
+                    <option value="2nd Year">2nd Year (₹699)</option>
+                  </select>
+
+                  <select
+                    value={locksStatusFilter}
+                    onChange={(e) => setLocksStatusFilter(e.target.value as any)}
+                    aria-label="Filter locks by lock status"
+                    className="bg-[#141815] border border-[#303a32] rounded-xl px-3 py-2 text-xs font-medium text-white focus:outline-none focus:border-[#a3b46a]"
+                  >
+                    <option value="all">All Lock Statuses</option>
+                    <option value="locked">Locked Only</option>
+                    <option value="unlocked">Unlocked Only</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Table */}
+              <div className="overflow-x-auto rounded-xl border border-[#303a32]">
+                <table className="w-full text-left text-sm">
+                  <thead className="bg-[#212823] text-gray-300 text-xs font-semibold uppercase tracking-wider border-b border-[#303a32]">
+                    <tr>
+                      <th className="py-3 px-4">Student</th>
+                      <th className="py-3 px-4">Academic Year</th>
+                      <th className="py-3 px-4">Registration Status</th>
+                      <th className="py-3 px-4">Payment</th>
+                      <th className="py-3 px-4">Lock Status</th>
+                      <th className="py-3 px-4 text-right">Super Admin Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#303a32]/60 bg-[#191e1b]">
+                    {filteredLocks.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} className="py-10 text-center text-gray-400 text-sm">
+                          {locksLoading ? 'Loading registration locks...' : 'No registrations found matching the criteria.'}
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredLocks.map((item) => (
+                        <tr key={`${item.email}-${item.year}-${item.participant_id}`} className="hover:bg-[#202722] transition-colors">
+                          <td className="py-3 px-4">
+                            <div className="font-semibold text-white text-xs">{item.full_name}</div>
+                            <div className="text-[11px] text-gray-400 font-mono mt-0.5">{item.email}</div>
+                            <div className="text-[11px] text-gray-400 mt-0.5">
+                              Roll: <span className="text-gray-300 font-mono">{item.roll_number || 'N/A'}</span> • {item.branch}
+                            </div>
+                          </td>
+                          <td className="py-3 px-4 whitespace-nowrap">
+                            <span
+                              className={`inline-block px-2 py-0.5 rounded text-[11px] font-bold border ${
+                                item.year === '1st Year'
+                                  ? 'bg-blue-500/15 text-blue-400 border-blue-500/30'
+                                  : 'bg-amber-500/15 text-amber-400 border-amber-500/30'
+                              }`}
+                            >
+                              {item.year}
+                            </span>
+                            <div className="text-[10px] text-gray-400 font-mono mt-1">
+                              {item.registration_id}
+                            </div>
+                          </td>
+                          <td className="py-3 px-4 whitespace-nowrap">
+                            <span
+                              className={`inline-block px-2 py-0.5 rounded text-[11px] font-bold border ${
+                                item.approval_status === 'approved'
+                                  ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
+                                  : item.approval_status === 'rejected'
+                                  ? 'bg-red-500/15 text-red-400 border-red-500/30'
+                                  : 'bg-yellow-500/15 text-yellow-400 border-yellow-500/30'
+                              }`}
+                            >
+                              {item.approval_status === 'approved'
+                                ? 'Approved'
+                                : item.approval_status === 'rejected'
+                                ? 'Rejected'
+                                : 'Pending Approval'}
+                            </span>
+                            <div className="text-[10px] text-gray-400 mt-1">
+                              {formatDate(item.registered_at)}
+                            </div>
+                          </td>
+                          <td className="py-3 px-4 whitespace-nowrap">
+                            <div className="text-xs font-semibold text-white">
+                              ₹{item.payment_amount}
+                            </div>
+                            <span
+                              className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold mt-1 border ${
+                                item.payment_verified || item.payment_status === 'completed'
+                                  ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
+                                  : item.payment_id
+                                  ? 'bg-blue-500/10 text-blue-400 border-blue-500/30'
+                                  : 'bg-gray-500/10 text-gray-400 border-gray-500/30'
+                              }`}
+                            >
+                              {item.payment_verified || item.payment_status === 'completed'
+                                ? 'Verified'
+                                : item.payment_id
+                                ? 'Submitted'
+                                : 'Pending'}
+                            </span>
+                          </td>
+                          <td className="py-3 px-4 whitespace-nowrap">
+                            {item.is_locked ? (
+                              <div>
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                                  <Lock size={12} />
+                                  Locked
+                                </span>
+                                {item.locked_at && (
+                                  <div className="text-[10px] text-gray-400 mt-0.5" title={item.lock_reason || undefined}>
+                                    Locked {formatDate(item.locked_at)}
+                                  </div>
+                                )}
+                              </div>
+                            ) : (
+                              <div>
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                                  <Unlock size={12} />
+                                  Unlocked
+                                </span>
+                                {item.unlocked_by && (
+                                  <div className="text-[10px] text-emerald-400/80 mt-0.5" title={item.unlock_reason || undefined}>
+                                    By {item.unlocked_by.split('@')[0]}
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </td>
+                          <td className="py-3 px-4 text-right whitespace-nowrap">
+                            {item.is_locked ? (
+                              <button
+                                onClick={() =>
+                                  setToggleTarget({
+                                    item,
+                                    action: 'unlock',
+                                  })
+                                }
+                                aria-label={`Unlock ${item.year} registration for ${item.email}`}
+                                className="px-3 py-1.5 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/25 text-xs font-semibold inline-flex items-center gap-1.5 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                              >
+                                <Unlock size={13} />
+                                Unlock Year
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() =>
+                                  setToggleTarget({
+                                    item,
+                                    action: 'lock',
+                                  })
+                                }
+                                aria-label={`Re-lock ${item.year} registration for ${item.email}`}
+                                className="px-3 py-1.5 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-300 hover:bg-amber-500/25 text-xs font-semibold inline-flex items-center gap-1.5 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400"
+                              >
+                                <Lock size={13} />
+                                Re-Lock Year
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Audit Log Box */}
+            <div className="bg-[#191e1b] border border-[#303a32] rounded-2xl p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="text-base font-bold text-white flex items-center gap-2">
+                    <History size={18} className="text-[#3b82f6]" />
+                    Registration Lock Audit Log
+                  </h3>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    Immutable history of Super Admin unlock and lock actions, reasons, and timestamps.
+                  </p>
+                </div>
+              </div>
+
+              <div className="overflow-x-auto rounded-xl border border-[#303a32]">
+                <table className="w-full text-left text-sm">
+                  <thead className="bg-[#212823] text-gray-300 text-xs font-semibold uppercase tracking-wider border-b border-[#303a32]">
+                    <tr>
+                      <th className="py-3 px-4">When</th>
+                      <th className="py-3 px-4">Super Admin</th>
+                      <th className="py-3 px-4">Action</th>
+                      <th className="py-3 px-4">Target Student</th>
+                      <th className="py-3 px-4">Academic Year</th>
+                      <th className="py-3 px-4">Reason / Notes</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#303a32]/60 bg-[#191e1b]">
+                    {lockAuditLogs.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} className="py-8 text-center text-gray-400 text-xs">
+                          {auditLoading ? 'Loading audit history...' : 'No lock or unlock events recorded yet.'}
+                        </td>
+                      </tr>
+                    ) : (
+                      lockAuditLogs.map((log) => {
+                        const isUnlock = log.action === 'unlock_registration';
+                        return (
+                          <tr key={log.id} className="hover:bg-[#202722] transition-colors">
+                            <td className="py-3 px-4 text-xs text-gray-400 whitespace-nowrap">
+                              {formatDate(log.created_at)}
+                            </td>
+                            <td className="py-3 px-4 text-xs text-white font-medium whitespace-nowrap">
+                              {log.actor_email}
+                            </td>
+                            <td className="py-3 px-4 whitespace-nowrap">
+                              <span
+                                className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-bold border ${
+                                  isUnlock
+                                    ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
+                                    : 'bg-amber-500/15 text-amber-400 border-amber-500/30'
+                                }`}
+                              >
+                                {isUnlock ? <Unlock size={11} /> : <Lock size={11} />}
+                                {isUnlock ? 'UNLOCKED' : 'LOCKED'}
+                              </span>
+                            </td>
+                            <td className="py-3 px-4 text-xs font-mono text-gray-300 whitespace-nowrap">
+                              {log.details?.email || 'N/A'}
+                            </td>
+                            <td className="py-3 px-4 whitespace-nowrap">
+                              <span className="text-xs font-bold text-[#a3b46a]">
+                                {log.details?.year || 'N/A'}
+                              </span>
+                            </td>
+                            <td className="py-3 px-4 text-xs text-gray-300 max-w-xs">
+                              <span className="italic text-gray-400">
+                                {log.details?.reason || 'No reason provided'}
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ============================================================== */}
         {/* 4. ACTIVITY LOG SECTION                                         */}
         {/* ============================================================== */}
         {activeTab === 'activity' && (
@@ -1623,6 +2162,163 @@ export default function SuperAdminControl() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================== */}
+      {/* LOCK / UNLOCK CONFIRMATION MODAL                               */}
+      {/* ============================================================== */}
+      {toggleTarget && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="lock-toggle-modal-title"
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in"
+        >
+          <div className="bg-[#191e1b] border border-[#303a32] rounded-2xl max-w-lg w-full p-6 shadow-2xl">
+            <div className="flex items-center justify-between mb-4 border-b border-[#303a32] pb-3">
+              <div className="flex items-center gap-3">
+                <div
+                  className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                    toggleTarget.action === 'unlock'
+                      ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                      : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                  }`}
+                >
+                  {toggleTarget.action === 'unlock' ? <Unlock size={20} /> : <Lock size={20} />}
+                </div>
+                <div>
+                  <h3 id="lock-toggle-modal-title" className="text-base font-bold text-white">
+                    {toggleTarget.action === 'unlock' ? 'Unlock Registration' : 'Re-Lock Registration'}
+                  </h3>
+                  <p className="text-xs text-gray-400">
+                    Academic Year: <span className="text-[#a3b46a] font-semibold">{toggleTarget.item.year}</span>
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  setToggleTarget(null);
+                  setToggleReason('');
+                }}
+                disabled={toggleLoading}
+                aria-label="Close dialog"
+                className="text-gray-400 hover:text-white p-1 rounded transition-colors"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="space-y-3 mb-5">
+              <div className="p-3.5 rounded-xl bg-[#141815] border border-[#303a32] text-xs space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-400">Student Name:</span>
+                  <span className="text-white font-medium">{toggleTarget.item.full_name}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-400">Email:</span>
+                  <span className="text-white font-mono">{toggleTarget.item.email}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-400">Roll Number:</span>
+                  <span className="text-white font-mono">{toggleTarget.item.roll_number || 'N/A'}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-400">Academic Year:</span>
+                  <span className="text-[#a3b46a] font-semibold">{toggleTarget.item.year}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-400">Registration ID:</span>
+                  <span className="text-white font-mono">{toggleTarget.item.registration_id}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-400">Current Lock Status:</span>
+                  <span className={`font-semibold ${toggleTarget.item.is_locked ? 'text-amber-400' : 'text-emerald-400'}`}>
+                    {toggleTarget.item.is_locked ? 'Locked' : 'Unlocked'}
+                  </span>
+                </div>
+              </div>
+
+              <div
+                className={`p-3.5 rounded-xl text-xs border ${
+                  toggleTarget.action === 'unlock'
+                    ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-300'
+                    : 'bg-amber-500/10 border-amber-500/20 text-amber-300'
+                }`}
+              >
+                {toggleTarget.action === 'unlock' ? (
+                  <p>
+                    <strong>Notice:</strong> Unlocking will allow this student to submit or update their{' '}
+                    <strong>{toggleTarget.item.year}</strong> registration. The other academic year's registration lock remains completely independent.
+                  </p>
+                ) : (
+                  <p>
+                    <strong>Notice:</strong> Re-locking will prevent this student from submitting or updating their{' '}
+                    <strong>{toggleTarget.item.year}</strong> registration on the registration page until unlocked again.
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label htmlFor="lock-reason" className="block text-xs font-semibold text-gray-300 mb-1.5">
+                  Reason for {toggleTarget.action === 'unlock' ? 'Unlocking' : 'Locking'} (Optional, recorded in audit log)
+                </label>
+                <textarea
+                  id="lock-reason"
+                  rows={2}
+                  value={toggleReason}
+                  onChange={(e) => setToggleReason(e.target.value)}
+                  placeholder={
+                    toggleTarget.action === 'unlock'
+                      ? 'e.g. Student requested to correct details, re-upload payment slip, special approval...'
+                      : 'e.g. Duplicate attempt prevented, manual lock enforcement...'
+                  }
+                  className="w-full bg-[#141815] border border-[#303a32] rounded-xl p-3 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-[#a3b46a] focus:ring-1 focus:ring-[#a3b46a]"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setToggleTarget(null);
+                  setToggleReason('');
+                }}
+                disabled={toggleLoading}
+                className="px-4 py-2 min-h-[44px] rounded-xl text-xs font-semibold bg-white/5 text-gray-300 hover:bg-white/10 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleToggleLockSubmit}
+                disabled={toggleLoading}
+                className={`px-4 py-2 min-h-[44px] rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 focus:outline-none focus:ring-2 ${
+                  toggleTarget.action === 'unlock'
+                    ? 'bg-emerald-500 text-black hover:bg-emerald-400 focus:ring-emerald-400'
+                    : 'bg-amber-500 text-black hover:bg-amber-400 focus:ring-amber-400'
+                } disabled:opacity-50`}
+              >
+                {toggleLoading ? (
+                  <>
+                    <RefreshCw size={14} className="animate-spin" />
+                    Processing...
+                  </>
+                ) : toggleTarget.action === 'unlock' ? (
+                  <>
+                    <Unlock size={14} />
+                    Confirm Unlock
+                  </>
+                ) : (
+                  <>
+                    <Lock size={14} />
+                    Confirm Lock
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       )}

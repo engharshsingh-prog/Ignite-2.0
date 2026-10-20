@@ -37,6 +37,12 @@ import {
   handleSubmitStep2Payment,
   handleGetRegistrationStatus,
 } from './registration-flow.js';
+import {
+  handleGetRegistrationLockStatus,
+  handleSuperAdminGetLocks,
+  handleSuperAdminToggleLock,
+  handleSuperAdminGetLockAuditLogs,
+} from './registration-locks.js';
 import { getAdminFromRequest, requireSuperAdmin } from './_auth.js';
 import { writeActivity } from './_activity.js';
 
@@ -66,6 +72,7 @@ const routeHandlers = new Map([
   ['/public-participants', publicParticipants],
   ['/public-media-control', publicMediaControl],
   ['/registration-control', registrationControl],
+  ['/registration-locks/status', handleGetRegistrationLockStatus],
   ['/registration-approvals', handleGetRegistrationApprovals],
   ['/registration-approvals/resolve', handleResolveRegistrationApproval],
   ['/registration-approvals/resend-email', handleResendApprovalEmail],
@@ -83,6 +90,9 @@ const routeHandlers = new Map([
   ['/super-admin/approvals', approvals],
   ['/super-admin/approval-resolve', approvalResolve],
   ['/super-admin/control', controlData],
+  ['/super-admin/registration-locks', handleSuperAdminGetLocks],
+  ['/super-admin/registration-locks/toggle', handleSuperAdminToggleLock],
+  ['/super-admin/registration-locks/audit-logs', handleSuperAdminGetLockAuditLogs],
 ]);
 
 async function genericSuperAdminHandler(req, res) {
