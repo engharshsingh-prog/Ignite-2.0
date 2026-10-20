@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   AlertCircle,
@@ -73,7 +73,6 @@ const SKILLS = ['Singing', 'Games/Fun Activities', 'Dance', 'Comedy/Standup', 'O
 
 const UPI_ID = 'ysamarjeetyadav2334@okaxis';
 const UPI_PAYEE_NAME = 'Samarjeet Yadav';
-const UPI_NOTE = 'Ignite 2.O Registration';
 
 function validateField(name: string, value: string): FieldState {
   if (!value) return 'idle';
@@ -184,18 +183,6 @@ export default function Register() {
   const activeUpiId = paymentYear === '2nd Year' ? (settings.upiId2ndYear || UPI_ID) : (settings.upiId1stYear || UPI_ID);
   const activeUpiName = paymentYear === '2nd Year' ? (settings.upiName2ndYear || UPI_PAYEE_NAME) : (settings.upiName1stYear || UPI_PAYEE_NAME);
   const activeQrUrl = paymentYear === '2nd Year' ? (settings.qr2ndYearUrl || '/payment-qr-2nd-year.png') : (settings.qr1stYearUrl || '/payment-qr-1st-year.png');
-
-  const upiLink = useMemo(() => {
-    const params = new URLSearchParams({
-      pa: activeUpiId,
-      pn: activeUpiName,
-      am: Number(activeFee).toFixed(2),
-      cu: 'INR',
-      tn: `${UPI_NOTE} - ${paymentYear}`,
-      aid: 'uGICAgIC399eLdg',
-    });
-    return `upi://pay?${params.toString()}`;
-  }, [activeUpiId, activeUpiName, activeFee, paymentYear]);
 
   // Check URL query on mount for continuation token (?token=... or ?step=2&token=...)
   useEffect(() => {
@@ -1451,14 +1438,7 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
                   </div>
                 )}
 
-                <a
-                  href={upiLink}
-                  className="block w-full text-center py-3 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-semibold hover:bg-emerald-500/30 transition-colors shadow-sm"
-                >
-                  Click to Pay (INR {activeFee})
-                </a>
-
-                <p className="text-xs text-gray-400 mt-3 break-all text-center">
+                <p className="text-xs text-gray-400 mt-1 break-all text-center">
                   Payee: <span className="text-gray-300 font-medium">{activeUpiName}</span> | UPI ID: <span className="font-mono text-white font-medium">{activeUpiId}</span>
                 </p>
               </div>
