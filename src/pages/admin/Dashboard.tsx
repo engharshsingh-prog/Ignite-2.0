@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -11,6 +11,7 @@ import {
   Trophy,
   RefreshCw,
   ChevronDown,
+  ChevronUp,
   Pencil,
   Trash2,
   ShieldCheck,
@@ -38,6 +39,7 @@ import {
   TrendingUp,
   GraduationCap,
   Building2,
+  Copy,
 } from 'lucide-react';
 import { authHeaders, checkAdminAuth, type AdminUser } from '../../lib/auth';
 import LoadingSpinner from '../../components/LoadingSpinner';
@@ -250,6 +252,14 @@ export default function AdminDashboard() {
   const [rejectPaymentModalParticipant, setRejectPaymentModalParticipant] = useState<Participant | null>(null);
   const [rejectPaymentReasonInput, setRejectPaymentReasonInput] = useState('');
   const [resolvingPaymentId, setResolvingPaymentId] = useState<number | null>(null);
+
+  // Dedicated Verified Payments Table States
+  const [verifiedSearch, setVerifiedSearch] = useState('');
+  const [verifiedYearFilter, setVerifiedYearFilter] = useState<'all' | '1st Year' | '2nd Year'>('all');
+  const [verifiedBranchFilter, setVerifiedBranchFilter] = useState('all');
+  const [verifiedCheckinFilter, setVerifiedCheckinFilter] = useState<'all' | 'checked_in' | 'pending'>('all');
+  const [verifiedCopiedId, setVerifiedCopiedId] = useState<string | null>(null);
+  const [isVerifiedTableExpanded, setIsVerifiedTableExpanded] = useState(true);
 
   useEffect(() => {
     let intervalId: number | undefined;
@@ -841,6 +851,137 @@ export default function AdminDashboard() {
     } finally {
       setRegistrationToggleLoading(false);
     }
+  };
+
+  const verifiedParticipants = useMemo(() => {
+    return participants.filter(
+      (p) => p.payment_status === 'approved' || Boolean(p.payment_verified)
+    );
+  }, [participants]);
+
+  const filteredVerifiedParticipants = useMemo(() => {
+    return verifiedParticipants.filter((p) => {
+      if (verifiedYearFilter !== 'all' && p.year !== verifiedYearFilter) return false;
+      if (verifiedBranchFilter !== 'all' && p.branch !== verifiedBranchFilter) return false;
+      if (verifiedCheckinFilter === 'checked_in' && !p.check_in_status) return false;
+      if (verifiedCheckinFilter === 'pending' && p.check_in_status) return false;
+
+      if (verifiedSearch.trim()) {
+        const q = verifiedSearch.toLowerCase().trim();
+        const matchName = (p.full_name || '').toLowerCase().includes(q);
+        const matchEmail = (p.email || '').toLowerCase().includes(q);
+        const matchRoll = (p.roll_number || '').toLowerCase().includes(q);
+        const matchRegId = (p.registration_id || '').toLowerCase().includes(q);
+        const matchPayId = (p.payment_id || '').toLowerCase().includes(q);
+        const matchHolder = (p.account_holder_name || '').toLowerCase().includes(q);
+        const matchPhone = (p.whatsapp_number || '').toLowerCase().includes(q);
+        if (!matchName && !matchEmail && !matchRoll && !matchRegId && !matchPayId && !matchHolder && !matchPhone) {
+          return false;
+        }
+      }
+      return true;
+    });
+  }, [verifiedParticipants, verifiedYearFilter, verifiedBranchFilter, verifiedCheckinFilter, verifiedSearch]);
+
+  const verifiedStats = useMemo(() => {
+    let firstYearCount = 0;
+    let secondYearCount = 0;
+    let totalAmount = 0;
+    let checkedInCount = 0;
+
+    for (const p of verifiedParticipants) {
+      const isSecondYear = p.year === '2nd Year' || p.year === '2-Year' || p.year === '2nd';
+      const isFirstYear = p.year === '1st Year' || p.year === '1-Year' || p.year === '1st';
+      const fee = isSecondYear ? 699 : 599;
+      const amount = (p.payment_amount != null && !isNaN(Number(p.payment_amount)) && Number(p.payment_amount) > 0)
+        ? Number(p.payment_amount)
+        : fee;
+
+      totalAmount += amount;
+      if (isFirstYear) firstYearCount++;
+      if (isSecondYear) secondYearCount++;
+      if (p.check_in_status) checkedInCount++;
+    }
+
+    return {
+      totalCount: verifiedParticipants.length,
+      firstYearCount,
+      secondYearCount,
+      totalAmount,
+      totalAmountFormatted: new Intl.NumberFormat('en-IN', {
+        style: 'currency',
+        currency: 'INR',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }).format(totalAmount),
+      checkedInCount,
+    };
+  }, [verifiedParticipants]);
+
+  const copyPaymentId = (text: string, id: string) => {
+    navigator.clipboard.writeText(text);
+    setVerifiedCopiedId(id);
+    setTimeout(() => setVerifiedCopiedId(null), 2000);
+  };
+
+  const exportVerifiedCsv = () => {
+    if (!filteredVerifiedParticipants.length) return;
+    const headers = [
+      'Registration ID',
+      'Full Name',
+      'Roll / Enrolment No',
+      'Branch',
+      'Academic Year',
+      'Amount (INR)',
+      'Payment ID',
+      'Account Holder Name',
+      'Payment Verified By',
+      'Payment Verified At',
+      'WhatsApp Number',
+      'Email',
+      'Check-in Status',
+      'Check-in Time',
+    ];
+
+    const escapeCsv = (str: any) => {
+      if (str == null) return '""';
+      const s = String(str).replace(/"/g, '""');
+      return `"${s}"`;
+    };
+
+    const rows = filteredVerifiedParticipants.map((p) => {
+      const isSecondYear = p.year === '2nd Year' || p.year === '2-Year' || p.year === '2nd';
+      const fee = isSecondYear ? 699 : 599;
+      const amount = (p.payment_amount != null && !isNaN(Number(p.payment_amount)) && Number(p.payment_amount) > 0)
+        ? Number(p.payment_amount)
+        : fee;
+
+      return [
+        escapeCsv(p.registration_id || `IGN-${p.id}`),
+        escapeCsv(p.full_name),
+        escapeCsv(p.roll_number),
+        escapeCsv(p.branch),
+        escapeCsv(p.year),
+        escapeCsv(amount),
+        escapeCsv(p.payment_id || ''),
+        escapeCsv(p.account_holder_name || ''),
+        escapeCsv(p.payment_verified_by || ''),
+        escapeCsv(p.payment_verified_at ? new Date(p.payment_verified_at).toLocaleString() : ''),
+        escapeCsv(p.whatsapp_number),
+        escapeCsv(p.email),
+        escapeCsv(p.check_in_status ? 'Checked In' : 'Not Checked In'),
+        escapeCsv(p.check_in_time ? new Date(p.check_in_time).toLocaleString() : ''),
+      ].join(',');
+    });
+
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `ignite20_verified_payments_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -1607,6 +1748,418 @@ export default function AdminDashboard() {
               </div>
             );
           })()}
+        </div>
+
+        {/* Verified Paid Participants (Only Verified Payments) Table Section */}
+        <div className="mb-8 p-6 rounded-2xl bg-[#191e1b]/95 border border-emerald-500/30 shadow-2xl shadow-emerald-950/20 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
+
+          {/* Section Header */}
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6 relative">
+            <div>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shrink-0">
+                  <ShieldCheck size={22} />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h2 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
+                      Verified Paid Participants
+                    </h2>
+                    <span className="px-2.5 py-0.5 text-xs font-black rounded-full bg-emerald-400 text-black shadow-sm">
+                      {verifiedParticipants.length} Verified
+                    </span>
+                    <span className="px-2.5 py-0.5 text-xs font-bold rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
+                      Total: {verifiedStats.totalAmountFormatted}
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    Exclusive list of participants whose payments have been verified and confirmed for Ignite 2.0.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Metrics Badges & Action Buttons */}
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="px-3 py-1.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs font-medium flex items-center gap-1.5">
+                <GraduationCap size={13} className="text-blue-400" />
+                1st Year: <strong className="text-white">{verifiedStats.firstYearCount}</strong>
+              </span>
+              <span className="px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs font-medium flex items-center gap-1.5">
+                <Crown size={13} className="text-amber-400" />
+                2nd Year: <strong className="text-white">{verifiedStats.secondYearCount}</strong>
+              </span>
+              <span className="px-3 py-1.5 rounded-xl bg-[#212823] border border-[#303a32] text-gray-300 text-xs font-medium flex items-center gap-1.5">
+                <UserCheck size={13} className="text-emerald-400" />
+                Arrived: <strong className="text-white">{verifiedStats.checkedInCount} / {verifiedStats.totalCount}</strong>
+              </span>
+
+              <button
+                type="button"
+                onClick={exportVerifiedCsv}
+                disabled={!filteredVerifiedParticipants.length}
+                className="px-3 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50"
+                title="Download CSV of verified participants"
+              >
+                <Download size={13} />
+                Export CSV ({filteredVerifiedParticipants.length})
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setIsVerifiedTableExpanded(!isVerifiedTableExpanded)}
+                className="p-1.5 rounded-xl bg-[#212823] border border-[#303a32] text-gray-400 hover:text-white transition-colors"
+                title={isVerifiedTableExpanded ? 'Collapse Table' : 'Expand Table'}
+              >
+                {isVerifiedTableExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+              </button>
+            </div>
+          </div>
+
+          {isVerifiedTableExpanded && (
+            <>
+              {/* Filter & Search Bar */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 mb-4">
+                <div className="relative">
+                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                  <input
+                    value={verifiedSearch}
+                    onChange={(e) => setVerifiedSearch(e.target.value)}
+                    placeholder="Search verified by name, roll, email, payment ID..."
+                    className="w-full bg-[#121613] border border-[#303a32] rounded-xl pl-8 pr-3 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500/50"
+                  />
+                  {verifiedSearch && (
+                    <button
+                      onClick={() => setVerifiedSearch('')}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white text-xs"
+                    >
+                      <X size={13} />
+                    </button>
+                  )}
+                </div>
+
+                <div className="relative">
+                  <select
+                    value={verifiedYearFilter}
+                    onChange={(e) => setVerifiedYearFilter(e.target.value as any)}
+                    className="w-full bg-[#121613] border border-[#303a32] rounded-xl px-3 py-2 pr-8 text-xs text-white focus:outline-none focus:border-emerald-500/50 appearance-none"
+                  >
+                    <option value="all">All Academic Years</option>
+                    <option value="1st Year">1st Year (₹599)</option>
+                    <option value="2nd Year">2nd Year (₹699)</option>
+                  </select>
+                  <ChevronDown size={13} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
+                </div>
+
+                <div className="relative">
+                  <select
+                    value={verifiedBranchFilter}
+                    onChange={(e) => setVerifiedBranchFilter(e.target.value)}
+                    className="w-full bg-[#121613] border border-[#303a32] rounded-xl px-3 py-2 pr-8 text-xs text-white focus:outline-none focus:border-emerald-500/50 appearance-none truncate"
+                  >
+                    <option value="all">All Branches</option>
+                    {branches.map((b) => (
+                      <option key={b} value={b}>
+                        {b}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown size={13} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
+                </div>
+
+                <div className="relative">
+                  <select
+                    value={verifiedCheckinFilter}
+                    onChange={(e) => setVerifiedCheckinFilter(e.target.value as any)}
+                    className="w-full bg-[#121613] border border-[#303a32] rounded-xl px-3 py-2 pr-8 text-xs text-white focus:outline-none focus:border-emerald-500/50 appearance-none"
+                  >
+                    <option value="all">All Check-in Status</option>
+                    <option value="checked_in">Checked In Only</option>
+                    <option value="pending">Awaiting Check-in</option>
+                  </select>
+                  <ChevronDown size={13} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
+                </div>
+              </div>
+
+              {/* Table */}
+              <div className="overflow-x-auto rounded-xl border border-emerald-500/20 bg-[#141815]/90">
+                <table className="w-full text-left text-xs min-w-[900px]">
+                  <thead>
+                    <tr className="border-b border-[#28322a] bg-[#1d2520] text-gray-400 font-semibold uppercase tracking-wider text-[10px]">
+                      <th className="py-3 px-3 text-center w-12">#</th>
+                      <th className="py-3 px-3">Participant & Reg ID</th>
+                      <th className="py-3 px-3">Roll / Enrolment No</th>
+                      <th className="py-3 px-3">Branch & Year</th>
+                      <th className="py-3 px-3">Payment Details</th>
+                      <th className="py-3 px-3">WhatsApp</th>
+                      <th className="py-3 px-3 text-center">Event Check-in</th>
+                      <th className="py-3 px-3 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#242d26]">
+                    {filteredVerifiedParticipants.length === 0 ? (
+                      <tr>
+                        <td colSpan={8} className="py-10 text-center text-gray-400">
+                          <ShieldCheck size={32} className="mx-auto mb-2 text-emerald-400/40" />
+                          <p className="font-semibold text-white">No verified participants found</p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            {verifiedSearch || verifiedYearFilter !== 'all' || verifiedBranchFilter !== 'all' || verifiedCheckinFilter !== 'all'
+                              ? 'Try adjusting or clearing your search filters above.'
+                              : 'No payments have been verified yet.'}
+                          </p>
+                          {(verifiedSearch || verifiedYearFilter !== 'all' || verifiedBranchFilter !== 'all' || verifiedCheckinFilter !== 'all') && (
+                            <button
+                              onClick={() => {
+                                setVerifiedSearch('');
+                                setVerifiedYearFilter('all');
+                                setVerifiedBranchFilter('all');
+                                setVerifiedCheckinFilter('all');
+                              }}
+                              className="mt-3 px-3 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 text-xs font-medium hover:bg-emerald-500/30 transition-colors"
+                            >
+                              Reset Filters
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredVerifiedParticipants.map((p, idx) => {
+                        const isSecondYear = p.year === '2nd Year' || p.year === '2-Year' || p.year === '2nd';
+                        const fee = isSecondYear ? (paymentSummary?.secondYear?.configuredFee ?? 699) : (paymentSummary?.firstYear?.configuredFee ?? 599);
+                        const amount = (p.payment_amount != null && !isNaN(Number(p.payment_amount)) && Number(p.payment_amount) > 0)
+                          ? Number(p.payment_amount)
+                          : fee;
+                        const formattedAmount = new Intl.NumberFormat('en-IN', {
+                          style: 'currency',
+                          currency: 'INR',
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        }).format(amount);
+
+                        return (
+                          <tr key={p.id} className="hover:bg-white/[0.03] transition-colors">
+                            {/* # Index */}
+                            <td className="py-3 px-3 text-center text-gray-500 font-mono text-[11px]">
+                              {idx + 1}
+                            </td>
+
+                            {/* Participant & Reg ID */}
+                            <td className="py-3 px-3">
+                              <div className="flex items-center gap-2.5">
+                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500/30 to-blue-500/30 border border-emerald-500/30 flex items-center justify-center text-xs font-bold text-emerald-300 shrink-0">
+                                  {p.full_name?.charAt(0) || '?'}
+                                </div>
+                                <div className="min-w-0">
+                                  <div className="flex items-center gap-1.5 flex-wrap">
+                                    <span className="font-semibold text-white text-xs truncate max-w-[180px]">
+                                      {p.full_name}
+                                    </span>
+                                    {p.registration_id && (
+                                      <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-300 font-bold border border-emerald-500/20">
+                                        {p.registration_id}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <p className="text-[11px] text-gray-400 truncate max-w-[200px]" title={p.email}>
+                                    {p.email}
+                                  </p>
+                                </div>
+                              </div>
+                            </td>
+
+                            {/* Roll Number */}
+                            <td className="py-3 px-3 font-mono text-xs text-gray-300">
+                              {p.roll_number}
+                            </td>
+
+                            {/* Branch & Year */}
+                            <td className="py-3 px-3">
+                              <span className="px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-300 text-[11px] font-medium border border-blue-500/20 block truncate max-w-[170px]" title={p.branch}>
+                                {p.branch}
+                              </span>
+                              <div className="mt-1">
+                                {isSecondYear ? (
+                                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-300 text-[10px] font-bold border border-amber-500/20">
+                                    <Crown size={10} /> 2nd Year
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-300 text-[10px] font-bold border border-blue-500/20">
+                                    <GraduationCap size={10} /> 1st Year
+                                  </span>
+                                )}
+                              </div>
+                            </td>
+
+                            {/* Payment Details */}
+                            <td className="py-3 px-3">
+                              <div className="space-y-1">
+                                <div className="flex items-center gap-1.5">
+                                  <span className="font-black text-emerald-400 font-mono text-xs">
+                                    {formattedAmount}
+                                  </span>
+                                  <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded-full bg-emerald-500/15 text-emerald-300 text-[10px] font-semibold border border-emerald-500/30">
+                                    <CheckCircle2 size={10} /> Verified
+                                  </span>
+                                </div>
+
+                                {p.payment_id && (
+                                  <div className="flex items-center gap-1">
+                                    <span className="font-mono text-[10px] text-gray-400 truncate max-w-[120px]" title={p.payment_id}>
+                                      ID: {p.payment_id}
+                                    </span>
+                                    <button
+                                      type="button"
+                                      onClick={() => copyPaymentId(p.payment_id!, `pid-${p.id}`)}
+                                      className="text-gray-500 hover:text-emerald-400 transition-colors p-0.5"
+                                      title="Copy transaction ID"
+                                    >
+                                      {verifiedCopiedId === `pid-${p.id}` ? (
+                                        <Check size={11} className="text-emerald-400" />
+                                      ) : (
+                                        <Copy size={11} />
+                                      )}
+                                    </button>
+                                  </div>
+                                )}
+
+                                {p.account_holder_name && (
+                                  <p className="text-[10px] text-gray-400 truncate max-w-[140px]" title={p.account_holder_name}>
+                                    Holder: <span className="text-gray-300">{p.account_holder_name}</span>
+                                  </p>
+                                )}
+
+                                {p.payment_screenshot_url && (
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      setScreenshotModal({
+                                        url: p.payment_screenshot_url!,
+                                        title: `${p.full_name} - Payment Screenshot`,
+                                        participant: p,
+                                      })
+                                    }
+                                    className="inline-flex items-center gap-1 text-[10px] text-emerald-300 hover:text-emerald-200 font-medium bg-emerald-500/10 hover:bg-emerald-500/20 px-1.5 py-0.5 rounded border border-emerald-500/30 transition-colors"
+                                  >
+                                    <Image size={10} /> View Screenshot
+                                  </button>
+                                )}
+
+                                {p.payment_verified_at && (
+                                  <p className="text-[9px] text-gray-500">
+                                    {new Date(p.payment_verified_at).toLocaleDateString()} {new Date(p.payment_verified_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                  </p>
+                                )}
+                              </div>
+                            </td>
+
+                            {/* WhatsApp Contact */}
+                            <td className="py-3 px-3">
+                              <a
+                                href={`https://wa.me/${p.whatsapp_number.replace(/[^0-9]/g, '')}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-flex items-center gap-1.5 text-xs text-emerald-300 hover:text-emerald-200 font-mono bg-emerald-500/10 px-2 py-1 rounded-lg border border-emerald-500/20 transition-colors"
+                                title="Chat on WhatsApp"
+                              >
+                                <Phone size={12} />
+                                {p.whatsapp_number}
+                              </a>
+                            </td>
+
+                            {/* Event Check-in */}
+                            <td className="py-3 px-3 text-center">
+                              <div className="flex flex-col items-center gap-1">
+                                {p.check_in_status ? (
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold">
+                                    <CheckCircle2 size={10} /> Checked In
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-gray-500/15 text-gray-400 border border-gray-500/30 text-[10px] font-medium">
+                                    <Clock size={10} /> Awaiting
+                                  </span>
+                                )}
+
+                                <button
+                                  type="button"
+                                  onClick={() => handleCheckIn(p.id, p.check_in_status)}
+                                  disabled={checkingIn === p.id}
+                                  className={`px-2 py-0.5 rounded text-[10px] font-semibold transition-colors disabled:opacity-50 ${
+                                    p.check_in_status
+                                      ? 'bg-red-500/10 text-red-300 hover:bg-red-500/20 border border-red-500/20'
+                                      : 'bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25 border border-emerald-500/30'
+                                  }`}
+                                >
+                                  {checkingIn === p.id ? '...' : p.check_in_status ? 'Undo' : 'Check In'}
+                                </button>
+                              </div>
+                            </td>
+
+                            {/* Actions */}
+                            <td className="py-3 px-3 text-right">
+                              <div className="flex items-center justify-end gap-1.5">
+                                <button
+                                  type="button"
+                                  onClick={() => openParticipantQr(p)}
+                                  className="px-2 py-1 rounded-lg bg-violet-500/15 hover:bg-violet-500/25 text-violet-300 border border-violet-500/30 text-xs font-medium inline-flex items-center gap-1 transition-colors"
+                                  title="View / Print QR Entry Pass"
+                                >
+                                  <QrCode size={12} />
+                                  QR Pass
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setEditingParticipant(p);
+                                    setEditForm(toFormData(p));
+                                    setEditError('');
+                                  }}
+                                  className="p-1 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+                                  title="Edit Participant"
+                                >
+                                  <Pencil size={12} />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                  {filteredVerifiedParticipants.length > 0 && (
+                    <tfoot>
+                      <tr className="border-t-2 border-[#2e3a31] bg-[#1a211c] font-bold text-white text-xs">
+                        <td colSpan={4} className="py-3 px-3 text-emerald-400 uppercase tracking-wider text-[11px]">
+                          Showing {filteredVerifiedParticipants.length} of {verifiedParticipants.length} Verified Participants
+                        </td>
+                        <td className="py-3 px-3 font-mono text-emerald-400 font-black text-sm">
+                          {new Intl.NumberFormat('en-IN', {
+                            style: 'currency',
+                            currency: 'INR',
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          }).format(
+                            filteredVerifiedParticipants.reduce((sum, p) => {
+                              const isSecondYear = p.year === '2nd Year' || p.year === '2-Year' || p.year === '2nd';
+                              const fee = isSecondYear ? (paymentSummary?.secondYear?.configuredFee ?? 699) : (paymentSummary?.firstYear?.configuredFee ?? 599);
+                              const amount = (p.payment_amount != null && !isNaN(Number(p.payment_amount)) && Number(p.payment_amount) > 0)
+                                ? Number(p.payment_amount)
+                                : fee;
+                              return sum + amount;
+                            }, 0)
+                          )}
+                        </td>
+                        <td colSpan={3} className="py-3 px-3 text-right text-gray-400 font-normal">
+                          {filteredVerifiedParticipants.filter((p) => p.check_in_status).length} Checked In •{' '}
+                          {filteredVerifiedParticipants.filter((p) => !p.check_in_status).length} Awaiting Check-in
+                        </td>
+                      </tr>
+                    </tfoot>
+                  )}
+                </table>
+              </div>
+            </>
+          )}
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3 mb-6">

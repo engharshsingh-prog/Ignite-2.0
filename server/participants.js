@@ -68,7 +68,7 @@ export default async function handler(req, res) {
       const admin = await requireAdmin(req, res);
       if (!admin) return;
 
-      const { search, branch, approval_status } = req.query;
+      const { search, branch, approval_status, payment_verified } = req.query;
       const params = [];
       let where = '1=1';
 
@@ -84,6 +84,11 @@ export default async function handler(req, res) {
       if (approval_status && approval_status !== 'all') {
         where += ' AND approval_status = ?';
         params.push(approval_status);
+      }
+      if (payment_verified === 'true' || payment_verified === '1') {
+        where += " AND (payment_status = 'approved' OR payment_verified = 1)";
+      } else if (payment_verified === 'false' || payment_verified === '0') {
+        where += " AND (payment_status != 'approved' AND (payment_verified = 0 OR payment_verified IS NULL))";
       }
 
       const rows = (await db.prepare(`SELECT * FROM participants WHERE ${where} ORDER BY registered_at DESC`).all(...params)).map(toParticipant);
