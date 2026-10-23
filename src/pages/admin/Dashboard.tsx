@@ -261,6 +261,9 @@ export default function AdminDashboard() {
   const [verifiedCopiedId, setVerifiedCopiedId] = useState<string | null>(null);
   const [isVerifiedTableExpanded, setIsVerifiedTableExpanded] = useState(true);
 
+  // Main Directory Filter (defaults to 'unverified' so verified participants are NOT shown twice)
+  const [mainTableFilter, setMainTableFilter] = useState<'unverified' | 'all' | 'verified'>('unverified');
+
   useEffect(() => {
     let intervalId: number | undefined;
 
@@ -854,10 +857,27 @@ export default function AdminDashboard() {
   };
 
   const verifiedParticipants = useMemo(() => {
-    return participants.filter(
-      (p) => p.payment_status === 'approved' || Boolean(p.payment_verified)
-    );
+    const seenIds = new Set<number>();
+    return participants.filter((p) => {
+      const isPaid = p.payment_status === 'approved' || Boolean(p.payment_verified);
+      if (!isPaid) return false;
+      if (seenIds.has(p.id)) return false;
+      seenIds.add(p.id);
+      return true;
+    });
   }, [participants]);
+
+  const displayedMainParticipants = useMemo(() => {
+    const seenIds = new Set<number>();
+    return participants.filter((p) => {
+      if (seenIds.has(p.id)) return false;
+      seenIds.add(p.id);
+      const isPaid = p.payment_status === 'approved' || Boolean(p.payment_verified);
+      if (mainTableFilter === 'unverified') return !isPaid;
+      if (mainTableFilter === 'verified') return isPaid;
+      return true; // 'all'
+    });
+  }, [participants, mainTableFilter]);
 
   const filteredVerifiedParticipants = useMemo(() => {
     return verifiedParticipants.filter((p) => {
@@ -2162,6 +2182,77 @@ export default function AdminDashboard() {
           )}
         </div>
 
+        {/* Registration Directory Controls & View Filters */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
+          <div>
+            <h3 className="text-base font-bold text-white flex items-center gap-2">
+              <Users size={18} className="text-blue-400" />
+              Registration Directory
+              <span className="text-xs font-normal text-gray-400">
+                ({displayedMainParticipants.length} students)
+              </span>
+            </h3>
+            <p className="text-xs text-gray-400 mt-0.5">
+              {mainTableFilter === 'unverified'
+                ? 'Showing unverified & pending registrations only (verified participants are in the table above).'
+                : mainTableFilter === 'verified'
+                ? 'Showing verified participants only.'
+                : 'Showing all registrations (including verified & pending).'}
+            </p>
+          </div>
+
+          {/* Filter Tabs */}
+          <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-xl bg-black/40 border border-white/5">
+            <button
+              type="button"
+              onClick={() => setMainTableFilter('unverified')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 ${
+                mainTableFilter === 'unverified'
+                  ? 'bg-amber-500 text-black font-bold shadow'
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              <Clock size={12} />
+              Awaiting Payment / Unverified
+              <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${mainTableFilter === 'unverified' ? 'bg-black/30 text-black' : 'bg-white/10 text-gray-300'}`}>
+                {participants.filter(p => !(p.payment_status === 'approved' || Boolean(p.payment_verified))).length}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setMainTableFilter('all')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 ${
+                mainTableFilter === 'all'
+                  ? 'bg-white/20 text-white font-bold shadow'
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              <Users size={12} />
+              All Registrations
+              <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${mainTableFilter === 'all' ? 'bg-black/30 text-white' : 'bg-white/10 text-gray-300'}`}>
+                {participants.length}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setMainTableFilter('verified')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 ${
+                mainTableFilter === 'verified'
+                  ? 'bg-emerald-500 text-black font-bold shadow'
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              <ShieldCheck size={12} />
+              Verified Only
+              <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${mainTableFilter === 'verified' ? 'bg-black/30 text-black' : 'bg-white/10 text-gray-300'}`}>
+                {verifiedParticipants.length}
+              </span>
+            </button>
+          </div>
+        </div>
+
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
           <div className="relative flex-1">
             <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500" />
@@ -2208,7 +2299,20 @@ export default function AdminDashboard() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
-                  {participants.map(p => (
+                  {displayedMainParticipants.length === 0 ? (
+                    <tr>
+                      <td colSpan={8} className="py-10 text-center text-gray-400">
+                        <Users size={28} className="mx-auto mb-2 opacity-30 text-blue-400" />
+                        <p className="text-sm font-semibold text-white">No registrations found in this view.</p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          {mainTableFilter === 'unverified'
+                            ? 'All participants are verified, or no unverified participants match your search.'
+                            : 'Try adjusting your search query or filters.'}
+                        </p>
+                      </td>
+                    </tr>
+                  ) : (
+                    displayedMainParticipants.map(p => (
                     <tr key={p.id} className="hover:bg-white/[0.02] transition-colors">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
@@ -2358,15 +2462,9 @@ export default function AdminDashboard() {
                         </div>
                       </td>
                     </tr>
-                  ))}
+                  )))}
                 </tbody>
               </table>
-              {participants.length === 0 && (
-                <div className="text-center py-12 text-gray-500">
-                  <Users size={32} className="mx-auto mb-3 opacity-40" />
-                  <p>No participants found</p>
-                </div>
-              )}
             </div>
           </div>
         )}
