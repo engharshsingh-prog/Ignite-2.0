@@ -10,6 +10,7 @@ import participantConfirmationEmail from './participant-confirmation-email.js';
 import participantsShare from './participants-share.js';
 import participantsTransfer from './participants-transfer.js';
 import participants from './participants.js';
+import paymentSummary from './payment-summary.js';
 import paymentVerification from './payment-verification.js';
 import publicParticipants from './public-participants.js';
 import publicMediaControl from './public-media-control.js';
@@ -70,6 +71,8 @@ const routeHandlers = new Map([
   ['/participants', participants],
   ['/participants-share', participantsShare],
   ['/participants-transfer', participantsTransfer],
+  ['/payment-summary', paymentSummary],
+  ['/admin/payment-summary', paymentSummary],
   ['/payment-verification', paymentVerification],
   ['/public-participants', publicParticipants],
   ['/public-media-control', publicMediaControl],

@@ -17,7 +17,6 @@ import {
   X,
   Download,
   FileUp,
-  Copy,
   Link2,
   Power,
   QrCode,
@@ -34,6 +33,9 @@ import {
   XCircle,
   Image,
   ExternalLink,
+  Wallet,
+  IndianRupee,
+  TrendingUp,
 } from 'lucide-react';
 import { authHeaders, checkAdminAuth, type AdminUser } from '../../lib/auth';
 import LoadingSpinner from '../../components/LoadingSpinner';
@@ -84,20 +86,37 @@ interface Stats {
   yearCounts: Record<string, number>;
 }
 
-interface ShareAccess {
-  enabled: boolean;
-  token: string;
-  share_path: string;
-  share_url: string;
-  updated_at: string | null;
-}
-
-interface ValidationHandlerAccess {
-  enabled: boolean;
-  token: string;
-  share_path: string;
-  share_url: string;
-  updated_at: string | null;
+interface PaymentCollectionSummary {
+  currency: string;
+  currencySymbol: string;
+  firstYear: {
+    planName: string;
+    academicYear: string;
+    totalAmount: number;
+    totalAmountFormatted: string;
+    successfulCount: number;
+    configuredFee: number;
+  };
+  secondYear: {
+    planName: string;
+    academicYear: string;
+    totalAmount: number;
+    totalAmountFormatted: string;
+    successfulCount: number;
+    configuredFee: number;
+  };
+  grandTotal: {
+    totalAmount: number;
+    totalAmountFormatted: string;
+    successfulCount: number;
+  };
+  metrics: {
+    pendingCount: number;
+    rejectedCount: number;
+    recordsNeedingReview: number;
+    duplicatePaymentsCount: number;
+  };
+  lastUpdated: string;
 }
 
 interface RegistrationControl {
@@ -113,7 +132,7 @@ interface ActionMenuState {
 }
 
 interface PanelMenuState {
-  menu: 'shortcuts' | 'data' | 'share' | 'handler';
+  menu: 'shortcuts' | 'data';
   top: number;
   left: number;
   width: number;
@@ -181,13 +200,9 @@ export default function AdminDashboard() {
   const [editError, setEditError] = useState('');
   const [transferLoading, setTransferLoading] = useState<'csv' | 'xlsx' | 'import' | null>(null);
   const [transferMessage, setTransferMessage] = useState('');
-  const [shareAccess, setShareAccess] = useState<ShareAccess | null>(null);
-  const [shareLoading, setShareLoading] = useState(false);
-  const [shareMessage, setShareMessage] = useState('');
-  const [handlerAccess, setHandlerAccess] = useState<ValidationHandlerAccess | null>(null);
-  const [handlerLoading, setHandlerLoading] = useState(false);
-  const [handlerMessage, setHandlerMessage] = useState('');
-  const [handlerPassword, setHandlerPassword] = useState('');
+  const [paymentSummary, setPaymentSummary] = useState<PaymentCollectionSummary | null>(null);
+  const [paymentSummaryLoading, setPaymentSummaryLoading] = useState(false);
+  const [paymentSummaryError, setPaymentSummaryError] = useState('');
   const [registrationControl, setRegistrationControl] = useState<RegistrationControl | null>(null);
   const [registrationToggleLoading, setRegistrationToggleLoading] = useState(false);
   const [openActionMenu, setOpenActionMenu] = useState<ActionMenuState | null>(null);
@@ -235,6 +250,22 @@ export default function AdminDashboard() {
     };
   }, []);
 
+  const fetchPaymentSummary = useCallback(async () => {
+    try {
+      setPaymentSummaryLoading(true);
+      setPaymentSummaryError('');
+      const res = await fetch('/api/payment-summary', { headers: authHeaders() });
+      const data = await readJsonSafe<PaymentCollectionSummary & { error?: string }>(res);
+      if (!res.ok) throw new Error(getErrorMessage(data, 'Failed to load payment collection summary'));
+      setPaymentSummary(data);
+    } catch (err) {
+      console.error('Fetch payment summary error:', err);
+      setPaymentSummaryError(err instanceof Error ? err.message : 'Failed to load payment collection summary');
+    } finally {
+      setPaymentSummaryLoading(false);
+    }
+  }, []);
+
   const fetchData = useCallback(async () => {
     try {
       const params = new URLSearchParams();
@@ -249,23 +280,13 @@ export default function AdminDashboard() {
       setParticipants(Array.isArray(pData) ? pData : []);
       setStats(sData ?? null);
       if (!branches.length && sData?.branchCounts) setBranches(Object.keys(sData.branchCounts));
+      fetchPaymentSummary();
     } catch (err) {
       console.error(err);
     } finally {
       setLoading(false);
     }
-  }, [search, branch, branches.length]);
-
-  const fetchShareAccess = useCallback(async () => {
-    try {
-      const res = await fetch('/api/participants-share', { headers: authHeaders() });
-      const data = await readJsonSafe<ShareAccess & { error?: string }>(res);
-      if (!res.ok) throw new Error(getErrorMessage(data, 'Failed to load share access'));
-      setShareAccess(data);
-    } catch (err) {
-      console.error(err);
-    }
-  }, []);
+  }, [search, branch, branches.length, fetchPaymentSummary]);
 
   const fetchRegistrationControl = useCallback(async () => {
     try {
@@ -278,23 +299,11 @@ export default function AdminDashboard() {
     }
   }, []);
 
-  const fetchHandlerAccess = useCallback(async () => {
-    try {
-      const res = await fetch('/api/validation-handler-access', { headers: authHeaders() });
-      const data = await readJsonSafe<ValidationHandlerAccess & { error?: string }>(res);
-      if (!res.ok) throw new Error(getErrorMessage(data, 'Failed to load validation handler access'));
-      setHandlerAccess(data);
-    } catch (err) {
-      console.error(err);
-    }
-  }, []);
-
   useEffect(() => {
     fetchData();
-    fetchShareAccess();
-    fetchHandlerAccess();
+    fetchPaymentSummary();
     fetchRegistrationControl();
-  }, [fetchData, fetchHandlerAccess, fetchRegistrationControl, fetchShareAccess]);
+  }, [fetchData, fetchPaymentSummary, fetchRegistrationControl]);
 
   useEffect(() => {
     const onPointerDown = (event: PointerEvent) => {
@@ -733,48 +742,6 @@ export default function AdminDashboard() {
     }
   };
 
-  const buildShareLink = () => {
-    if (!shareAccess?.token) return '';
-    if (shareAccess.share_url) {
-      return /^https?:\/\//i.test(shareAccess.share_url) ? shareAccess.share_url : `${window.location.origin}${shareAccess.share_url}`;
-    }
-    return `${window.location.origin}/records/${shareAccess.token}`;
-  };
-
-  const handleShareAccessUpdate = async (payload: { enabled?: boolean; regenerate?: boolean }, successMessage: string) => {
-    setShareLoading(true);
-    setShareMessage('');
-    try {
-      const res = await fetch('/api/participants-share', {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify(payload),
-      });
-      const data = await readJsonSafe<ShareAccess & { error?: string }>(res);
-      if (!res.ok) throw new Error(getErrorMessage(data, 'Failed to update shared access'));
-      setShareAccess(data);
-      setShareMessage(successMessage);
-    } catch (err) {
-      setShareMessage(err instanceof Error ? err.message : 'Failed to update shared access');
-    } finally {
-      setShareLoading(false);
-    }
-  };
-
-  const handleCopyShareLink = async () => {
-    const link = buildShareLink();
-    if (!link) {
-      setShareMessage('Share link is not available yet.');
-      return;
-    }
-    try {
-      await navigator.clipboard.writeText(link);
-      setShareMessage('Private share link copied.');
-    } catch {
-      setShareMessage(link);
-    }
-  };
-
   const openParticipantQr = (participant: Participant) => {
     const payload = JSON.stringify({
       id: participant.id,
@@ -784,15 +751,6 @@ export default function AdminDashboard() {
       whatsapp_number: participant.whatsapp_number,
     });
     setQrModal({ title: `QR - ${participant.full_name}`, value: payload });
-  };
-
-  const openShareQr = () => {
-    const link = buildShareLink();
-    if (!link) {
-      setShareMessage('Share link is not available yet.');
-      return;
-    }
-    setQrModal({ title: 'Shared View Access Link', value: link });
   };
 
   const toggleActionMenu = (event: React.MouseEvent, participantId: number) => {
@@ -858,49 +816,6 @@ export default function AdminDashboard() {
       setTransferMessage(err instanceof Error ? err.message : 'Failed to update registration status');
     } finally {
       setRegistrationToggleLoading(false);
-    }
-  };
-
-  const buildHandlerLink = () => {
-    if (!handlerAccess?.token) return '';
-    if (handlerAccess.share_url) {
-      return /^https?:\/\//i.test(handlerAccess.share_url) ? handlerAccess.share_url : `${window.location.origin}${handlerAccess.share_url}`;
-    }
-    return `${window.location.origin}/validate/${handlerAccess.token}`;
-  };
-
-  const handleHandlerAccessUpdate = async (payload: { enabled?: boolean; regenerate?: boolean; password?: string }, successMessage: string) => {
-    setHandlerLoading(true);
-    setHandlerMessage('');
-    try {
-      const res = await fetch('/api/validation-handler-access', {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify(payload),
-      });
-      const data = await readJsonSafe<ValidationHandlerAccess & { error?: string }>(res);
-      if (!res.ok) throw new Error(getErrorMessage(data, 'Failed to update validation handler access'));
-      setHandlerAccess(data);
-      setHandlerMessage(successMessage);
-      if (payload.password) setHandlerPassword('');
-    } catch (err) {
-      setHandlerMessage(err instanceof Error ? err.message : 'Failed to update validation handler access');
-    } finally {
-      setHandlerLoading(false);
-    }
-  };
-
-  const copyHandlerLink = async () => {
-    const link = buildHandlerLink();
-    if (!link) {
-      setHandlerMessage('Validation handler link is not available yet.');
-      return;
-    }
-    try {
-      await navigator.clipboard.writeText(link);
-      setHandlerMessage('Validation handler link copied.');
-    } catch {
-      setHandlerMessage(link);
     }
   };
 
@@ -973,72 +888,204 @@ export default function AdminDashboard() {
         />
         {transferMessage && <p className="mb-5 text-sm text-gray-300">{transferMessage}</p>}
 
-        <div className="mb-8 p-5 rounded-2xl bg-[#191e1b]/90 border border-[#303a32]">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        {/* ============================================================== */}
+        {/* PAYMENT COLLECTION SUMMARY DASHBOARD                          */}
+        {/* ============================================================== */}
+        <div className="mb-8 p-6 rounded-2xl bg-[#191e1b]/90 border border-[#303a32] shadow-xl">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 pb-4 border-b border-[#303a32]/60">
             <div>
-              <p className="text-white font-semibold flex items-center gap-2"><Link2 size={16} className="text-blue-300" /> Shared View Access</p>
-              <p className="text-sm text-gray-400 mt-1">Hidden by default. Only users with the private tokenized link can view registrations when enabled.</p>
-              {shareAccess?.token && (
-                <p className="text-xs text-gray-500 mt-2">Token: <span className="font-mono">{shareAccess.token.slice(0, 10)}...</span></p>
-              )}
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                  <Wallet size={18} />
+                </div>
+                <h2 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
+                  Payment Collection Summary
+                </h2>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  Verified Collections
+                </span>
+              </div>
+              <p className="text-xs text-gray-400 mt-1 max-w-2xl leading-relaxed">
+                Calculated in real-time from verified payment records stored in the database. Excludes pending, unverified, and rejected submissions.
+              </p>
             </div>
-            <div className="flex flex-wrap gap-2">
-              <button
-                data-menu-trigger="true"
-                onClick={(event) => togglePanelMenu(event, 'share', 220)}
-                disabled={shareLoading}
-                className="px-4 py-2 rounded-xl border border-blue-500/30 bg-blue-500/10 text-blue-200 text-sm font-medium inline-flex items-center gap-2 hover:bg-blue-500/20 transition-colors disabled:opacity-50"
-              >
-                <Link2 size={14} />
-                {shareLoading ? 'Updating...' : 'Access Options'}
-                <ChevronDown size={14} className={`transition-transform ${openPanelMenu?.menu === 'share' ? 'rotate-180' : ''}`} />
-              </button>
-            </div>
-          </div>
-          {shareMessage && <p className="text-sm text-gray-300 mt-3">{shareMessage}</p>}
-        </div>
 
-        <div className="mb-8 p-5 rounded-2xl bg-[#191e1b]/90 border border-[#303a32]">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-              <p className="text-white font-semibold flex items-center gap-2"><ShieldCheck size={16} className="text-emerald-300" /> Validation Handler Access</p>
-              <p className="text-sm text-gray-400 mt-1">Hidden tokenized page for QR scan + quick search and payment/check-in handling.</p>
-              {handlerAccess?.token && (
-                <p className="text-xs text-gray-500 mt-2">Token: <span className="font-mono">{handlerAccess.token.slice(0, 10)}...</span></p>
+            <div className="flex items-center gap-3 shrink-0">
+              {paymentSummary?.lastUpdated && (
+                <span className="text-[11px] text-gray-400 flex items-center gap-1 hidden md:inline-flex">
+                  <Clock size={12} className="text-gray-500" />
+                  Updated: {new Date(paymentSummary.lastUpdated).toLocaleTimeString()}
+                </span>
               )}
-            </div>
-            <div className="flex flex-wrap gap-2">
               <button
-                data-menu-trigger="true"
-                onClick={(event) => togglePanelMenu(event, 'handler', 200)}
-                disabled={handlerLoading}
-                className="px-4 py-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-200 text-sm font-medium inline-flex items-center gap-2 hover:bg-emerald-500/20 transition-colors disabled:opacity-50"
+                onClick={fetchPaymentSummary}
+                disabled={paymentSummaryLoading}
+                className="px-3.5 py-1.5 rounded-xl border border-[#303a32] bg-[#212823] hover:bg-[#2b352e] text-xs font-medium text-gray-300 hover:text-white transition-colors flex items-center gap-1.5 disabled:opacity-50"
+                title="Refresh payment collection summary"
               >
-                <ShieldCheck size={14} />
-                {handlerLoading ? 'Updating...' : 'Handler Options'}
-                <ChevronDown size={14} className={`transition-transform ${openPanelMenu?.menu === 'handler' ? 'rotate-180' : ''}`} />
+                <RefreshCw size={13} className={paymentSummaryLoading ? 'animate-spin text-emerald-400' : ''} />
+                {paymentSummaryLoading ? 'Calculating...' : 'Refresh Totals'}
               </button>
             </div>
           </div>
 
-          <div className="mt-4 flex flex-col sm:flex-row gap-2">
-            <input
-              type="password"
-              value={handlerPassword}
-              onChange={(e) => setHandlerPassword(e.target.value)}
-              placeholder="Set/rotate handler page password"
-              className="flex-1 bg-[#15152a] border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-400/50"
-            />
-            <button
-              onClick={() => handleHandlerAccessUpdate({ password: handlerPassword }, 'Validation handler password updated.')}
-              disabled={handlerLoading || handlerPassword.trim().length < 4}
-              className="px-4 py-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 text-sm font-medium hover:bg-emerald-500/20 transition-colors disabled:opacity-50"
-            >
-              Update Password
-            </button>
+          {paymentSummaryError && (
+            <div className="mb-5 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-300 text-xs flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <AlertCircle size={16} className="text-red-400 shrink-0" />
+                <span>{paymentSummaryError}</span>
+              </div>
+              <button
+                onClick={fetchPaymentSummary}
+                className="px-2.5 py-1 rounded bg-red-500/20 hover:bg-red-500/30 text-red-200 text-xs font-medium transition-colors"
+              >
+                Retry
+              </button>
+            </div>
+          )}
+
+          {/* 3 Summary Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Card 1: 1-Year Payment Total */}
+            <div className="p-5 rounded-xl bg-[#212823]/80 border border-[#303a32] hover:border-blue-500/40 transition-all flex flex-col justify-between relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-28 h-28 bg-blue-500/5 rounded-full blur-2xl pointer-events-none group-hover:bg-blue-500/10 transition-colors" />
+              <div>
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center">
+                      <IndianRupee size={15} />
+                    </div>
+                    <span className="text-xs font-bold text-gray-300 uppercase tracking-wider">
+                      1-Year Plan Collection
+                    </span>
+                  </div>
+                  <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20">
+                    1st Year (₹{paymentSummary?.firstYear?.configuredFee ?? 599})
+                  </span>
+                </div>
+
+                <div className="mt-2">
+                  <p className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                    {paymentSummaryLoading ? '...' : (paymentSummary?.firstYear?.totalAmountFormatted ?? '₹0.00')}
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between text-xs text-gray-400">
+                <span className="flex items-center gap-1.5">
+                  <Users size={13} className="text-blue-400" />
+                  <strong className="text-white font-semibold">
+                    {paymentSummary?.firstYear?.successfulCount ?? 0}
+                  </strong> Paid Participants
+                </span>
+                <span className="text-[11px] text-gray-500">Confirmed</span>
+              </div>
+            </div>
+
+            {/* Card 2: 2-Year Payment Total */}
+            <div className="p-5 rounded-xl bg-[#212823]/80 border border-[#303a32] hover:border-amber-500/40 transition-all flex flex-col justify-between relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-28 h-28 bg-amber-500/5 rounded-full blur-2xl pointer-events-none group-hover:bg-amber-500/10 transition-colors" />
+              <div>
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center">
+                      <IndianRupee size={15} />
+                    </div>
+                    <span className="text-xs font-bold text-gray-300 uppercase tracking-wider">
+                      2-Year Plan Collection
+                    </span>
+                  </div>
+                  <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20">
+                    2nd Year (₹{paymentSummary?.secondYear?.configuredFee ?? 699})
+                  </span>
+                </div>
+
+                <div className="mt-2">
+                  <p className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                    {paymentSummaryLoading ? '...' : (paymentSummary?.secondYear?.totalAmountFormatted ?? '₹0.00')}
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between text-xs text-gray-400">
+                <span className="flex items-center gap-1.5">
+                  <Crown size={13} className="text-amber-400" />
+                  <strong className="text-white font-semibold">
+                    {paymentSummary?.secondYear?.successfulCount ?? 0}
+                  </strong> Paid Participants
+                </span>
+                <span className="text-[11px] text-gray-500">Confirmed</span>
+              </div>
+            </div>
+
+            {/* Card 3: Grand Total Collection */}
+            <div className="p-5 rounded-xl bg-gradient-to-br from-[#1d2720] via-[#1a221c] to-[#151c17] border border-emerald-500/40 shadow-lg shadow-emerald-950/30 flex flex-col justify-between relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none group-hover:bg-emerald-500/15 transition-colors" />
+              <div>
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                      <TrendingUp size={15} />
+                    </div>
+                    <span className="text-xs font-bold text-emerald-300 uppercase tracking-wider">
+                      Grand Total Collection
+                    </span>
+                  </div>
+                  <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                    All Plans
+                  </span>
+                </div>
+
+                <div className="mt-2">
+                  <p className="text-2xl sm:text-3xl font-black text-emerald-400 tracking-tight glow-text-olive">
+                    {paymentSummaryLoading ? '...' : (paymentSummary?.grandTotal?.totalAmountFormatted ?? '₹0.00')}
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-4 pt-3 border-t border-emerald-500/20 flex items-center justify-between text-xs text-gray-300">
+                <span className="flex items-center gap-1.5">
+                  <ShieldCheck size={13} className="text-emerald-400" />
+                  <strong className="text-white font-semibold">
+                    {paymentSummary?.grandTotal?.successfulCount ?? 0}
+                  </strong> Total Paid
+                </span>
+                <span className="text-[11px] text-emerald-400/80 font-mono">
+                  1-Year + 2-Year
+                </span>
+              </div>
+            </div>
           </div>
 
-          {handlerMessage && <p className="text-sm text-gray-300 mt-3">{handlerMessage}</p>}
+          {/* Audit & Reconcile Footnote Bar */}
+          <div className="mt-4 px-3 py-2 rounded-lg bg-black/20 border border-white/5 flex flex-wrap items-center justify-between gap-2 text-[11px] text-gray-400">
+            <div className="flex items-center gap-3">
+              <span>
+                Pending verification:{' '}
+                <strong className="text-amber-400">{paymentSummary?.metrics?.pendingCount ?? 0}</strong>
+              </span>
+              <span>•</span>
+              <span>
+                Excluded (pending/rejected):{' '}
+                <strong className="text-gray-300">
+                  {(paymentSummary?.metrics?.pendingCount ?? 0) + (paymentSummary?.metrics?.rejectedCount ?? 0)}
+                </strong>
+              </span>
+              {paymentSummary?.metrics?.recordsNeedingReview ? (
+                <>
+                  <span>•</span>
+                  <span className="text-amber-400 font-semibold">
+                    ⚠️ {paymentSummary.metrics.recordsNeedingReview} record(s) need review
+                  </span>
+                </>
+              ) : null}
+            </div>
+
+            <span className="text-gray-500 text-[10px]">
+              Formula: Grand Total = 1-Year Total + 2-Year Total
+            </span>
+          </div>
         </div>
 
         {stats && (
@@ -1978,100 +2025,6 @@ export default function AdminDashboard() {
                 className="w-full px-3 py-2.5 text-left text-sm text-gray-200 hover:bg-white/10 flex items-center gap-2 border-t border-white/5"
               >
                 <RefreshCw size={14} /> Refresh Data
-              </button>
-            </>
-          )}
-
-          {openPanelMenu.menu === 'share' && (
-            <>
-              <button
-                onClick={() => {
-                  handleShareAccessUpdate(
-                    { enabled: !shareAccess?.enabled },
-                    shareAccess?.enabled ? 'Shared access disabled.' : 'Shared access enabled.'
-                  );
-                  setOpenPanelMenu(null);
-                }}
-                disabled={shareLoading}
-                className={`w-full px-3 py-2.5 text-left text-sm flex items-center gap-2 disabled:opacity-50 ${
-                  shareAccess?.enabled
-                    ? 'text-red-200 hover:bg-red-500/10'
-                    : 'text-emerald-200 hover:bg-emerald-500/10'
-                }`}
-              >
-                <Power size={14} /> {shareAccess?.enabled ? 'Disable Access' : 'Enable Access'}
-              </button>
-              <button
-                onClick={() => {
-                  handleShareAccessUpdate({ regenerate: true }, 'Share link regenerated. Old link is now revoked.');
-                  setOpenPanelMenu(null);
-                }}
-                disabled={shareLoading}
-                className="w-full px-3 py-2.5 text-left text-sm text-olive-200 hover:bg-olive-500/10 flex items-center gap-2 border-t border-white/5 disabled:opacity-50"
-              >
-                <RefreshCw size={14} /> Regenerate Link
-              </button>
-              <button
-                onClick={() => {
-                  handleCopyShareLink();
-                  setOpenPanelMenu(null);
-                }}
-                disabled={shareLoading || !shareAccess?.enabled}
-                className="w-full px-3 py-2.5 text-left text-sm text-blue-200 hover:bg-blue-500/10 flex items-center gap-2 border-t border-white/5 disabled:opacity-50"
-              >
-                <Copy size={14} /> Copy Link
-              </button>
-              <button
-                onClick={() => {
-                  openShareQr();
-                  setOpenPanelMenu(null);
-                }}
-                disabled={shareLoading || !shareAccess?.enabled}
-                className="w-full px-3 py-2.5 text-left text-sm text-violet-200 hover:bg-violet-500/10 flex items-center gap-2 border-t border-white/5 disabled:opacity-50"
-              >
-                <QrCode size={14} /> QR Link
-              </button>
-            </>
-          )}
-
-          {openPanelMenu.menu === 'handler' && (
-            <>
-              <button
-                onClick={() => {
-                  handleHandlerAccessUpdate(
-                    { enabled: !handlerAccess?.enabled },
-                    handlerAccess?.enabled ? 'Validation handler access disabled.' : 'Validation handler access enabled.'
-                  );
-                  setOpenPanelMenu(null);
-                }}
-                disabled={handlerLoading}
-                className={`w-full px-3 py-2.5 text-left text-sm flex items-center gap-2 disabled:opacity-50 ${
-                  handlerAccess?.enabled
-                    ? 'text-red-200 hover:bg-red-500/10'
-                    : 'text-emerald-200 hover:bg-emerald-500/10'
-                }`}
-              >
-                <Power size={14} /> {handlerAccess?.enabled ? 'Disable Access' : 'Enable Access'}
-              </button>
-              <button
-                onClick={() => {
-                  handleHandlerAccessUpdate({ regenerate: true }, 'Validation handler link regenerated. Old link revoked.');
-                  setOpenPanelMenu(null);
-                }}
-                disabled={handlerLoading}
-                className="w-full px-3 py-2.5 text-left text-sm text-olive-200 hover:bg-olive-500/10 flex items-center gap-2 border-t border-white/5 disabled:opacity-50"
-              >
-                <RefreshCw size={14} /> Regenerate Link
-              </button>
-              <button
-                onClick={() => {
-                  copyHandlerLink();
-                  setOpenPanelMenu(null);
-                }}
-                disabled={handlerLoading || !handlerAccess?.enabled}
-                className="w-full px-3 py-2.5 text-left text-sm text-blue-200 hover:bg-blue-500/10 flex items-center gap-2 border-t border-white/5 disabled:opacity-50"
-              >
-                <Copy size={14} /> Copy Link
               </button>
             </>
           )}
