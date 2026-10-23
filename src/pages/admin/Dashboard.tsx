@@ -36,6 +36,8 @@ import {
   Wallet,
   IndianRupee,
   TrendingUp,
+  GraduationCap,
+  Building2,
 } from 'lucide-react';
 import { authHeaders, checkAdminAuth, type AdminUser } from '../../lib/auth';
 import LoadingSpinner from '../../components/LoadingSpinner';
@@ -86,6 +88,19 @@ interface Stats {
   yearCounts: Record<string, number>;
 }
 
+export interface BranchYearSummaryItem {
+  branch: string;
+  firstYearCount: number;
+  firstYearPaid: number;
+  secondYearCount: number;
+  secondYearPaid: number;
+  totalCount: number;
+  totalPaid: number;
+  totalAmount: number;
+  totalAmountFormatted: string;
+  percentageOfTotal: number;
+}
+
 interface PaymentCollectionSummary {
   currency: string;
   currencySymbol: string;
@@ -110,6 +125,15 @@ interface PaymentCollectionSummary {
     totalAmountFormatted: string;
     successfulCount: number;
   };
+  registrationTotals?: {
+    firstYearTotal: number;
+    firstYearPaid: number;
+    secondYearTotal: number;
+    secondYearPaid: number;
+    grandTotalRegistrations: number;
+    grandTotalPaid: number;
+  };
+  branchBreakdown?: BranchYearSummaryItem[];
   metrics: {
     pendingCount: number;
     rejectedCount: number;
@@ -1055,6 +1079,161 @@ export default function AdminDashboard() {
                   1-Year + 2-Year
                 </span>
               </div>
+            </div>
+          </div>
+
+          {/* Branch & Year Registration Breakdown Section */}
+          <div className="mt-5 pt-5 border-t border-[#303a32]">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+              <div>
+                <h3 className="text-sm sm:text-base font-bold text-white tracking-wide flex items-center gap-2">
+                  <Building2 size={16} className="text-emerald-400" />
+                  Branch & Academic Year Breakdown
+                </h3>
+                <p className="text-[11px] text-gray-400 mt-0.5">
+                  Registration volume and verified payment breakdown by engineering branch and academic year.
+                </p>
+              </div>
+
+              {paymentSummary?.registrationTotals && (
+                <div className="flex flex-wrap items-center gap-2 text-xs">
+                  <span className="px-2.5 py-1 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-300 font-medium flex items-center gap-1.5">
+                    <GraduationCap size={13} className="text-blue-400" />
+                    1st Year: <strong className="text-white font-bold">{paymentSummary.registrationTotals.firstYearTotal}</strong>
+                    <span className="text-[10px] text-blue-300/70">({paymentSummary.registrationTotals.firstYearPaid} paid)</span>
+                  </span>
+                  <span className="px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-300 font-medium flex items-center gap-1.5">
+                    <Crown size={13} className="text-amber-400" />
+                    2nd Year: <strong className="text-white font-bold">{paymentSummary.registrationTotals.secondYearTotal}</strong>
+                    <span className="text-[10px] text-amber-300/70">({paymentSummary.registrationTotals.secondYearPaid} paid)</span>
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Table */}
+            <div className="overflow-x-auto rounded-xl border border-[#303a32] bg-[#161b17]/90 shadow-inner">
+              <table className="w-full text-left text-xs min-w-[640px]">
+                <thead>
+                  <tr className="border-b border-[#303a32] bg-[#212823]/70 text-gray-400 font-semibold uppercase tracking-wider text-[10px]">
+                    <th className="py-3 px-4">Branch</th>
+                    <th className="py-3 px-4 text-center">1st Year</th>
+                    <th className="py-3 px-4 text-center">2nd Year</th>
+                    <th className="py-3 px-4 text-center">Total Registered</th>
+                    <th className="py-3 px-4 text-right">Collections</th>
+                    <th className="py-3 px-4 text-center hidden md:table-cell">Share</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#242d26]">
+                  {paymentSummaryLoading && !paymentSummary?.branchBreakdown?.length ? (
+                    <tr>
+                      <td colSpan={6} className="py-8 text-center text-gray-400">
+                        <LoadingSpinner text="Loading branch & year distribution..." />
+                      </td>
+                    </tr>
+                  ) : paymentSummary?.branchBreakdown?.length ? (
+                    paymentSummary.branchBreakdown.map((item) => (
+                      <tr key={item.branch} className="hover:bg-white/[0.03] transition-colors">
+                        <td className="py-3 px-4">
+                          <div className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-emerald-400/80 shrink-0" />
+                            <span className="font-semibold text-white">{item.branch}</span>
+                          </div>
+                        </td>
+                        <td className="py-3 px-4 text-center">
+                          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-blue-500/10 border border-blue-500/20 text-blue-300 font-semibold">
+                            <span>{item.firstYearCount}</span>
+                            <span className="text-[10px] text-blue-200/70 font-normal">
+                              ({item.firstYearPaid} paid)
+                            </span>
+                          </div>
+                        </td>
+                        <td className="py-3 px-4 text-center">
+                          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-500/10 border border-amber-500/20 text-amber-300 font-semibold">
+                            <span>{item.secondYearCount}</span>
+                            <span className="text-[10px] text-amber-200/70 font-normal">
+                              ({item.secondYearPaid} paid)
+                            </span>
+                          </div>
+                        </td>
+                        <td className="py-3 px-4 text-center">
+                          <span className="font-bold text-white text-sm">{item.totalCount}</span>
+                          <span className="text-[10px] text-gray-400 block font-normal">
+                            {item.totalPaid} confirmed paid
+                          </span>
+                        </td>
+                        <td className="py-3 px-4 text-right">
+                          <span className="font-bold text-emerald-400 font-mono text-sm">
+                            {item.totalAmountFormatted}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4 text-center hidden md:table-cell">
+                          <div className="flex items-center justify-center gap-2">
+                            <div className="w-16 h-1.5 rounded-full bg-white/10 overflow-hidden">
+                              <div
+                                className="h-full bg-emerald-500 rounded-full"
+                                style={{ width: `${Math.min(item.percentageOfTotal, 100)}%` }}
+                              />
+                            </div>
+                            <span className="text-[11px] text-gray-400 w-9 text-right font-mono">
+                              {item.percentageOfTotal}%
+                            </span>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={6} className="py-6 text-center text-gray-400">
+                        No registrations recorded yet.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+                {paymentSummary?.registrationTotals && (
+                  <tfoot>
+                    <tr className="border-t-2 border-[#303a32] bg-[#1d241f] font-bold text-white">
+                      <td className="py-3 px-4">
+                        <span className="uppercase text-[11px] tracking-wider text-emerald-400">
+                          Total Across All Branches
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        <span className="text-blue-300 font-black text-sm">
+                          {paymentSummary.registrationTotals.firstYearTotal}
+                        </span>
+                        <span className="text-[10px] text-blue-200/70 font-normal block">
+                          ({paymentSummary.registrationTotals.firstYearPaid} paid)
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        <span className="text-amber-300 font-black text-sm">
+                          {paymentSummary.registrationTotals.secondYearTotal}
+                        </span>
+                        <span className="text-[10px] text-amber-200/70 font-normal block">
+                          ({paymentSummary.registrationTotals.secondYearPaid} paid)
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        <span className="text-emerald-400 font-black text-base">
+                          {paymentSummary.registrationTotals.grandTotalRegistrations}
+                        </span>
+                        <span className="text-[10px] text-emerald-300/80 font-normal block">
+                          ({paymentSummary.registrationTotals.grandTotalPaid} paid)
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-right">
+                        <span className="text-emerald-400 font-black text-base font-mono">
+                          {paymentSummary.grandTotal.totalAmountFormatted}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-center hidden md:table-cell text-gray-400 font-mono text-[11px]">
+                        100%
+                      </td>
+                    </tr>
+                  </tfoot>
+                )}
+              </table>
             </div>
           </div>
 

@@ -24,6 +24,17 @@ export default async function handler(req, res) {
     const branchCounts = participants.reduce((acc, p) => { acc[p.branch] = (acc[p.branch] || 0) + 1; return acc; }, {});
     const yearCounts = participants.reduce((acc, p) => { acc[p.year] = (acc[p.year] || 0) + 1; return acc; }, {});
 
+    const branchYearCounts = {};
+    for (const p of participants) {
+      const b = p.branch || 'Unknown';
+      const rawYear = String(p.year || '').trim();
+      const isSecondYear = rawYear === '2nd Year' || rawYear === '2-Year' || rawYear === '2nd';
+      const yKey = isSecondYear ? '2nd Year' : '1st Year';
+      if (!branchYearCounts[b]) branchYearCounts[b] = { '1st Year': 0, '2nd Year': 0, total: 0 };
+      branchYearCounts[b][yKey] = (branchYearCounts[b][yKey] || 0) + 1;
+      branchYearCounts[b].total++;
+    }
+
     return res.status(200).json({
       total,
       pendingApprovals,
@@ -35,6 +46,7 @@ export default async function handler(req, res) {
       paymentsPending,
       branchCounts,
       yearCounts,
+      branchYearCounts,
     });
   } catch (err) {
     return res.status(500).json({ error: err.message });

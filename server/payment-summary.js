@@ -23,7 +23,7 @@ export async function calculatePaymentSummary() {
   } catch (_) {}
 
   const participants = await db.prepare(`
-    SELECT id, email, roll_number, year, payment_id, payment_amount, payment_status, payment_verified, approval_status
+    SELECT id, email, roll_number, branch, year, payment_id, payment_amount, payment_status, payment_verified, approval_status
     FROM participants
   `).all();
 
@@ -40,7 +40,38 @@ export async function calculatePaymentSummary() {
   let recordsNeedingReview = 0;
   let duplicatePaymentsCount = 0;
 
+  // Track branch and year distribution
+  const branchMap = {};
+  let totalRegFirstYear = 0;
+  let totalRegSecondYear = 0;
+
   for (const p of participants) {
+    const rawBranch = String(p.branch || 'Unknown / Not Specified').trim();
+    const rawYear = String(p.year || '').trim();
+    const isFirstYear = rawYear === '1st Year' || rawYear === '1-Year' || rawYear === '1st';
+    const isSecondYear = rawYear === '2nd Year' || rawYear === '2-Year' || rawYear === '2nd';
+
+    if (isFirstYear) totalRegFirstYear++;
+    else if (isSecondYear) totalRegSecondYear++;
+
+    if (!branchMap[rawBranch]) {
+      branchMap[rawBranch] = {
+        branch: rawBranch,
+        firstYearCount: 0,
+        firstYearPaid: 0,
+        secondYearCount: 0,
+        secondYearPaid: 0,
+        totalCount: 0,
+        totalPaid: 0,
+        totalAmount: 0,
+      };
+    }
+
+    const b = branchMap[rawBranch];
+    b.totalCount++;
+    if (isFirstYear) b.firstYearCount++;
+    else if (isSecondYear) b.secondYearCount++;
+
     // Only confirmed/successful payments
     const isApproved = p.payment_status === 'approved' || (p.payment_status === undefined && Boolean(p.payment_verified));
     const isPending = p.payment_status === 'pending_verification' && !p.payment_verified;
@@ -52,10 +83,6 @@ export async function calculatePaymentSummary() {
     if (!isApproved) continue;
 
     // Check plan / academic year
-    const rawYear = String(p.year || '').trim();
-    const isFirstYear = rawYear === '1st Year' || rawYear === '1-Year' || rawYear === '1st';
-    const isSecondYear = rawYear === '2nd Year' || rawYear === '2-Year' || rawYear === '2nd';
-
     if (!isFirstYear && !isSecondYear) {
       recordsNeedingReview++;
       continue;
@@ -87,14 +114,28 @@ export async function calculatePaymentSummary() {
     if (isFirstYear) {
       firstYearTotal += amount;
       firstYearCount++;
+      b.firstYearPaid++;
     } else if (isSecondYear) {
       secondYearTotal += amount;
       secondYearCount++;
+      b.secondYearPaid++;
     }
+
+    b.totalPaid++;
+    b.totalAmount += amount;
   }
 
   const grandTotal = firstYearTotal + secondYearTotal;
   const grandCount = firstYearCount + secondYearCount;
+  const totalRegistrations = participants.length;
+
+  const branchBreakdown = Object.values(branchMap)
+    .map(b => ({
+      ...b,
+      totalAmountFormatted: formatInr(b.totalAmount),
+      percentageOfTotal: totalRegistrations > 0 ? Number(((b.totalCount / totalRegistrations) * 100).toFixed(1)) : 0,
+    }))
+    .sort((a, b) => b.totalCount - a.totalCount || b.totalAmount - a.totalAmount);
 
   return {
     currency: 'INR',
@@ -120,6 +161,15 @@ export async function calculatePaymentSummary() {
       totalAmountFormatted: formatInr(grandTotal),
       successfulCount: grandCount,
     },
+    registrationTotals: {
+      firstYearTotal: totalRegFirstYear,
+      firstYearPaid: firstYearCount,
+      secondYearTotal: totalRegSecondYear,
+      secondYearPaid: secondYearCount,
+      grandTotalRegistrations: totalRegistrations,
+      grandTotalPaid: grandCount,
+    },
+    branchBreakdown,
     metrics: {
       pendingCount,
       rejectedCount,
