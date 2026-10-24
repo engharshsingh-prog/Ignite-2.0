@@ -534,7 +534,12 @@ export default function AdminDashboard() {
   };
 
   const handleDelete = async (participant: Participant) => {
-    const confirmDelete = window.confirm(`Delete registration for ${participant.full_name}? This cannot be undone.`);
+    const isVerified = participant.payment_status === 'approved' || Boolean(participant.payment_verified);
+    const confirmMessage = isVerified
+      ? `WARNING: ${participant.full_name} has a VERIFIED PAYMENT of ₹${participant.payment_amount || (participant.year === '2nd Year' ? 699 : 599)}. Deleting will permanently remove their registration and verified payment record.\n\nAre you sure you want to delete this participant?`
+      : `Delete registration for ${participant.full_name}? This cannot be undone.`;
+
+    const confirmDelete = window.confirm(confirmMessage);
     if (!confirmDelete) return;
 
     setDeletingId(participant.id);
@@ -2134,10 +2139,19 @@ export default function AdminDashboard() {
                                     setEditForm(toFormData(p));
                                     setEditError('');
                                   }}
-                                  className="p-1 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+                                  className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
                                   title="Edit Participant"
                                 >
                                   <Pencil size={12} />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDelete(p)}
+                                  disabled={deletingId === p.id}
+                                  className="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 border border-red-500/25 transition-colors disabled:opacity-50"
+                                  title="Delete Verified Registration"
+                                >
+                                  <Trash2 size={12} className={deletingId === p.id ? 'animate-pulse' : ''} />
                                 </button>
                               </div>
                             </td>
