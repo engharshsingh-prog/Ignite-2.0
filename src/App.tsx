@@ -15,6 +15,7 @@ import MediaUpload from './pages/admin/MediaUpload';
 import MediaBulkImport from './pages/admin/MediaBulkImport';
 import WinnersManager from './pages/admin/WinnersManager';
 import BulkPassDownload from './pages/admin/BulkPassDownload';
+import QrScannerPage from './pages/admin/QrScannerPage';
 import ManagementTeamManager from './pages/admin/ManagementTeamManager';
 import ActivityLogsHidden from './pages/admin/ActivityLogsHidden';
 import EventSettings from './pages/admin/EventSettings';
@@ -40,6 +41,7 @@ export default function App() {
         <Route path="/my-profile" element={<MyProfile />} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin" element={<AdminGuard><AdminDashboard /></AdminGuard>} />
+        <Route path="/admin/scan" element={<AdminGuard><QrScannerPage /></AdminGuard>} />
         <Route path="/admin/super" element={<AdminGuard requireSuperAdmin><SuperAdminControl /></AdminGuard>} />
         <Route path="/admin/control" element={<AdminGuard requireSuperAdmin><SuperAdminControl /></AdminGuard>} />
         <Route path="/admin/control-legacy" element={<AdminGuard requireSuperAdmin><ControlCenter /></AdminGuard>} />
@@ -56,4 +58,3 @@ export default function App() {
     </BrowserRouter>
   );
 }
-

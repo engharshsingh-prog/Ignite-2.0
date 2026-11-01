@@ -43,6 +43,7 @@ import {
 } from 'lucide-react';
 import { authHeaders, checkAdminAuth, type AdminUser } from '../../lib/auth';
 import LoadingSpinner from '../../components/LoadingSpinner';
+import QrCheckinScannerModal from '../../components/QrCheckinScannerModal';
 import { getErrorMessage, readJsonSafe } from '../../lib/http';
 
 interface Participant {
@@ -263,6 +264,9 @@ export default function AdminDashboard() {
 
   // Main Directory Filter (defaults to 'unverified' so verified participants are NOT shown twice)
   const [mainTableFilter, setMainTableFilter] = useState<'unverified' | 'all' | 'verified'>('unverified');
+
+  // Live QR Pass Scanner Modal
+  const [scannerModalOpen, setScannerModalOpen] = useState(false);
 
   useEffect(() => {
     let intervalId: number | undefined;
@@ -1047,6 +1051,15 @@ export default function AdminDashboard() {
                 </Link>
               </div>
             )}
+            <button
+              type="button"
+              onClick={() => setScannerModalOpen(true)}
+              className="px-3.5 py-2 rounded-xl border border-emerald-500/40 bg-gradient-to-r from-emerald-500/20 via-green-500/20 to-teal-500/20 text-emerald-200 text-sm font-semibold inline-flex items-center gap-2 hover:from-emerald-500/30 hover:to-teal-500/30 transition-all shadow-md shadow-emerald-950/30 cursor-pointer"
+              title="Open Live Pass QR Scanner for Check-in"
+            >
+              <QrCode size={16} className="text-emerald-400" />
+              Scan Pass
+            </button>
             <button
               data-menu-trigger="true"
               onClick={(event) => togglePanelMenu(event, 'shortcuts', 180)}
@@ -2774,9 +2787,16 @@ export default function AdminDashboard() {
           {openPanelMenu.menu === 'shortcuts' && (
             <>
               <Link
+                to="/admin/scan"
+                onClick={() => setOpenPanelMenu(null)}
+                className="w-full px-3 py-2.5 text-sm text-emerald-300 hover:bg-emerald-500/10 flex items-center gap-2 font-semibold"
+              >
+                <QrCode size={14} /> Pass QR Scanner (Desk Mode)
+              </Link>
+              <Link
                 to="/admin/management-team"
                 onClick={() => setOpenPanelMenu(null)}
-                className="w-full px-3 py-2.5 text-sm text-indigo-200 hover:bg-indigo-500/10 flex items-center gap-2"
+                className="w-full px-3 py-2.5 text-sm text-indigo-200 hover:bg-indigo-500/10 flex items-center gap-2 border-t border-white/5"
               >
                 <ShieldCheck size={14} /> Management Team
               </Link>
@@ -3517,6 +3537,14 @@ export default function AdminDashboard() {
           </motion.div>
         </div>
       )}
+
+      {/* Live Pass QR Scanner Modal */}
+      <QrCheckinScannerModal
+        isOpen={scannerModalOpen}
+        onClose={() => setScannerModalOpen(false)}
+        onCheckInSuccess={() => fetchData()}
+        knownParticipants={participants}
+      />
     </div>
   );
 }

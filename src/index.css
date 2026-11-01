@@ -114,6 +114,21 @@ label {
   outline-offset: 3px;
 }
 
+@keyframes scannerLine {
+  0% {
+    top: 6%;
+    opacity: 0.8;
+  }
+  50% {
+    top: 94%;
+    opacity: 1;
+  }
+  100% {
+    top: 6%;
+    opacity: 0.8;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

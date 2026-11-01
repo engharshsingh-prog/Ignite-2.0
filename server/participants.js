@@ -68,9 +68,14 @@ export default async function handler(req, res) {
       const admin = await requireAdmin(req, res);
       if (!admin) return;
 
-      const { search, branch, approval_status, payment_verified } = req.query;
+      const { search, branch, approval_status, payment_verified, id } = req.query;
       const params = [];
       let where = '1=1';
+
+      if (id) {
+        where += ' AND id = ?';
+        params.push(Number(id) || id);
+      }
 
       if (search) {
         where += ' AND (full_name LIKE ? OR roll_number LIKE ? OR email LIKE ? OR payment_id LIKE ? OR whatsapp_number LIKE ? OR registration_id LIKE ? OR account_holder_name LIKE ?)';
