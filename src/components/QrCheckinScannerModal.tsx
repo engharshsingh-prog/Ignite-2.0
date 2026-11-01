@@ -51,14 +51,16 @@ interface QrCheckinScannerModalProps {
 
 function playBeep(success = true) {
   try {
-    const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    const AudioContextClass =
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
     if (!AudioContextClass) return;
     const ctx = new AudioContextClass();
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
 
     osc.type = success ? 'sine' : 'sawtooth';
-    osc.frequency.setValueAtTime(success ? 880 : 330, ctx.currentTime);
+    osc.frequency.setValueAtTime(success ? 880 : 300, ctx.currentTime);
     if (success) {
       osc.frequency.exponentialRampToValueAtTime(1760, ctx.currentTime + 0.12);
     }
@@ -84,10 +86,17 @@ export default function QrCheckinScannerModal({
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
-  const scanTimerRef = useRef<number | null>(null);
+  const animFrameRef = useRef<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
+  // Use refs to prevent render-reset loops
+  const scanningPausedRef = useRef(false);
+  const isMountedRef = useRef(true);
+  const knownParticipantsRef = useRef<Participant[]>(knownParticipants || []);
+  knownParticipantsRef.current = knownParticipants || [];
+
   const [cameraActive, setCameraActive] = useState(false);
+  const [cameraStarting, setCameraStarting] = useState(false);
   const [cameraError, setCameraError] = useState('');
   const [facingMode, setFacingMode] = useState<'environment' | 'user'>('environment');
   const [hasTorch, setHasTorch] = useState(false);
@@ -108,188 +117,249 @@ export default function QrCheckinScannerModal({
   const [actionSuccessMessage, setActionSuccessMessage] = useState('');
 
   const stopCamera = useCallback(() => {
-    if (scanTimerRef.current) {
-      clearInterval(scanTimerRef.current);
-      scanTimerRef.current = null;
+    if (animFrameRef.current) {
+      cancelAnimationFrame(animFrameRef.current);
+      animFrameRef.current = null;
     }
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => track.stop());
+      try {
+        streamRef.current.getTracks().forEach((track) => track.stop());
+      } catch (_) {}
       streamRef.current = null;
     }
     if (videoRef.current) {
       videoRef.current.srcObject = null;
     }
     setCameraActive(false);
+    setCameraStarting(false);
     setTorchOn(false);
   }, []);
 
   const resumeScanning = useCallback(() => {
+    scanningPausedRef.current = false;
     setScannedParticipant(null);
     setLookupError('');
     setRawScannedData(null);
     setActionSuccessMessage('');
   }, []);
 
-  const lookupParticipant = useCallback(
-    async (rawCode: string) => {
-      setLookupError('');
-      setActionSuccessMessage('');
-      setRawScannedData(rawCode);
+  const lookupParticipant = useCallback(async (rawCode: string) => {
+    // Instantly pause scanning so no second scan triggers while processing
+    scanningPausedRef.current = true;
+    setLookupError('');
+    setActionSuccessMessage('');
+    setRawScannedData(rawCode);
 
-      let searchId: number | null = null;
-      let searchKey = rawCode.trim();
+    let searchId: number | null = null;
+    let searchKey = rawCode.trim();
 
-      // 1. Try parsing JSON payload from pass
-      try {
-        const parsed = JSON.parse(rawCode);
-        if (parsed && typeof parsed === 'object') {
-          if (parsed.id != null && !isNaN(Number(parsed.id))) {
-            searchId = Number(parsed.id);
-          }
-          searchKey = String(
-            parsed.roll_number ||
-            parsed.rollNumber ||
-            parsed.registration_id ||
-            parsed.registrationId ||
-            parsed.payment_id ||
-            parsed.paymentId ||
-            parsed.email ||
-            parsed.whatsapp_number ||
-            parsed.id ||
-            rawCode
-          ).trim();
+    // 1. Try parsing JSON payload from pass
+    try {
+      const parsed = JSON.parse(rawCode);
+      if (parsed && typeof parsed === 'object') {
+        if (parsed.id != null && !isNaN(Number(parsed.id))) {
+          searchId = Number(parsed.id);
         }
-      } catch {
-        // Not a JSON string, proceed with raw text
+        searchKey = String(
+          parsed.roll_number ||
+          parsed.rollNumber ||
+          parsed.registration_id ||
+          parsed.registrationId ||
+          parsed.payment_id ||
+          parsed.paymentId ||
+          parsed.email ||
+          parsed.whatsapp_number ||
+          parsed.id ||
+          rawCode
+        ).trim();
+      }
+    } catch {
+      // Plain string
+    }
+
+    // 2. Check local in-memory participants first
+    const pool = knownParticipantsRef.current;
+    if (pool.length > 0) {
+      let match: Participant | undefined;
+      if (searchId != null) {
+        match = pool.find((p) => p.id === searchId);
+      }
+      if (!match) {
+        const lowerKey = searchKey.toLowerCase();
+        match = pool.find(
+          (p) =>
+            (p.registration_id && p.registration_id.toLowerCase() === lowerKey) ||
+            p.roll_number.toLowerCase() === lowerKey ||
+            p.email.toLowerCase() === lowerKey ||
+            (p.payment_id && p.payment_id.toLowerCase() === lowerKey) ||
+            p.whatsapp_number === lowerKey ||
+            p.full_name.toLowerCase() === lowerKey
+        );
       }
 
-      // Check in known in-memory participants first if provided
-      if (knownParticipants && knownParticipants.length > 0) {
-        let match: Participant | undefined;
-        if (searchId != null) {
-          match = knownParticipants.find((p) => p.id === searchId);
-        }
-        if (!match) {
-          const lowerKey = searchKey.toLowerCase();
-          match = knownParticipants.find(
-            (p) =>
-              (p.registration_id && p.registration_id.toLowerCase() === lowerKey) ||
-              p.roll_number.toLowerCase() === lowerKey ||
-              p.email.toLowerCase() === lowerKey ||
-              (p.payment_id && p.payment_id.toLowerCase() === lowerKey) ||
-              p.whatsapp_number === lowerKey ||
-              p.full_name.toLowerCase() === lowerKey
-          );
-        }
+      if (match) {
+        playBeep(true);
+        try {
+          navigator.vibrate?.([80, 40, 80]);
+        } catch (_) {}
+        setScannedParticipant(match);
+        return;
+      }
+    }
 
-        if (match) {
-          playBeep(true);
-          try {
-            navigator.vibrate?.([80, 40, 80]);
-          } catch (_) {}
-          setScannedParticipant(match);
-          return;
-        }
+    // 3. Fetch from server API
+    setSearching(true);
+    try {
+      const queryParams = new URLSearchParams();
+      if (searchId != null) {
+        queryParams.set('id', String(searchId));
+      } else {
+        queryParams.set('search', searchKey);
       }
 
-      // 2. Fetch live from server
-      setSearching(true);
-      try {
-        const queryParams = new URLSearchParams();
-        if (searchId != null) {
-          queryParams.set('id', String(searchId));
-        } else {
-          queryParams.set('search', searchKey);
-        }
+      const res = await fetch(`/api/participants?${queryParams}`, { headers: authHeaders() });
+      const data = await readJsonSafe<Participant[] & { error?: string }>(res);
+      if (!res.ok) throw new Error(getErrorMessage(data, 'Failed to lookup participant'));
 
-        const res = await fetch(`/api/participants?${queryParams}`, { headers: authHeaders() });
-        const data = await readJsonSafe<Participant[] & { error?: string }>(res);
-        if (!res.ok) throw new Error(getErrorMessage(data, 'Failed to lookup participant'));
-
-        const list = Array.isArray(data) ? data : [];
-        if (list.length === 0) {
-          playBeep(false);
-          setLookupError(`No participant found for QR pass: "${searchKey.slice(0, 40)}"`);
-          setScannedParticipant(null);
-        } else {
-          playBeep(true);
-          try {
-            navigator.vibrate?.([80, 40, 80]);
-          } catch (_) {}
-          setScannedParticipant(list[0]);
-        }
-      } catch (err) {
+      const list = Array.isArray(data) ? data : [];
+      if (list.length === 0) {
         playBeep(false);
-        setLookupError(err instanceof Error ? err.message : 'Lookup failed');
+        setLookupError(`No participant found for QR pass: "${searchKey.slice(0, 40)}"`);
         setScannedParticipant(null);
-      } finally {
-        setSearching(false);
+      } else {
+        playBeep(true);
+        try {
+          navigator.vibrate?.([80, 40, 80]);
+        } catch (_) {}
+        setScannedParticipant(list[0]);
       }
-    },
-    [knownParticipants]
-  );
+    } catch (err) {
+      playBeep(false);
+      setLookupError(err instanceof Error ? err.message : 'Lookup failed');
+      setScannedParticipant(null);
+    } finally {
+      setSearching(false);
+    }
+  }, []);
 
   const startCamera = useCallback(async () => {
     stopCamera();
     setCameraError('');
-    try {
-      const constraints: MediaStreamConstraints = {
-        video: {
-          facingMode: { ideal: facingMode },
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-        },
-        audio: false,
-      };
+    setCameraStarting(true);
 
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+    if (!navigator?.mediaDevices?.getUserMedia) {
+      setCameraError('Camera access requires HTTPS or localhost. You can still scan by clicking "Upload Pass Image" below.');
+      setCameraStarting(false);
+      return;
+    }
+
+    try {
+      // Attempt camera with ideal facing mode
+      let stream: MediaStream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: facingMode === 'environment' ? { ideal: 'environment' } : 'user',
+          },
+          audio: false,
+        });
+      } catch (e) {
+        console.warn('Ideal facingMode failed, falling back to basic video:', e);
+        // Fallback to any available video stream
+        stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      }
+
       streamRef.current = stream;
 
       // Check torch capability
-      const videoTrack = stream.getVideoTracks()[0];
-      const capabilities = (videoTrack?.getCapabilities?.() as unknown as { torch?: boolean }) || {};
-      setHasTorch(Boolean(capabilities?.torch));
+      try {
+        const videoTrack = stream.getVideoTracks()[0];
+        const capabilities = (videoTrack?.getCapabilities?.() as unknown as { torch?: boolean }) || {};
+        setHasTorch(Boolean(capabilities?.torch));
+      } catch (_) {}
 
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play();
+      const video = videoRef.current;
+      if (!video) {
+        setCameraStarting(false);
+        return;
       }
 
+      video.srcObject = stream;
+      video.muted = true;
+      video.playsInline = true;
+
+      // Wait for video to be ready and playing
+      await new Promise<void>((resolve) => {
+        video.onloadedmetadata = () => {
+          video.play().then(() => resolve()).catch(() => resolve());
+        };
+        // Safety timeout
+        setTimeout(resolve, 800);
+      });
+
       setCameraActive(true);
+      setCameraStarting(false);
 
-      // Start scanning loop
-      scanTimerRef.current = window.setInterval(() => {
-        // Pause scanning if we already have a candidate waiting for permission
-        if (scannedParticipant || !videoRef.current || videoRef.current.readyState < HTMLMediaElement.HAVE_ENOUGH_DATA) {
-          return;
+      // Start the scan loop using requestAnimationFrame
+      let lastScanTime = 0;
+      const scanLoop = (timestamp: number) => {
+        if (!isMountedRef.current) return;
+
+        // Scan every ~120ms to save CPU while maintaining high responsiveness
+        if (
+          !scanningPausedRef.current &&
+          videoRef.current &&
+          videoRef.current.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA &&
+          timestamp - lastScanTime > 120
+        ) {
+          lastScanTime = timestamp;
+          const v = videoRef.current;
+          const canvas = canvasRef.current;
+          if (canvas && v.videoWidth > 0 && v.videoHeight > 0) {
+            // Scale down to max 640px width for fast decoding
+            const scale = Math.min(1, 640 / v.videoWidth);
+            const w = Math.floor(v.videoWidth * scale);
+            const h = Math.floor(v.videoHeight * scale);
+
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d', { willReadFrequently: true });
+            if (ctx) {
+              ctx.drawImage(v, 0, 0, w, h);
+              const imageData = ctx.getImageData(0, 0, w, h);
+              const code = jsQR(imageData.data, w, h, {
+                inversionAttempts: 'attemptBoth',
+              });
+
+              if (code && code.data && code.data.trim()) {
+                lookupParticipant(code.data.trim());
+              }
+            }
+          }
         }
 
-        const video = videoRef.current;
-        const canvas = canvasRef.current;
-        if (!canvas) return;
+        animFrameRef.current = requestAnimationFrame(scanLoop);
+      };
 
-        const width = video.videoWidth;
-        const height = video.videoHeight;
-        if (!width || !height) return;
-
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d', { willReadFrequently: true });
-        if (!ctx) return;
-
-        ctx.drawImage(video, 0, 0, width, height);
-        const imageData = ctx.getImageData(0, 0, width, height);
-        const code = jsQR(imageData.data, width, height, { inversionAttempts: 'dontInvert' });
-
-        if (code && code.data && code.data.trim()) {
-          lookupParticipant(code.data.trim());
-        }
-      }, 150);
-    } catch (err) {
-      setCameraError(err instanceof Error ? err.message : 'Unable to access camera. Please allow camera permissions or upload a pass image.');
+      animFrameRef.current = requestAnimationFrame(scanLoop);
+    } catch (err: unknown) {
+      console.error('Camera start error:', err);
+      const name = (err as { name?: string })?.name || '';
+      let msg = 'Failed to access camera.';
+      if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
+        msg = 'Camera permission was denied. Please allow camera access in your browser settings, or use "Upload Pass Image" below.';
+      } else if (name === 'NotFoundError' || name === 'DevicesNotFoundError') {
+        msg = 'No camera found on this device. You can upload an image of the pass or search manually below.';
+      } else if (name === 'NotReadableError' || name === 'TrackStartError') {
+        msg = 'Camera is currently in use by another application. Please close other camera apps and retry.';
+      } else if (err instanceof Error && err.message) {
+        msg = err.message;
+      }
+      setCameraError(msg);
       setCameraActive(false);
+      setCameraStarting(false);
     }
-  }, [facingMode, lookupParticipant, scannedParticipant, stopCamera]);
+  }, [facingMode, lookupParticipant, stopCamera]);
 
   const toggleTorch = async () => {
     if (!streamRef.current || !hasTorch) return;
@@ -309,7 +379,7 @@ export default function QrCheckinScannerModal({
     setFacingMode((prev) => (prev === 'environment' ? 'user' : 'environment'));
   };
 
-  // Handle image upload from file picker
+  // Image upload fallback (or mobile camera via file picker)
   const handleImageFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -319,18 +389,31 @@ export default function QrCheckinScannerModal({
     reader.onload = (event) => {
       img.onload = () => {
         const canvas = canvasRef.current || document.createElement('canvas');
-        canvas.width = img.width;
-        canvas.height = img.height;
-        const ctx = canvas.getContext('2d');
+        // Scale to max 1200px for robust QR detection
+        const maxDim = 1200;
+        let w = img.width;
+        let h = img.height;
+        if (w > maxDim || h > maxDim) {
+          if (w > h) {
+            h = Math.round((h * maxDim) / w);
+            w = maxDim;
+          } else {
+            w = Math.round((w * maxDim) / h);
+            h = maxDim;
+          }
+        }
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
         if (!ctx) return;
-        ctx.drawImage(img, 0, 0, img.width, img.height);
-        const imageData = ctx.getImageData(0, 0, img.width, img.height);
-        const code = jsQR(imageData.data, img.width, img.height);
-        if (code && code.data) {
-          lookupParticipant(code.data);
+        ctx.drawImage(img, 0, 0, w, h);
+        const imageData = ctx.getImageData(0, 0, w, h);
+        const code = jsQR(imageData.data, w, h, { inversionAttempts: 'attemptBoth' });
+        if (code && code.data && code.data.trim()) {
+          lookupParticipant(code.data.trim());
         } else {
           playBeep(false);
-          setLookupError('Could not detect a valid QR code in the selected image. Please try another image.');
+          setLookupError('Could not detect a QR code in the selected image. Please ensure the QR code is clearly visible and well-lit.');
         }
       };
       img.src = event.target?.result as string;
@@ -408,22 +491,26 @@ export default function QrCheckinScannerModal({
     }
   };
 
-  // Lifecycle when modal opens/closes
+  // Mount/unmount lifecycle
   useEffect(() => {
+    isMountedRef.current = true;
     if (isOpen) {
       resumeScanning();
       startCamera();
     } else {
       stopCamera();
     }
-    return () => stopCamera();
-  }, [isOpen, startCamera, stopCamera, resumeScanning]);
+    return () => {
+      isMountedRef.current = false;
+      stopCamera();
+    };
+  }, [isOpen, facingMode]); // Only restart camera if modal opened or facingMode flipped!
 
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md overflow-y-auto">
-      <div className="relative w-full max-w-lg bg-[#141815] border border-emerald-500/30 rounded-3xl shadow-2xl overflow-hidden flex flex-col my-auto max-h-[92vh]">
+      <div className="relative w-full max-w-lg bg-[#141815] border border-emerald-500/30 rounded-3xl shadow-2xl overflow-hidden flex flex-col my-auto max-h-[94vh]">
         {/* Header Bar */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-[#242e26] bg-[#1a211c]">
           <div className="flex items-center gap-2.5">
@@ -446,7 +533,7 @@ export default function QrCheckinScannerModal({
               stopCamera();
               onClose();
             }}
-            className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white flex items-center justify-center transition-colors"
+            className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
             title="Close Scanner"
           >
             <X size={16} />
@@ -455,91 +542,111 @@ export default function QrCheckinScannerModal({
 
         {/* Content Body */}
         <div className="p-4 sm:p-5 overflow-y-auto space-y-4">
-          {/* CAMERA VIEWPORT (Hidden when a participant is actively under review for permission) */}
-          {!scannedParticipant && (
-            <div className="relative rounded-2xl overflow-hidden bg-black aspect-video sm:aspect-[4/3] border border-white/10 flex items-center justify-center">
-              {/* Video Element */}
-              <video
-                ref={videoRef}
-                playsInline
-                muted
-                className={`w-full h-full object-cover ${cameraActive ? 'block' : 'hidden'}`}
-              />
-              <canvas ref={canvasRef} className="hidden" />
+          {/* CAMERA VIEWPORT - Kept alive in DOM so camera stream never drops */}
+          <div
+            className={`relative rounded-2xl overflow-hidden bg-black aspect-video sm:aspect-[4/3] border border-white/10 flex items-center justify-center ${
+              scannedParticipant ? 'hidden' : 'block'
+            }`}
+          >
+            {/* Video Element (always mounted, playsInline, autoPlay) */}
+            <video
+              ref={videoRef}
+              autoPlay
+              playsInline
+              muted
+              className="w-full h-full object-cover"
+            />
+            <canvas ref={canvasRef} className="hidden" />
 
-              {/* Viewfinder Overlay with Animated Laser */}
-              {cameraActive && (
-                <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-                  <div className="relative w-56 h-56 sm:w-64 sm:h-64 border-2 border-emerald-400/40 rounded-2xl">
-                    {/* Glowing corners */}
-                    <div className="absolute -top-1 -left-1 w-6 h-6 border-t-4 border-l-4 border-emerald-400 rounded-tl-lg" />
-                    <div className="absolute -top-1 -right-1 w-6 h-6 border-t-4 border-r-4 border-emerald-400 rounded-tr-lg" />
-                    <div className="absolute -bottom-1 -left-1 w-6 h-6 border-b-4 border-l-4 border-emerald-400 rounded-bl-lg" />
-                    <div className="absolute -bottom-1 -right-1 w-6 h-6 border-b-4 border-r-4 border-emerald-400 rounded-br-lg" />
+            {/* Viewfinder Overlay with Animated Laser */}
+            {cameraActive && !scannedParticipant && (
+              <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+                <div className="relative w-56 h-56 sm:w-64 sm:h-64 border-2 border-emerald-400/40 rounded-2xl">
+                  {/* Glowing corners */}
+                  <div className="absolute -top-1 -left-1 w-6 h-6 border-t-4 border-l-4 border-emerald-400 rounded-tl-lg" />
+                  <div className="absolute -top-1 -right-1 w-6 h-6 border-t-4 border-r-4 border-emerald-400 rounded-tr-lg" />
+                  <div className="absolute -bottom-1 -left-1 w-6 h-6 border-b-4 border-l-4 border-emerald-400 rounded-bl-lg" />
+                  <div className="absolute -bottom-1 -right-1 w-6 h-6 border-b-4 border-r-4 border-emerald-400 rounded-br-lg" />
 
-                    {/* Animated Scanning Line */}
-                    <div className="absolute inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-emerald-400 to-transparent shadow-[0_0_12px_#34d399] animate-[scannerLine_2s_ease-in-out_infinite]" />
-                  </div>
+                  {/* Animated Scanning Line */}
+                  <div className="absolute inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-emerald-400 to-transparent shadow-[0_0_12px_#34d399] animate-[scannerLine_2s_ease-in-out_infinite]" />
                 </div>
-              )}
+              </div>
+            )}
 
-              {/* Camera State Messages */}
-              {!cameraActive && (
-                <div className="p-6 text-center text-gray-400 space-y-3">
-                  <Camera size={40} className="mx-auto opacity-40 text-emerald-400" />
-                  <p className="text-sm">
-                    {cameraError || 'Starting camera stream for QR code scanning...'}
-                  </p>
-                  <button
-                    onClick={startCamera}
-                    className="px-3.5 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 text-xs font-semibold inline-flex items-center gap-1.5 transition-colors"
-                  >
-                    <RefreshCw size={13} /> Retry Camera
-                  </button>
-                </div>
-              )}
+            {/* Camera Starting / Error Overlay */}
+            {(!cameraActive || cameraStarting) && (
+              <div className="absolute inset-0 bg-[#0d120f] flex flex-col items-center justify-center p-6 text-center text-gray-300 space-y-3 z-10">
+                {cameraStarting ? (
+                  <>
+                    <LoadingSpinner text="Starting camera stream..." />
+                    <p className="text-xs text-gray-400">Please grant camera permissions if prompted</p>
+                  </>
+                ) : cameraError ? (
+                  <>
+                    <Camera size={36} className="text-amber-400 opacity-60" />
+                    <p className="text-xs text-amber-200/90 max-w-sm">{cameraError}</p>
+                    <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
+                      <button
+                        type="button"
+                        onClick={startCamera}
+                        className="px-3 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 text-xs font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer"
+                      >
+                        <RefreshCw size={12} /> Retry Camera
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="px-3 py-1.5 rounded-xl bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 border border-blue-500/30 text-xs font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer"
+                      >
+                        <Upload size={12} /> Upload Pass Image
+                      </button>
+                    </div>
+                  </>
+                ) : null}
+              </div>
+            )}
 
-              {/* Camera Controls Overlay (Flip, Torch, File) */}
-              {cameraActive && (
-                <div className="absolute bottom-3 inset-x-0 flex items-center justify-center gap-2 z-10 px-3">
+            {/* Camera Controls Overlay (Flip, Torch, File) */}
+            {cameraActive && (
+              <div className="absolute bottom-3 inset-x-0 flex items-center justify-center gap-2 z-10 px-3">
+                <button
+                  type="button"
+                  onClick={flipCamera}
+                  className="p-2.5 rounded-full bg-black/60 hover:bg-black/80 text-white backdrop-blur-sm border border-white/20 transition-colors cursor-pointer"
+                  title="Switch Camera (Front/Back)"
+                >
+                  <RotateCw size={16} />
+                </button>
+
+                {hasTorch && (
                   <button
                     type="button"
-                    onClick={flipCamera}
-                    className="p-2.5 rounded-full bg-black/60 hover:bg-black/80 text-white backdrop-blur-sm border border-white/20 transition-colors"
-                    title="Switch Camera (Front/Back)"
+                    onClick={toggleTorch}
+                    className={`p-2.5 rounded-full backdrop-blur-sm border transition-colors cursor-pointer ${
+                      torchOn
+                        ? 'bg-amber-400 text-black border-amber-300'
+                        : 'bg-black/60 hover:bg-black/80 text-white border-white/20'
+                    }`}
+                    title={torchOn ? 'Turn Flashlight Off' : 'Turn Flashlight On'}
                   >
-                    <RotateCw size={16} />
+                    <Flashlight size={16} />
                   </button>
+                )}
 
-                  {hasTorch && (
-                    <button
-                      type="button"
-                      onClick={toggleTorch}
-                      className={`p-2.5 rounded-full backdrop-blur-sm border transition-colors ${
-                        torchOn
-                          ? 'bg-amber-400 text-black border-amber-300'
-                          : 'bg-black/60 hover:bg-black/80 text-white border-white/20'
-                      }`}
-                      title={torchOn ? 'Turn Flashlight Off' : 'Turn Flashlight On'}
-                    >
-                      <Flashlight size={16} />
-                    </button>
-                  )}
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="p-2.5 rounded-full bg-black/60 hover:bg-black/80 text-white backdrop-blur-sm border border-white/20 transition-colors cursor-pointer"
+                  title="Upload / Photo of Pass Image"
+                >
+                  <Upload size={16} />
+                </button>
+              </div>
+            )}
+          </div>
 
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="p-2.5 rounded-full bg-black/60 hover:bg-black/80 text-white backdrop-blur-sm border border-white/20 transition-colors"
-                    title="Upload Pass Image from Device"
-                  >
-                    <Upload size={16} />
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Hidden File Input */}
+          {/* Hidden File Input (supports device camera capture) */}
           <input
             ref={fileInputRef}
             type="file"
@@ -556,13 +663,13 @@ export default function QrCheckinScannerModal({
                 <p className="font-semibold text-red-100">{lookupError}</p>
                 {rawScannedData && (
                   <p className="text-[10px] text-red-300/80 mt-1 font-mono break-all line-clamp-2">
-                    Scanned: {rawScannedData}
+                    Scanned content: {rawScannedData}
                   </p>
                 )}
               </div>
               <button
                 onClick={resumeScanning}
-                className="text-[11px] underline text-red-300 hover:text-white font-semibold shrink-0"
+                className="text-[11px] underline text-red-300 hover:text-white font-semibold shrink-0 cursor-pointer"
               >
                 Scan Next
               </button>
@@ -691,7 +798,7 @@ export default function QrCheckinScannerModal({
                       <button
                         type="button"
                         onClick={resumeScanning}
-                        className="flex-1 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-2 transition-colors shadow-lg shadow-emerald-950/40"
+                        className="flex-1 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-2 transition-colors shadow-lg shadow-emerald-950/40 cursor-pointer"
                       >
                         Scan Next Pass <ArrowRight size={14} />
                       </button>
@@ -700,7 +807,7 @@ export default function QrCheckinScannerModal({
                         type="button"
                         onClick={handleUndoCheckIn}
                         disabled={undoing}
-                        className="px-3 py-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-300 border border-red-500/25 text-xs font-semibold transition-colors disabled:opacity-50"
+                        className="px-3 py-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-300 border border-red-500/25 text-xs font-semibold transition-colors disabled:opacity-50 cursor-pointer"
                         title="Revert check-in if marked by mistake"
                       >
                         {undoing ? 'Reverting...' : 'Undo Check-in'}
@@ -720,7 +827,7 @@ export default function QrCheckinScannerModal({
                         type="button"
                         onClick={handleApproveCheckIn}
                         disabled={approving}
-                        className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-black font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 transition-all disabled:opacity-50"
+                        className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-black font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 transition-all disabled:opacity-50 cursor-pointer"
                       >
                         {approving ? (
                           <>
@@ -739,7 +846,7 @@ export default function QrCheckinScannerModal({
                         type="button"
                         onClick={resumeScanning}
                         disabled={approving}
-                        className="py-3 px-4 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10 text-xs font-semibold transition-colors"
+                        className="py-3 px-4 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10 text-xs font-semibold transition-colors cursor-pointer"
                       >
                         Cancel / Next
                       </button>
@@ -758,7 +865,7 @@ export default function QrCheckinScannerModal({
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="text-emerald-400 hover:underline flex items-center gap-1 font-medium"
+                  className="text-emerald-400 hover:underline flex items-center gap-1 font-medium cursor-pointer"
                 >
                   <Upload size={12} /> Upload Pass Image
                 </button>
@@ -777,7 +884,7 @@ export default function QrCheckinScannerModal({
                 <button
                   type="submit"
                   disabled={searching || !manualQuery.trim()}
-                  className="px-3.5 py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 text-xs font-bold transition-colors disabled:opacity-50 shrink-0"
+                  className="px-3.5 py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 text-xs font-bold transition-colors disabled:opacity-50 shrink-0 cursor-pointer"
                 >
                   {searching ? 'Finding...' : 'Lookup'}
                 </button>
