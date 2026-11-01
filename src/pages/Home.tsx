@@ -13,10 +13,14 @@ import {
   Star,
   BadgeCheck,
   PartyPopper,
+  Navigation,
+  ExternalLink,
 } from 'lucide-react';
 import Countdown from '../components/Countdown';
 import SplashScreen from '../components/SplashScreen';
 import { useEventSettings } from '../lib/useEventSettings';
+
+const VENUE_MAP_URL = 'https://maps.app.goo.gl/DTi1mudbavWHZzYCA?g_st=aw';
 
 const fadeUp = { hidden: { opacity: 0, y: 28 }, show: { opacity: 1, y: 0 } };
 
@@ -40,9 +44,16 @@ export default function Home() {
   const { settings, loading, error } = useEventSettings();
 
   const quickDetails = useMemo(() => [
-    { icon: Calendar, label: 'Date', value: settings.dateLabel, tone: 'blue' },
-    { icon: Clock, label: 'Time', value: settings.timeLabel, tone: 'olive' },
-    { icon: MapPin, label: 'Venue', value: settings.venue, tone: 'olive' },
+    { icon: Calendar, label: 'Date', value: settings.dateLabel, tone: 'blue' as const },
+    { icon: Clock, label: 'Time', value: settings.timeLabel, tone: 'olive' as const },
+    {
+      icon: MapPin,
+      label: 'Venue',
+      value: settings.venue || 'Institute Campus',
+      tone: 'olive' as const,
+      link: VENUE_MAP_URL,
+      actionText: 'Open in Maps',
+    },
   ], [settings.dateLabel, settings.timeLabel, settings.venue]);
 
   const flow = useMemo(() => settings.flow, [settings.flow]);
@@ -134,17 +145,57 @@ export default function Home() {
       <section className="py-20 px-4 relative z-10 scroll-snap-section">
         <div className="max-w-6xl mx-auto">
           <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {quickDetails.map((item, i) => (
-              <motion.div key={item.label} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} className="flex items-center gap-4 p-6 rounded-2xl bg-[#191e1b]/90 border border-[#303a32] hover:border-blue-500/30 transition-colors backdrop-blur-sm">
-                <div className={`w-12 h-12 min-w-12 min-h-12 aspect-square shrink-0 rounded-xl flex items-center justify-center ${item.tone === 'blue' ? 'bg-blue-500/20 text-blue-400' : 'bg-olive-500/20 text-olive-300'}`}>
-                  <item.icon size={22} className="shrink-0" />
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500 uppercase tracking-wider">{item.label}</p>
-                  <p className="text-white font-semibold">{loading ? 'Loading…' : error ? 'Details unavailable' : (item.value || 'To be announced')}</p>
-                </div>
-              </motion.div>
-            ))}
+            {quickDetails.map((item, i) => {
+              const content = (
+                <>
+                  <div className={`w-12 h-12 min-w-12 min-h-12 aspect-square shrink-0 rounded-xl flex items-center justify-center ${item.tone === 'blue' ? 'bg-blue-500/20 text-blue-400' : 'bg-olive-500/20 text-olive-300'}`}>
+                    <item.icon size={22} className="shrink-0" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs text-gray-500 uppercase tracking-wider">{item.label}</p>
+                    <p className="text-white font-semibold truncate">{loading ? 'Loading…' : error ? 'Details unavailable' : (item.value || 'To be announced')}</p>
+                    {'link' in item && item.link ? (
+                      <span className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-emerald-400 group-hover:text-emerald-300 transition-colors">
+                        <Navigation size={12} className="shrink-0" />
+                        {item.actionText}
+                        <ExternalLink size={11} className="shrink-0 opacity-70" />
+                      </span>
+                    ) : null}
+                  </div>
+                </>
+              );
+
+              if ('link' in item && item.link) {
+                return (
+                  <motion.a
+                    key={item.label}
+                    href={item.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.1 }}
+                    className="group flex items-center gap-4 p-6 rounded-2xl bg-[#191e1b]/90 border border-[#303a32] hover:border-emerald-500/40 hover:bg-[#1f2622] transition-all backdrop-blur-sm shadow-md"
+                  >
+                    {content}
+                  </motion.a>
+                );
+              }
+
+              return (
+                <motion.div
+                  key={item.label}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  className="flex items-center gap-4 p-6 rounded-2xl bg-[#191e1b]/90 border border-[#303a32] hover:border-blue-500/30 transition-colors backdrop-blur-sm"
+                >
+                  {content}
+                </motion.div>
+              );
+            })}
           </motion.div>
         </div>
       </section>
@@ -184,6 +235,111 @@ export default function Home() {
               <p className="text-xl font-bold text-white">{settings.dressCodeFemale}</p>
             </motion.div>
           </div>
+        </div>
+      </section>
+
+      {/* Venue & Location Section */}
+      <section className="py-16 px-4 relative z-10 scroll-snap-section">
+        <div className="max-w-6xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="relative overflow-hidden rounded-3xl border border-emerald-500/20 bg-gradient-to-br from-[#191e1b] via-[#141916] to-[#1a221d] p-7 sm:p-10 shadow-2xl backdrop-blur-md"
+          >
+            {/* Ambient Glows */}
+            <div className="absolute -top-24 -right-24 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-24 -left-24 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+              <div className="lg:col-span-7 space-y-5">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 text-xs font-semibold uppercase tracking-wider">
+                  <MapPin size={13} className="shrink-0 text-emerald-400" />
+                  Event Venue & Navigation
+                </div>
+
+                <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+                  Reach the Celebration Venue
+                </h2>
+
+                <p className="text-gray-300 text-base leading-relaxed">
+                  Join us at the official venue for Ignite 2.O. Find your way effortlessly using Google Maps navigation with real-time route directions and live traffic updates.
+                </p>
+
+                <div className="p-4 rounded-2xl border border-white/10 bg-black/30 backdrop-blur-sm flex items-start gap-3.5">
+                  <div className="w-11 h-11 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+                    <MapPin size={22} />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs text-gray-400 uppercase tracking-wider font-medium">Venue Location</p>
+                    <p className="text-white font-bold text-lg sm:text-xl">
+                      {settings.venue || 'Institute Campus Grounds'}
+                    </p>
+                    <p className="text-xs text-emerald-400/90 mt-1 flex items-center gap-1.5 font-medium">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse inline-block" />
+                      Live Location Pin Ready • Tap below to start navigation
+                    </p>
+                  </div>
+                </div>
+
+                <div className="pt-2 flex flex-wrap gap-3.5">
+                  <a
+                    href={VENUE_MAP_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-bold text-base hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-emerald-500/20 group"
+                  >
+                    <Navigation size={18} className="group-hover:rotate-12 transition-transform" />
+                    <span>Open in Google Maps</span>
+                    <ExternalLink size={15} className="opacity-80" />
+                  </a>
+
+                  <a
+                    href={VENUE_MAP_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl border border-white/20 bg-white/5 hover:bg-white/10 text-white font-semibold text-sm transition-all"
+                  >
+                    <span>Get Directions</span>
+                    <ArrowRight size={16} />
+                  </a>
+                </div>
+              </div>
+
+              {/* Visual Map / Location Preview Card */}
+              <div className="lg:col-span-5">
+                <a
+                  href={VENUE_MAP_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group block relative overflow-hidden rounded-2xl border border-emerald-500/30 bg-gradient-to-b from-[#1b231e] to-[#121714] p-6 hover:border-emerald-400 transition-all shadow-xl hover:shadow-emerald-500/15"
+                >
+                  <div className="aspect-[4/3] w-full rounded-xl bg-black/40 border border-white/10 relative flex flex-col items-center justify-center text-center p-6 overflow-hidden">
+                    <div className="absolute inset-0 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:16px_16px] opacity-20" />
+                    <div className="absolute -inset-4 bg-gradient-to-t from-[#121714] via-transparent to-transparent pointer-events-none" />
+
+                    <div className="relative z-10 flex flex-col items-center">
+                      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 p-0.5 shadow-lg shadow-emerald-500/30 mb-3 group-hover:scale-110 transition-transform">
+                        <div className="w-full h-full rounded-[14px] bg-[#111411] flex items-center justify-center text-emerald-400">
+                          <MapPin size={28} className="group-hover:-translate-y-1 transition-transform" />
+                        </div>
+                      </div>
+                      <p className="text-white font-bold text-base group-hover:text-emerald-300 transition-colors">
+                        Tap to View Venue Map
+                      </p>
+                      <p className="text-xs text-gray-400 mt-1 max-w-[220px]">
+                        Opens directly in Google Maps app for seamless driving and walking directions
+                      </p>
+                      <span className="mt-4 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-semibold group-hover:bg-emerald-500 group-hover:text-white transition-all">
+                        <Navigation size={12} />
+                        Start GPS Navigation
+                      </span>
+                    </div>
+                  </div>
+                </a>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </section>
 
