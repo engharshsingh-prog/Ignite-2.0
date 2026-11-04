@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Crown, Trophy, Star, Sparkles, Mic2, Laugh, Shirt } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import LoadingSpinner from '../components/LoadingSpinner';
+import WinnerAvatar from '../components/WinnerAvatar';
 import { readJsonSafe } from '../lib/http';
 
 interface Winner {
@@ -129,14 +130,15 @@ export default function HallOfFame() {
                         <div className={`inline-block px-4 py-1.5 rounded-full text-sm font-bold mb-4 bg-gradient-to-r ${AWARD_COLORS[winner.award_title] || 'from-blue-500 to-olive-500'} text-white`}>
                           {winner.award_title}
                         </div>
-                        {winner.image_url ? (
-                          <img src={winner.image_url} alt={winner.name}
-                            className="w-32 h-32 rounded-full object-cover mx-auto mb-4 border-4 border-olive-400/30" />
-                        ) : (
-                          <div className="w-32 h-32 rounded-full bg-gradient-to-br from-[#3b82f6] to-[#718044] flex items-center justify-center mx-auto mb-4 text-4xl font-black">
-                            {winner.name.charAt(0)}
-                          </div>
-                        )}
+                        <div className="flex justify-center mb-4">
+                          <WinnerAvatar
+                            src={winner.image_url}
+                            name={winner.name}
+                            className="w-32 h-32 rounded-full object-cover border-4 border-olive-400/30 shadow-lg shadow-olive-500/10"
+                            fallbackClassName="w-32 h-32 rounded-full bg-gradient-to-br from-[#3b82f6] to-[#718044] flex items-center justify-center text-4xl font-black text-white border-4 border-olive-400/30"
+                            textSize="text-4xl"
+                          />
+                        </div>
                         <h2 className="text-2xl font-black text-white mb-1">{winner.name}</h2>
                         <p className="text-gray-400 text-sm mb-3">{winner.roll_no} &bull; {winner.branch}</p>
                         {winner.description && <p className="text-gray-300 text-sm leading-relaxed">{winner.description}</p>}
@@ -158,13 +160,13 @@ export default function HallOfFame() {
                         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 + i * 0.1 }}
                         className="bg-[#191e1b]/90 border border-[#303a32] rounded-2xl p-6 hover:border-blue-500/40 transition-all hover:-translate-y-1">
                         <div className="flex items-center gap-4 mb-4">
-                          {winner.image_url ? (
-                            <img src={winner.image_url} alt={winner.name} className="w-16 h-16 rounded-full object-cover border-2 border-blue-500/30" />
-                          ) : (
-                            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#3b82f6] to-[#718044] flex items-center justify-center text-2xl font-black">
-                              {winner.name.charAt(0)}
-                            </div>
-                          )}
+                          <WinnerAvatar
+                            src={winner.image_url}
+                            name={winner.name}
+                            className="w-16 h-16 rounded-full object-cover border-2 border-blue-500/30 shrink-0"
+                            fallbackClassName="w-16 h-16 rounded-full bg-gradient-to-br from-[#3b82f6] to-[#718044] flex items-center justify-center text-2xl font-black text-white border-2 border-blue-500/30 shrink-0"
+                            textSize="text-2xl"
+                          />
                           <div>
                             <h3 className="font-bold text-white">{winner.name}</h3>
                             <p className="text-gray-400 text-xs">{winner.roll_no} &bull; {winner.branch}</p>
