@@ -27,3 +27,4 @@ export function normalizeImageUrl(rawUrl: string | null | undefined): string {
 
   return value;
 }
+
