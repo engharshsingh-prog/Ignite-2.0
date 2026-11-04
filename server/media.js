@@ -41,7 +41,7 @@ function inferDriveMediaType(name, fallback = 'image') {
 
 function driveMediaUrls(fileId) {
   return {
-    url: `https://drive.google.com/uc?export=download&id=${fileId}`,
+    url: `https://lh3.googleusercontent.com/d/${fileId}`,
     thumb_url: `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`,
   };
 }
@@ -51,27 +51,47 @@ async function resolvePublicDriveFolderMedia(folderId, fallbackType) {
     redirect: 'follow',
   });
   if (!response.ok) {
-    throw new Error(`Unable to read Drive folder (HTTP ${response.status})`);
+    throw new Error(`Unable to read Drive folder (HTTP ${response.status}). Ensure the folder sharing setting is 'Anyone with the link can view'.`);
   }
 
   const html = await response.text();
   const byId = new Map();
 
-  const anchorRegex = /href="\/file\/d\/([a-zA-Z0-9_-]+)\/view[^"]*"[^>]*>([^<]*)</g;
-  let match = anchorRegex.exec(html);
+  // Pattern 1: match entry div and title from Google's grid layout
+  const entryRegex = /id="entry-([a-zA-Z0-9_-]+)"[\s\S]*?<div class="flip-entry-title">([^<]*)<\/div>/g;
+  let match = entryRegex.exec(html);
   while (match) {
     const id = match[1];
     const name = (match[2] || '').trim();
-    if (!byId.has(id)) byId.set(id, { id, name, type: inferDriveMediaType(name, fallbackType) });
-    match = anchorRegex.exec(html);
+    if (!byId.has(id)) {
+      byId.set(id, { id, name, type: inferDriveMediaType(name, fallbackType) });
+    }
+    match = entryRegex.exec(html);
   }
 
+  // Pattern 2: match anchor tags with /file/d/
   if (byId.size === 0) {
-    const fallbackRegex = /\/file\/d\/([a-zA-Z0-9_-]+)\/view/g;
+    const anchorRegex = /href="[^"]*\/file\/d\/([a-zA-Z0-9_-]+)[^"]*"[^>]*>([^<]*)</g;
+    let aMatch = anchorRegex.exec(html);
+    while (aMatch) {
+      const id = aMatch[1];
+      const name = (aMatch[2] || '').trim();
+      if (!byId.has(id)) {
+        byId.set(id, { id, name, type: inferDriveMediaType(name, fallbackType) });
+      }
+      aMatch = anchorRegex.exec(html);
+    }
+  }
+
+  // Pattern 3: fallback for any file/d pattern in the page
+  if (byId.size === 0) {
+    const fallbackRegex = /\/file\/d\/([a-zA-Z0-9_-]+)/g;
     let fallback = fallbackRegex.exec(html);
     while (fallback) {
       const id = fallback[1];
-      if (!byId.has(id)) byId.set(id, { id, name: '', type: fallbackType });
+      if (!byId.has(id)) {
+        byId.set(id, { id, name: '', type: fallbackType });
+      }
       fallback = fallbackRegex.exec(html);
     }
   }
@@ -164,9 +184,18 @@ export default async function handler(req, res) {
       if (driveInputLinks.length > 0) {
         if (!admin) return res.status(403).json({ error: 'Admin access required for Drive imports' });
 
-        const imported = [];
+        let totalImported = 0;
         let totalResolved = 0;
         const failedLinks = [];
+
+        // Pre-fetch existing media URLs to avoid duplicate inserts
+        let existingUrlSet = new Set();
+        try {
+          const existingRows = await db.prepare('SELECT url FROM media').all();
+          existingUrlSet = new Set((existingRows || []).map((r) => r.url));
+        } catch (e) {
+          console.warn('[media] Could not check existing media URLs:', e.message);
+        }
 
         for (const link of driveInputLinks) {
           try {
@@ -186,30 +215,75 @@ export default async function handler(req, res) {
             const mediaEntries = entries.filter((entry) => entry.type === 'image' || entry.type === 'video');
             totalResolved += mediaEntries.length;
 
-            for (const entry of mediaEntries) {
+            if (mediaEntries.length === 0) {
+              failedLinks.push({ link, error: 'No media items found in the specified Google Drive link' });
+              continue;
+            }
+
+            // Filter out items already in the database
+            const newEntries = mediaEntries.filter((entry) => {
               const urls = driveMediaUrls(entry.id);
-              const row = await insertMediaRecord({
-                mediaUrl: urls.url,
-                thumbUrl: urls.thumb_url,
-                caption: caption || entry.name || '',
-                type: entry.type,
-                category,
-                status: 'approved',
-                uploadedBy: admin.email,
-              });
-              imported.push(row);
+              return !existingUrlSet.has(urls.url);
+            });
+
+            // Fast batch insert in chunks of 50 statements
+            const CHUNK_SIZE = 50;
+            for (let i = 0; i < newEntries.length; i += CHUNK_SIZE) {
+              const chunk = newEntries.slice(i, i + CHUNK_SIZE);
+              const placeholders = chunk.map(() => '(?, ?, ?, ?, ?, ?, ?)').join(', ');
+              const sql = `INSERT INTO media (url, thumb_url, caption, type, category, status, uploaded_by) VALUES ${placeholders}`;
+              const params = [];
+              for (const entry of chunk) {
+                const urls = driveMediaUrls(entry.id);
+                existingUrlSet.add(urls.url);
+                params.push(
+                  urls.url,
+                  urls.thumb_url,
+                  caption || entry.name || '',
+                  entry.type,
+                  category,
+                  'approved',
+                  admin.email
+                );
+              }
+              await db.prepare(sql).run(...params);
+              totalImported += chunk.length;
+            }
+
+            // Include already existing count in reported imported
+            const alreadyExisting = mediaEntries.length - newEntries.length;
+            if (alreadyExisting > 0) {
+              totalImported += alreadyExisting;
             }
           } catch (error) {
+            console.error('[media] Drive import error:', error);
             failedLinks.push({ link, error: error?.message || 'Failed to import link' });
+          }
+        }
+
+        if (totalImported > 0) {
+          try {
+            await writeActivity({
+              entity_type: 'media',
+              entity_id: 0,
+              action: 'media_added_by_admin',
+              actor_email: admin.email,
+              details: {
+                batch_count: totalImported,
+                category,
+                type,
+              },
+            });
+          } catch (err) {
+            console.error('[media] Activity log failed:', err);
           }
         }
 
         return res.status(201).json({
           ok: true,
-          imported: imported.length,
+          imported: totalImported,
           resolved: totalResolved,
           failed_links: failedLinks,
-          rows: imported,
         });
       }
 

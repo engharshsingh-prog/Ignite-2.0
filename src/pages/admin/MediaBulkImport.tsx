@@ -8,21 +8,26 @@ type UploadResponse = {
   imported?: number;
   resolved?: number;
   failed_links?: Array<{ link: string; error: string }>;
+  error?: string;
 };
 
-async function uploadMedia(payload: Record<string, unknown>): Promise<{ ok: boolean; data: UploadResponse | null }> {
-  const res = await fetch('/api/media', {
-    method: 'POST',
-    headers: authHeaders(),
-    body: JSON.stringify(payload),
-  });
-  let data: UploadResponse | null = null;
+async function uploadMedia(payload: Record<string, unknown>): Promise<{ ok: boolean; status: number; data: UploadResponse | null }> {
   try {
-    data = await res.json();
-  } catch {
-    data = null;
+    const res = await fetch('/api/media', {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify(payload),
+    });
+    let data: UploadResponse | null = null;
+    try {
+      data = await res.json();
+    } catch {
+      data = null;
+    }
+    return { ok: res.ok, status: res.status, data };
+  } catch (err: any) {
+    return { ok: false, status: 0, data: { error: err?.message || 'Network request failed' } };
   }
-  return { ok: res.ok, data };
 }
 
 export default function MediaBulkImport() {
@@ -93,11 +98,12 @@ export default function MediaBulkImport() {
     let importedMedia = 0;
     let resolvedMedia = 0;
     let failedLinks = 0;
+    const failureMessages: string[] = [];
 
     for (let index = 0; index < lines.length; index += 1) {
       const link = lines[index];
-      setDriveResult(`Importing ${Math.max(importedMedia, 0)}/${Math.max(resolvedMedia, 1)} media...`);
-      const { ok, data } = await uploadMedia({
+      setDriveResult(`Importing media from link ${index + 1}/${lines.length}...`);
+      const { ok, status, data } = await uploadMedia({
         type: driveType,
         category: driveCategory,
         caption: driveCaption,
@@ -106,20 +112,28 @@ export default function MediaBulkImport() {
 
       if (!ok) {
         failedLinks += 1;
+        const errMsg = data?.error || (status === 504 ? 'Execution timed out (Vercel limit)' : `HTTP error ${status}`);
+        failureMessages.push(`Link ${index + 1}: ${errMsg}`);
         continue;
       }
 
       importedMedia += Number(data?.imported || 0);
       resolvedMedia += Number(data?.resolved || 0);
-      failedLinks += Array.isArray(data?.failed_links) ? data!.failed_links!.length : 0;
-      setDriveResult(`Importing ${importedMedia}/${Math.max(resolvedMedia, importedMedia, 1)} media...`);
+      if (Array.isArray(data?.failed_links) && data.failed_links.length > 0) {
+        failedLinks += data.failed_links.length;
+        data.failed_links.forEach(f => failureMessages.push(f.error || 'Failed to import'));
+      }
+      setDriveResult(`Imported ${importedMedia}/${Math.max(resolvedMedia, importedMedia, 1)} media...`);
     }
 
     setDriveLoading(false);
-    setDriveResult(
-      `Imported ${importedMedia}/${Math.max(resolvedMedia, importedMedia)} Google Drive media` +
-      `${failedLinks ? ` (${failedLinks} link${failedLinks > 1 ? 's' : ''} failed)` : ''}.`
-    );
+    let resultMsg = `Imported ${importedMedia}/${Math.max(resolvedMedia, importedMedia)} Google Drive media`;
+    if (failedLinks > 0) {
+      resultMsg += ` (${failedLinks} link${failedLinks > 1 ? 's' : ''} failed: ${failureMessages.slice(0, 2).join('; ')})`;
+    } else {
+      resultMsg += ' successfully.';
+    }
+    setDriveResult(resultMsg);
   };
 
   return (
