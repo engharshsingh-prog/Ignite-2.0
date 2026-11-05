@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   X,
@@ -13,7 +12,6 @@ import {
   Sparkles,
   Trophy,
   ArrowRight,
-  Upload,
 } from 'lucide-react';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { readJsonSafe } from '../lib/http';
@@ -241,21 +239,14 @@ export default function Gallery() {
                       <Video size={22} />
                     </div>
                     <div>
-                      <h2 className="text-xl font-bold text-white">Videos & Reels Slot</h2>
+                      <h2 className="text-xl font-bold text-white">Video Showcase Slot</h2>
                       <p className="text-xs text-gray-400">
                         {media.length > 0
-                          ? `Showing ${media.length} official event videos & clips.`
+                          ? `Showing ${media.length} official event videos & highlights.`
                           : 'Official video highlights, stage shows, and event reels.'}
                       </p>
                     </div>
                   </div>
-
-                  <Link
-                    to="/admin/media-import"
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-500/20 border border-blue-500/40 text-blue-300 text-xs font-semibold hover:bg-blue-500/30 transition-colors"
-                  >
-                    <Upload size={14} /> Add Video
-                  </Link>
                 </div>
 
                 {media.length === 0 ? (
@@ -265,21 +256,15 @@ export default function Gallery() {
                     </div>
                     <h3 className="text-2xl font-bold text-white mb-2">No Videos in the Slot Yet</h3>
                     <p className="text-gray-400 text-sm max-w-md mx-auto mb-6">
-                      Event highlights, stage showdowns, afterparties, and drone footage will be showcased right here!
+                      Event highlights, stage showdowns, afterparties, and drone footage will appear in this slot soon.
                     </p>
-                    <div className="flex justify-center gap-3">
+                    <div className="flex justify-center">
                       <button
                         onClick={() => setFilter('all')}
-                        className="px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white text-sm font-semibold transition-colors"
+                        className="px-6 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white text-sm font-semibold transition-colors"
                       >
-                        View All Photos & Media
+                        Browse All Media
                       </button>
-                      <Link
-                        to="/admin/media-import"
-                        className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-emerald-600 text-white text-sm font-semibold hover:opacity-90 transition-opacity"
-                      >
-                        Upload Video
-                      </Link>
                     </div>
                   </div>
                 ) : (
