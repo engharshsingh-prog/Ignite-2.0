@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Image, Filter, Download, Share2 } from 'lucide-react';
+import { X, Image, Filter, Download, Share2, Play } from 'lucide-react';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { readJsonSafe } from '../lib/http';
 import { normalizeImageUrl, getVideoEmbedInfo } from '../lib/imageUrl';
@@ -45,10 +45,14 @@ export default function Gallery() {
 
   const handleDownload = () => {
     if (!lightbox) return;
-    const extension = lightbox.type === 'video' ? 'mp4' : 'jpg';
+    const { isDrive, downloadUrl } = lightbox.type === 'video'
+      ? getVideoEmbedInfo(lightbox.url)
+      : { isDrive: false, downloadUrl: lightbox.url };
+
+    const extension = lightbox.type === 'video' ? 'mov' : 'jpg';
     const a = document.createElement('a');
-    a.href = lightbox.url;
-    a.download = `ignite26-media-${lightbox.id}.${extension}`;
+    a.href = isDrive ? downloadUrl : lightbox.url;
+    a.download = lightbox.caption || `ignite26-media-${lightbox.id}.${extension}`;
     a.target = '_blank';
     document.body.appendChild(a);
     a.click();
@@ -128,14 +132,19 @@ export default function Gallery() {
                 onClick={() => setLightbox(item)}
               >
                 {item.type === 'video' ? (
-                  <div className="relative">
+                  <div className="relative aspect-video bg-[#121613]">
                     <img
                       src={normalizeImageUrl(item.thumb_url || item.url)}
                       alt={item.caption || 'Video preview'}
-                      className="w-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                    <div className="absolute top-3 left-3 px-2 py-1 rounded-full bg-black/65 text-white text-xs">
+                    <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-black/75 backdrop-blur-md border border-white/15 text-white text-xs font-semibold flex items-center gap-1.5 shadow">
                       Video
+                    </div>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-12 h-12 rounded-full bg-blue-600/90 backdrop-blur-sm border border-white/40 flex items-center justify-center text-white shadow-lg group-hover:scale-115 transition-transform">
+                        <Play size={20} className="fill-white translate-x-0.5" />
+                      </div>
                     </div>
                   </div>
                 ) : (
@@ -187,13 +196,15 @@ export default function Gallery() {
                   const { isDrive, embedUrl } = getVideoEmbedInfo(lightbox.url);
                   if (isDrive) {
                     return (
-                      <iframe
-                        src={embedUrl}
-                        className="w-[85vw] max-w-4xl aspect-video rounded-2xl border-0"
-                        allow="autoplay; encrypted-media; fullscreen"
-                        allowFullScreen
-                        title={lightbox.caption || 'Video'}
-                      />
+                      <div className="relative w-[90vw] max-w-4xl aspect-video rounded-2xl overflow-hidden bg-black shadow-2xl border border-white/20">
+                        <iframe
+                          src={embedUrl}
+                          className="w-full h-full border-0"
+                          allow="autoplay; fullscreen"
+                          allowFullScreen
+                          title={lightbox.caption || 'Video Player'}
+                        />
+                      </div>
                     );
                   }
                   return (
@@ -202,7 +213,8 @@ export default function Gallery() {
                       poster={normalizeImageUrl(lightbox.thumb_url) || undefined}
                       controls
                       autoPlay
-                      className="max-h-[80vh] rounded-2xl object-contain"
+                      playsInline
+                      className="max-h-[80vh] w-full max-w-4xl rounded-2xl object-contain bg-black shadow-2xl"
                     />
                   );
                 })()

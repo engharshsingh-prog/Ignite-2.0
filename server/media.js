@@ -39,7 +39,13 @@ function inferDriveMediaType(name, fallback = 'image') {
   return fallback;
 }
 
-function driveMediaUrls(fileId) {
+function driveMediaUrls(fileId, type = 'image') {
+  if (type === 'video') {
+    return {
+      url: `https://drive.google.com/file/d/${fileId}/view`,
+      thumb_url: `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`,
+    };
+  }
   return {
     url: `https://lh3.googleusercontent.com/d/${fileId}`,
     thumb_url: `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`,
@@ -227,7 +233,7 @@ export default async function handler(req, res) {
 
             // Filter out items already in the database
             const newEntries = mediaEntries.filter((entry) => {
-              const urls = driveMediaUrls(entry.id);
+              const urls = driveMediaUrls(entry.id, entry.type);
               return !existingUrlSet.has(urls.url);
             });
 
@@ -239,7 +245,7 @@ export default async function handler(req, res) {
               const sql = `INSERT INTO media (url, thumb_url, caption, type, category, status, uploaded_by) VALUES ${placeholders}`;
               const params = [];
               for (const entry of chunk) {
-                const urls = driveMediaUrls(entry.id);
+                const urls = driveMediaUrls(entry.id, entry.type);
                 existingUrlSet.add(urls.url);
                 params.push(
                   urls.url,
