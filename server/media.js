@@ -128,13 +128,18 @@ export default async function handler(req, res) {
   try {
     if (req.method === 'GET') {
       const admin = await getAdminFromRequest(req);
-      const { category, status } = req.query;
+      const { category, status, type } = req.query;
       const params = [];
       let where = '1=1';
 
       if (category && category !== 'all') {
         where += ' AND category = ?';
         params.push(category);
+      }
+
+      if (type && type !== 'all') {
+        where += ' AND type = ?';
+        params.push(type);
       }
 
       if (admin) {
