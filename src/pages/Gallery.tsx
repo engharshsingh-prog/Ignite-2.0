@@ -86,87 +86,95 @@ export default function Gallery() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#111411] grid-bg text-white pt-20 pb-16">
+    <div className="min-h-screen text-white pt-24 pb-16">
       <div className="max-w-7xl mx-auto px-4">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">
-          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/20 text-blue-300 text-sm font-medium mb-4">
-            <Image size={14} /> Media Hub
+          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full liquid-glass-pill text-cyan-200 text-sm font-medium mb-4">
+            <Image size={14} className="text-cyan-300" /> Media Hub
           </span>
-          <h1 className="text-4xl sm:text-5xl font-black mb-3">Gallery</h1>
-          <p className="text-gray-400">Relive the magic of Ignite 2.O</p>
+          <h1 className="text-4xl sm:text-5xl font-black mb-3 bg-gradient-to-r from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent">
+            Gallery
+          </h1>
+          <p className="text-slate-300">Relive the magic of Ignite 2.O</p>
         </motion.div>
 
-        <div className="flex items-center justify-center gap-3 mb-10">
-          <Filter size={16} className="text-gray-500" />
-          {filters.map((f) => (
-            <button
-              key={f.value}
-              onClick={() => setFilter(f.value)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                filter === f.value
-                  ? 'bg-[#3b82f6] text-white'
-                  : 'bg-white/5 text-gray-400 hover:bg-white/10'
-              }`}
-            >
-              {f.label}
-            </button>
-          ))}
+        <div className="flex flex-wrap items-center justify-center gap-3 mb-10">
+          <div className="inline-flex flex-wrap items-center justify-center gap-2 p-1.5 rounded-2xl liquid-glass">
+            <Filter size={15} className="text-cyan-300 ml-2 mr-1" />
+            {filters.map((f) => (
+              <button
+                key={f.value}
+                onClick={() => setFilter(f.value)}
+                className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+                  filter === f.value
+                    ? 'liquid-btn-primary text-white'
+                    : 'text-slate-300 hover:text-white hover:bg-white/[0.08]'
+                }`}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         {loading ? (
           <LoadingSpinner text="Loading gallery..." />
         ) : media.length === 0 ? (
-          <div className="text-center py-20">
-            <Image size={48} className="mx-auto text-gray-700 mb-4" />
-            <p className="text-gray-500">No media uploaded yet. Check back after the event!</p>
+          <div className="text-center py-20 rounded-3xl liquid-glass max-w-lg mx-auto px-6">
+            <div className="w-16 h-16 rounded-2xl liquid-icon-bubble mx-auto mb-4 flex items-center justify-center text-cyan-300">
+              <Image size={32} />
+            </div>
+            <p className="text-slate-300">No media uploaded yet. Check back after the event!</p>
           </div>
         ) : (
-          <motion.div layout className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4">
+          <motion.div layout className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-5">
             {media.map((item, i) => (
               <motion.div
                 key={item.id}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: i * 0.05 }}
-                className="break-inside-avoid mb-4 group cursor-pointer relative overflow-hidden rounded-2xl"
+                transition={{ delay: Math.min(i * 0.04, 0.4) }}
+                className="break-inside-avoid mb-5 group cursor-pointer relative overflow-hidden rounded-3xl liquid-glass-card p-1.5"
                 onClick={() => setLightbox(item)}
               >
-                {item.type === 'video' ? (
-                  <div className="relative aspect-video bg-[#121613]">
-                    <img
-                      src={normalizeImageUrl(item.thumb_url || item.url)}
-                      alt={item.caption || 'Video preview'}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-black/75 backdrop-blur-md border border-white/15 text-white text-xs font-semibold flex items-center gap-1.5 shadow">
-                      Video
-                    </div>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-12 h-12 rounded-full bg-blue-600/90 backdrop-blur-sm border border-white/40 flex items-center justify-center text-white shadow-lg group-hover:scale-115 transition-transform">
-                        <Play size={20} className="fill-white translate-x-0.5" />
+                <div className="relative overflow-hidden rounded-2xl">
+                  {item.type === 'video' ? (
+                    <div className="relative aspect-video bg-[#071124]">
+                      <img
+                        src={normalizeImageUrl(item.thumb_url || item.url)}
+                        alt={item.caption || 'Video preview'}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full liquid-glass-strong text-cyan-100 text-xs font-semibold flex items-center gap-1.5">
+                        Video
+                      </div>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="w-13 h-13 rounded-full liquid-icon-bubble flex items-center justify-center text-white shadow-lg group-hover:scale-115 transition-transform">
+                          <Play size={20} className="fill-white translate-x-0.5" />
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ) : (
-                  <img
-                    src={normalizeImageUrl(item.thumb_url || item.url)}
-                    alt={item.caption}
-                    className="w-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    loading="lazy"
-                  />
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-                  <div className="absolute bottom-0 left-0 right-0 p-4">
-                    <p className="text-white text-sm font-medium">{item.caption}</p>
-                    <span
-                      className={`text-xs px-2 py-0.5 rounded-full mt-1 inline-block ${
-                        item.category === 'winner'
-                          ? 'bg-olive-500/30 text-olive-300'
-                          : 'bg-blue-500/30 text-blue-300'
-                      }`}
-                    >
-                      {item.category}
-                    </span>
+                  ) : (
+                    <img
+                      src={normalizeImageUrl(item.thumb_url || item.url)}
+                      alt={item.caption}
+                      className="w-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      loading="lazy"
+                    />
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#040814]/85 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="absolute bottom-0 left-0 right-0 p-4">
+                      <p className="text-white text-sm font-medium">{item.caption}</p>
+                      <span
+                        className={`text-xs px-2.5 py-0.5 rounded-full mt-1.5 inline-block border ${
+                          item.category === 'winner'
+                            ? 'bg-violet-500/30 border-violet-300/40 text-violet-200'
+                            : 'bg-cyan-500/25 border-cyan-300/40 text-cyan-200'
+                        }`}
+                      >
+                        {item.category}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </motion.div>
@@ -181,14 +189,14 @@ export default function Gallery() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4"
+            className="fixed inset-0 z-50 bg-[#040814]/85 backdrop-blur-xl flex items-center justify-center p-4"
             onClick={() => setLightbox(null)}
           >
             <motion.div
-              initial={{ scale: 0.9 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.9 }}
-              className="relative max-w-4xl max-h-[85vh]"
+              initial={{ scale: 0.92, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.92, opacity: 0 }}
+              className="relative max-w-4xl max-h-[85vh] p-2 rounded-3xl liquid-glass-strong"
               onClick={(e) => e.stopPropagation()}
             >
               {lightbox.type === 'video' ? (
@@ -196,7 +204,7 @@ export default function Gallery() {
                   const { isDrive, embedUrl } = getVideoEmbedInfo(lightbox.url);
                   if (isDrive) {
                     return (
-                      <div className="relative w-[90vw] max-w-4xl aspect-video rounded-2xl overflow-hidden bg-black shadow-2xl border border-white/20">
+                      <div className="relative w-[88vw] max-w-4xl aspect-video rounded-2xl overflow-hidden bg-black shadow-2xl border border-cyan-300/25">
                         <iframe
                           src={embedUrl}
                           className="w-full h-full border-0"
@@ -225,36 +233,36 @@ export default function Gallery() {
                   className="max-h-[80vh] rounded-2xl object-contain"
                 />
               )}
-              <div className="absolute top-3 right-3 flex items-center gap-2">
+              <div className="absolute top-4 right-4 flex items-center gap-2 z-20">
                 <button
                   onClick={handleDownload}
-                  className="w-9 h-9 rounded-full bg-black/50 flex items-center justify-center text-white hover:bg-black/70"
+                  className="w-9 h-9 rounded-full liquid-icon-bubble flex items-center justify-center text-white"
                   title="Download media"
                 >
                   <Download size={16} />
                 </button>
                 <button
                   onClick={handleShare}
-                  className="w-9 h-9 rounded-full bg-black/50 flex items-center justify-center text-white hover:bg-black/70"
+                  className="w-9 h-9 rounded-full liquid-icon-bubble flex items-center justify-center text-white"
                   title="Share media"
                 >
                   <Share2 size={16} />
                 </button>
                 <button
                   onClick={() => setLightbox(null)}
-                  className="w-9 h-9 rounded-full bg-black/50 flex items-center justify-center text-white hover:bg-black/70"
+                  className="w-9 h-9 rounded-full liquid-icon-bubble flex items-center justify-center text-white"
                   title="Close"
                 >
                   <X size={18} />
                 </button>
               </div>
               {actionMessage && (
-                <div className="absolute top-3 left-3 px-3 py-1.5 rounded-lg bg-black/65 text-white text-xs">
+                <div className="absolute top-4 left-4 px-3 py-1.5 rounded-xl liquid-glass-strong text-cyan-200 text-xs z-20">
                   {actionMessage}
                 </div>
               )}
               {lightbox.caption && (
-                <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 rounded-b-2xl">
+                <div className="absolute bottom-2 left-2 right-2 p-4 bg-gradient-to-t from-[#040814]/90 to-transparent rounded-b-2xl pointer-events-none">
                   <p className="text-white font-medium">{lightbox.caption}</p>
                 </div>
               )}

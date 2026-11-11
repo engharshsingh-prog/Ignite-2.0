@@ -31,7 +31,7 @@ export default function AdminGuard({
 
   if (status === 'loading') {
     return (
-      <div className="min-h-screen bg-[#171b18] flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <LoadingSpinner text="Verifying authorization..." />
       </div>
     );

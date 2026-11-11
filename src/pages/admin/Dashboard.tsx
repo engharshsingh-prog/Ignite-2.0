@@ -1046,22 +1046,22 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0e120f] grid-bg text-white pt-20 pb-20 selection:bg-emerald-500/30 selection:text-emerald-200">
+    <div className="min-h-screen text-white pt-24 pb-20 selection:bg-cyan-500/30 selection:text-cyan-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
 
         {/* ============================================================== */}
         {/* EXECUTIVE V2 TOPBAR & COMMAND HEADER                          */}
         {/* ============================================================== */}
-        <header className="mb-8 p-5 sm:p-6 rounded-3xl bg-gradient-to-b from-[#19201b]/95 via-[#151a17]/90 to-[#121613]/95 border border-[#2d382f]/80 shadow-2xl backdrop-blur-xl relative overflow-hidden">
+        <header className="mb-8 p-5 sm:p-6 rounded-3xl liquid-glass-strong relative overflow-hidden">
           {/* Subtle Ambient Radial Glow */}
-          <div className="absolute top-0 right-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none -translate-y-1/2" />
-          <div className="absolute top-1/2 right-0 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute top-0 right-1/4 w-96 h-96 bg-cyan-500/12 rounded-full blur-3xl pointer-events-none -translate-y-1/2" />
+          <div className="absolute top-1/2 right-0 w-64 h-64 bg-violet-500/10 rounded-full blur-3xl pointer-events-none" />
 
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5 relative z-10">
             {/* Title & Status Badges */}
             <div>
               <div className="flex items-center gap-3 flex-wrap">
-                <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-blue-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-inner">
+                <div className="liquid-icon-bubble !w-10 !h-10 !rounded-2xl text-cyan-300">
                   <ShieldCheck size={22} />
                 </div>
                 <div>
@@ -1069,11 +1069,11 @@ export default function AdminDashboard() {
                     <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white flex items-center gap-2">
                       Admin Command Center
                     </h1>
-                    <span className="px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-cyan-500/20 text-cyan-200 border border-cyan-400/35 backdrop-blur-md">
                       UI V2
                     </span>
                   </div>
-                  <p className="text-xs sm:text-sm text-gray-400 mt-0.5 flex items-center gap-2 flex-wrap">
+                  <p className="text-xs sm:text-sm text-slate-400 mt-0.5 flex items-center gap-2 flex-wrap">
                     <span>Ignite 2.O • Live Operations & Registration Hub</span>
                   </p>
                 </div>
@@ -1081,20 +1081,20 @@ export default function AdminDashboard() {
 
               {/* Live Status Indicators */}
               <div className="mt-3.5 flex items-center gap-2.5 flex-wrap text-xs">
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-400/30 font-medium backdrop-blur-md">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                   Live Sync Online
                 </span>
 
                 {currentUser && (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/5 text-gray-300 border border-white/10 font-medium">
-                    <Crown size={12} className={currentUser.role === 'super_admin' ? 'text-amber-400' : 'text-blue-400'} />
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.06] text-slate-200 border border-white/15 font-medium backdrop-blur-md">
+                    <Crown size={12} className={currentUser.role === 'super_admin' ? 'text-amber-400' : 'text-cyan-400'} />
                     {currentUser.role === 'super_admin' ? 'Super Admin' : 'Admin'}: <strong className="text-white">{currentUser.email}</strong>
                   </span>
                 )}
 
                 {paymentSummary?.lastUpdated && (
-                  <span className="text-[11px] text-gray-500 flex items-center gap-1">
+                  <span className="text-[11px] text-slate-400 flex items-center gap-1">
                     <Clock size={11} />
                     Updated: {new Date(paymentSummary.lastUpdated).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                   </span>
@@ -1108,10 +1108,10 @@ export default function AdminDashboard() {
               <button
                 type="button"
                 onClick={() => setScannerModalOpen(true)}
-                className="px-4 py-2.5 rounded-2xl border border-emerald-500/40 bg-gradient-to-r from-emerald-500/25 via-emerald-600/20 to-teal-500/25 text-emerald-200 text-xs sm:text-sm font-bold inline-flex items-center gap-2 hover:from-emerald-500/35 hover:to-teal-500/35 transition-all shadow-lg shadow-emerald-950/40 cursor-pointer active:scale-95"
+                className="px-4 py-2.5 rounded-2xl border border-cyan-400/40 bg-gradient-to-r from-cyan-500/25 via-sky-500/20 to-teal-500/25 text-cyan-100 text-xs sm:text-sm font-bold inline-flex items-center gap-2 hover:from-cyan-500/35 hover:to-teal-500/35 transition-all shadow-lg shadow-cyan-950/30 backdrop-blur-md cursor-pointer active:scale-95"
                 title="Launch Live Camera QR Pass Scanner"
               >
-                <QrCode size={16} className="text-emerald-400" />
+                <QrCode size={16} className="text-cyan-300" />
                 Live Pass Scanner
               </button>
 
@@ -1121,14 +1121,14 @@ export default function AdminDashboard() {
                   to="/admin/super"
                   aria-label="Super Admin control"
                   title="Super Admin control"
-                  className="group relative flex items-center justify-center min-w-[42px] min-h-[42px] w-[42px] h-[42px] rounded-2xl bg-[#1d2520] border border-amber-500/40 text-amber-400 hover:text-white hover:bg-amber-500/20 transition-all focus:outline-none focus:ring-2 focus:ring-amber-500/50 shadow-md shadow-amber-950/20"
+                  className="group relative flex items-center justify-center min-w-[42px] min-h-[42px] w-[42px] h-[42px] rounded-2xl bg-amber-500/15 border border-amber-400/40 text-amber-300 hover:text-white hover:bg-amber-500/25 transition-all focus:outline-none focus:ring-2 focus:ring-amber-400/50 backdrop-blur-md"
                 >
                   <Crown size={19} className="transition-transform group-hover:scale-110" />
 
                   {pendingApprovalCount > 0 && (
                     <span
                       aria-label={`${pendingApprovalCount} pending requests`}
-                      className="absolute -top-1.5 -right-1.5 min-w-[19px] h-[19px] px-1 rounded-full text-[10px] font-black bg-amber-400 text-black flex items-center justify-center border-2 border-[#111411] animate-pulse"
+                      className="absolute -top-1.5 -right-1.5 min-w-[19px] h-[19px] px-1 rounded-full text-[10px] font-black bg-amber-400 text-black flex items-center justify-center border-2 border-[#040814] animate-pulse"
                     >
                       {pendingApprovalCount > 9 ? '9+' : pendingApprovalCount}
                     </span>
@@ -1140,11 +1140,11 @@ export default function AdminDashboard() {
               <button
                 data-menu-trigger="true"
                 onClick={(event) => togglePanelMenu(event, 'shortcuts', 220)}
-                className="px-3.5 py-2.5 rounded-2xl border border-white/10 bg-[#1e2721] hover:bg-[#25312a] text-gray-200 text-xs sm:text-sm font-semibold inline-flex items-center gap-1.5 transition-colors"
+                className="liquid-btn-glass px-3.5 py-2.5 !rounded-2xl text-xs sm:text-sm inline-flex items-center gap-1.5"
               >
-                <Link2 size={15} className="text-fuchsia-400" />
+                <Link2 size={15} className="text-violet-400" />
                 <span>Quick Tools</span>
-                <ChevronDown size={14} className={`text-gray-400 transition-transform ${openPanelMenu?.menu === 'shortcuts' ? 'rotate-180' : ''}`} />
+                <ChevronDown size={14} className={`text-slate-400 transition-transform ${openPanelMenu?.menu === 'shortcuts' ? 'rotate-180' : ''}`} />
               </button>
 
               {/* Data Tools Menu */}
@@ -1152,11 +1152,11 @@ export default function AdminDashboard() {
                 data-menu-trigger="true"
                 onClick={(event) => togglePanelMenu(event, 'data', 200)}
                 disabled={transferLoading !== null}
-                className="px-3.5 py-2.5 rounded-2xl border border-white/10 bg-[#1e2721] hover:bg-[#25312a] text-gray-200 text-xs sm:text-sm font-semibold inline-flex items-center gap-1.5 transition-colors disabled:opacity-50"
+                className="liquid-btn-glass px-3.5 py-2.5 !rounded-2xl text-xs sm:text-sm inline-flex items-center gap-1.5 disabled:opacity-50"
               >
-                <Download size={15} className="text-blue-400" />
+                <Download size={15} className="text-cyan-400" />
                 <span>{transferLoading ? 'Processing...' : 'Data Hub'}</span>
-                <ChevronDown size={14} className={`text-gray-400 transition-transform ${openPanelMenu?.menu === 'data' ? 'rotate-180' : ''}`} />
+                <ChevronDown size={14} className={`text-slate-400 transition-transform ${openPanelMenu?.menu === 'data' ? 'rotate-180' : ''}`} />
               </button>
 
               {/* Refresh Data Button */}
@@ -1166,10 +1166,10 @@ export default function AdminDashboard() {
                   fetchPaymentSummary();
                 }}
                 disabled={loading || paymentSummaryLoading}
-                className="p-2.5 rounded-2xl border border-white/10 bg-[#1e2721] hover:bg-[#25312a] text-gray-300 hover:text-white transition-colors disabled:opacity-50"
+                className="liquid-btn-glass p-2.5 !rounded-2xl text-slate-300 hover:text-white disabled:opacity-50"
                 title="Refresh All Data"
               >
-                <RefreshCw size={15} className={(loading || paymentSummaryLoading) ? 'animate-spin text-emerald-400' : ''} />
+                <RefreshCw size={15} className={(loading || paymentSummaryLoading) ? 'animate-spin text-cyan-400' : ''} />
               </button>
             </div>
           </div>
@@ -1185,9 +1185,9 @@ export default function AdminDashboard() {
         />
 
         {transferMessage && (
-          <div className="mb-6 p-4 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-xs sm:text-sm text-blue-200 flex items-center justify-between">
+          <div className="mb-6 p-4 rounded-2xl bg-cyan-500/15 border border-cyan-400/30 text-xs sm:text-sm text-cyan-100 flex items-center justify-between backdrop-blur-md">
             <span>{transferMessage}</span>
-            <button onClick={() => setTransferMessage('')} className="text-blue-300 hover:text-white">
+            <button onClick={() => setTransferMessage('')} className="text-cyan-300 hover:text-white">
               <X size={14} />
             </button>
           </div>
@@ -1202,17 +1202,17 @@ export default function AdminDashboard() {
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="p-4 sm:p-5 rounded-2xl bg-[#161c18]/90 border border-[#2d382f] hover:border-blue-500/40 transition-all flex flex-col justify-between"
+              className="liquid-glass-card p-4 sm:p-5 rounded-2xl flex flex-col justify-between"
             >
               <div className="flex items-center justify-between gap-2 mb-2">
-                <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Total Registered</span>
-                <div className="w-8 h-8 rounded-xl bg-blue-500/15 border border-blue-500/30 flex items-center justify-center text-blue-400">
+                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Registered</span>
+                <div className="w-8 h-8 rounded-xl bg-blue-500/15 border border-blue-400/30 flex items-center justify-center text-blue-300">
                   <Users size={16} />
                 </div>
               </div>
               <div>
                 <p className="text-2xl sm:text-3xl font-black text-white">{stats.total}</p>
-                <p className="text-[11px] text-gray-500 mt-0.5">Ignite 2.0 Attendees</p>
+                <p className="text-[11px] text-slate-400 mt-0.5">Ignite 2.0 Attendees</p>
               </div>
             </motion.div>
 
@@ -1222,21 +1222,21 @@ export default function AdminDashboard() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.05 }}
               onClick={() => setActiveWorkspaceTab('step1')}
-              className={`p-4 sm:p-5 rounded-2xl bg-[#161c18]/90 border cursor-pointer transition-all flex flex-col justify-between ${
+              className={`liquid-glass-card p-4 sm:p-5 rounded-2xl cursor-pointer flex flex-col justify-between ${
                 ((stats.pendingApprovals ?? 0) > 0)
-                  ? 'border-amber-500/50 shadow-lg shadow-amber-500/10 hover:border-amber-400'
-                  : 'border-[#2d382f] hover:border-white/20'
+                  ? '!border-amber-400/50 shadow-lg shadow-amber-500/10'
+                  : ''
               }`}
             >
               <div className="flex items-center justify-between gap-2 mb-2">
-                <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Step 1 Approvals</span>
-                <div className="w-8 h-8 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Step 1 Approvals</span>
+                <div className="w-8 h-8 rounded-xl bg-amber-500/15 border border-amber-400/30 flex items-center justify-center text-amber-300">
                   <Clock size={16} />
                 </div>
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <p className={`text-2xl sm:text-3xl font-black ${((stats.pendingApprovals ?? 0) > 0) ? 'text-amber-400' : 'text-white'}`}>
+                  <p className={`text-2xl sm:text-3xl font-black ${((stats.pendingApprovals ?? 0) > 0) ? 'text-amber-300' : 'text-white'}`}>
                     {stats.pendingApprovals ?? 0}
                   </p>
                   {(stats.pendingApprovals ?? 0) > 0 && (
@@ -1245,7 +1245,7 @@ export default function AdminDashboard() {
                     </span>
                   )}
                 </div>
-                <p className="text-[11px] text-gray-500 mt-0.5">
+                <p className="text-[11px] text-slate-400 mt-0.5">
                   {(stats.pendingApprovals ?? 0) > 0 ? 'Click to review queue' : 'All registrations verified'}
                 </p>
               </div>
@@ -1257,19 +1257,19 @@ export default function AdminDashboard() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.08 }}
               onClick={() => setActiveWorkspaceTab('verified')}
-              className="p-4 sm:p-5 rounded-2xl bg-[#161c18]/90 border border-[#2d382f] hover:border-emerald-500/40 transition-all cursor-pointer flex flex-col justify-between"
+              className="liquid-glass-card p-4 sm:p-5 rounded-2xl cursor-pointer flex flex-col justify-between"
             >
               <div className="flex items-center justify-between gap-2 mb-2">
-                <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Payments Verified</span>
-                <div className="w-8 h-8 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Payments Verified</span>
+                <div className="w-8 h-8 rounded-xl bg-emerald-500/15 border border-emerald-400/30 flex items-center justify-center text-emerald-300">
                   <ShieldCheck size={16} />
                 </div>
               </div>
               <div>
-                <p className="text-2xl sm:text-3xl font-black text-emerald-400">{stats.paymentsVerified ?? 0}</p>
-                <p className="text-[11px] text-gray-500 mt-0.5">
+                <p className="text-2xl sm:text-3xl font-black text-emerald-300">{stats.paymentsVerified ?? 0}</p>
+                <p className="text-[11px] text-slate-400 mt-0.5">
                   {paymentPendingCount > 0 ? (
-                    <span className="text-amber-400 font-semibold">{paymentPendingCount} pending review</span>
+                    <span className="text-amber-300 font-semibold">{paymentPendingCount} pending review</span>
                   ) : (
                     'Confirmed & verified'
                   )}
@@ -1282,20 +1282,20 @@ export default function AdminDashboard() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.12 }}
-              className="p-4 sm:p-5 rounded-2xl bg-[#161c18]/90 border border-[#2d382f] hover:border-teal-500/40 transition-all flex flex-col justify-between"
+              className="liquid-glass-card p-4 sm:p-5 rounded-2xl flex flex-col justify-between"
             >
               <div className="flex items-center justify-between gap-2 mb-2">
-                <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Venue Check-in</span>
-                <div className="w-8 h-8 rounded-xl bg-teal-500/15 border border-teal-500/30 flex items-center justify-center text-teal-400">
+                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Venue Check-in</span>
+                <div className="w-8 h-8 rounded-xl bg-cyan-500/15 border border-cyan-400/30 flex items-center justify-center text-cyan-300">
                   <UserCheck size={16} />
                 </div>
               </div>
               <div>
                 <div className="flex items-baseline gap-1.5">
-                  <p className="text-2xl sm:text-3xl font-black text-teal-400">{stats.checkedIn}</p>
-                  <span className="text-xs text-gray-400">/ {stats.total}</span>
+                  <p className="text-2xl sm:text-3xl font-black text-cyan-300">{stats.checkedIn}</p>
+                  <span className="text-xs text-slate-400">/ {stats.total}</span>
                 </div>
-                <p className="text-[11px] text-gray-500 mt-0.5">{stats.notCheckedIn} awaiting arrival</p>
+                <p className="text-[11px] text-slate-400 mt-0.5">{stats.notCheckedIn} awaiting arrival</p>
               </div>
             </motion.div>
 
@@ -1304,19 +1304,19 @@ export default function AdminDashboard() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.15 }}
-              className="col-span-2 lg:col-span-1 p-4 sm:p-5 rounded-2xl bg-[#161c18]/90 border border-[#2d382f] flex flex-col justify-between"
+              className="col-span-2 lg:col-span-1 liquid-glass-card p-4 sm:p-5 rounded-2xl flex flex-col justify-between"
             >
               <div className="flex items-center justify-between gap-2 mb-2">
-                <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Registration Gate</span>
+                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Registration Gate</span>
                 <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${
-                  registrationControl?.enabled ? 'bg-emerald-500/15 border border-emerald-500/30 text-emerald-400' : 'bg-red-500/15 border border-red-500/30 text-red-400'
+                  registrationControl?.enabled ? 'bg-emerald-500/15 border border-emerald-400/30 text-emerald-300' : 'bg-red-500/15 border border-red-400/30 text-red-300'
                 }`}>
                   <Power size={16} />
                 </div>
               </div>
               <div>
                 <div className="flex items-center justify-between gap-2">
-                  <span className={`text-xl sm:text-2xl font-black ${registrationControl?.enabled ? 'text-emerald-400' : 'text-red-400'}`}>
+                  <span className={`text-xl sm:text-2xl font-black ${registrationControl?.enabled ? 'text-emerald-300' : 'text-red-300'}`}>
                     {registrationControl?.enabled ? 'Open' : 'Closed'}
                   </span>
                   <button
@@ -1324,14 +1324,14 @@ export default function AdminDashboard() {
                     disabled={registrationToggleLoading}
                     className={`px-3 py-1 rounded-xl text-xs font-bold border transition-all disabled:opacity-50 ${
                       registrationControl?.enabled
-                        ? 'bg-red-500/15 border-red-500/30 text-red-300 hover:bg-red-500/25'
-                        : 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/25'
+                        ? 'bg-red-500/15 border-red-400/30 text-red-200 hover:bg-red-500/25'
+                        : 'bg-emerald-500/15 border-emerald-400/30 text-emerald-200 hover:bg-emerald-500/25'
                     }`}
                   >
                     {registrationToggleLoading ? '...' : registrationControl?.enabled ? 'Close Gate' : 'Open Gate'}
                   </button>
                 </div>
-                <p className="text-[10px] text-gray-500 mt-1">Public form acceptance</p>
+                <p className="text-[10px] text-slate-400 mt-1">Public form acceptance</p>
               </div>
             </motion.div>
           </div>
@@ -1339,23 +1339,23 @@ export default function AdminDashboard() {
 
         {/* Live Venue Arrival Progress Bar */}
         {stats && (
-          <div className="mb-8 p-4 sm:p-5 rounded-2xl bg-[#161c18]/90 border border-[#2d382f] shadow-lg">
+          <div className="mb-8 p-4 sm:p-5 rounded-2xl liquid-glass-card">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs sm:text-sm mb-2.5">
-              <span className="text-gray-300 font-semibold flex items-center gap-2">
-                <UserCheck size={15} className="text-emerald-400" />
+              <span className="text-slate-200 font-semibold flex items-center gap-2">
+                <UserCheck size={15} className="text-cyan-400" />
                 Live Venue Attendance Progress
               </span>
-              <span className="text-gray-400">
-                <strong className="text-emerald-400 font-bold">{stats.checkedIn}</strong> arrived ({checkinPct}%) •{' '}
-                <strong className="text-gray-200">{stats.notCheckedIn}</strong> awaiting arrival
+              <span className="text-slate-400">
+                <strong className="text-cyan-300 font-bold">{stats.checkedIn}</strong> arrived ({checkinPct}%) •{' '}
+                <strong className="text-slate-200">{stats.notCheckedIn}</strong> awaiting arrival
               </span>
             </div>
-            <div className="h-3 bg-black/40 rounded-full overflow-hidden border border-white/5 p-0.5">
+            <div className="h-3 bg-white/[0.06] rounded-full overflow-hidden border border-white/10 p-0.5">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${checkinPct}%` }}
                 transition={{ duration: 0.8, ease: 'easeOut' }}
-                className="h-full bg-gradient-to-r from-teal-500 via-emerald-500 to-green-400 rounded-full shadow-sm"
+                className="h-full bg-gradient-to-r from-cyan-400 via-sky-400 to-emerald-400 rounded-full shadow-sm"
               />
             </div>
           </div>
@@ -1364,22 +1364,22 @@ export default function AdminDashboard() {
         {/* ============================================================== */}
         {/* FINANCIAL COLLECTIONS & REVENUE INTELLIGENCE HUB              */}
         {/* ============================================================== */}
-        <section className="mb-8 p-5 sm:p-6 rounded-3xl bg-gradient-to-b from-[#181f1a]/90 via-[#151a17]/90 to-[#121613]/90 border border-[#2d382f] shadow-xl">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 pb-4 border-b border-[#2d382f]">
+        <section className="mb-8 p-5 sm:p-6 rounded-3xl liquid-glass-strong relative">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 pb-4 border-b border-white/10">
             <div>
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                <div className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-400/35 flex items-center justify-center text-emerald-300">
                   <Wallet size={18} />
                 </div>
                 <h2 className="text-lg sm:text-xl font-bold text-white tracking-tight flex items-center gap-2">
                   Payment Collection & Revenue Intelligence
                 </h2>
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-400/30">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                   Verified Only
                 </span>
               </div>
-              <p className="text-xs text-gray-400 mt-1 max-w-2xl leading-relaxed">
+              <p className="text-xs text-slate-400 mt-1 max-w-2xl leading-relaxed">
                 Reconciled in real-time from verified payment records. Excludes pending, unverified, and rejected submissions.
               </p>
             </div>
@@ -1388,9 +1388,9 @@ export default function AdminDashboard() {
               <button
                 type="button"
                 onClick={() => setIsBranchBreakdownOpen(!isBranchBreakdownOpen)}
-                className="px-3.5 py-2 rounded-xl border border-white/10 bg-[#202822] hover:bg-[#28332b] text-xs font-semibold text-gray-300 hover:text-white transition-colors inline-flex items-center gap-1.5"
+                className="liquid-btn-glass px-3.5 py-2 text-xs inline-flex items-center gap-1.5"
               >
-                <Building2 size={13} className="text-emerald-400" />
+                <Building2 size={13} className="text-cyan-400" />
                 <span>{isBranchBreakdownOpen ? 'Hide' : 'View'} Branch Breakdown</span>
                 <ChevronDown size={13} className={`transition-transform ${isBranchBreakdownOpen ? 'rotate-180' : ''}`} />
               </button>
@@ -1398,23 +1398,23 @@ export default function AdminDashboard() {
               <button
                 onClick={fetchPaymentSummary}
                 disabled={paymentSummaryLoading}
-                className="p-2 rounded-xl border border-white/10 bg-[#202822] hover:bg-[#28332b] text-gray-300 hover:text-white transition-colors disabled:opacity-50"
+                className="liquid-btn-glass p-2 disabled:opacity-50"
                 title="Recalculate payment totals"
               >
-                <RefreshCw size={13} className={paymentSummaryLoading ? 'animate-spin text-emerald-400' : ''} />
+                <RefreshCw size={13} className={paymentSummaryLoading ? 'animate-spin text-cyan-400' : ''} />
               </button>
             </div>
           </div>
 
           {paymentSummaryError && (
-            <div className="mb-5 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-300 text-xs flex items-center justify-between">
+            <div className="mb-5 p-4 rounded-xl bg-red-500/15 border border-red-400/30 text-red-200 text-xs flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <AlertCircle size={16} className="text-red-400 shrink-0" />
                 <span>{paymentSummaryError}</span>
               </div>
               <button
                 onClick={fetchPaymentSummary}
-                className="px-2.5 py-1 rounded bg-red-500/20 hover:bg-red-500/30 text-red-200 text-xs font-medium transition-colors"
+                className="px-2.5 py-1 rounded bg-red-500/25 hover:bg-red-500/35 text-red-100 text-xs font-medium transition-colors"
               >
                 Retry
               </button>
@@ -1424,19 +1424,19 @@ export default function AdminDashboard() {
           {/* 3 Executive Financial Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* 1st Year Plan */}
-            <div className="p-5 rounded-2xl bg-[#1d2520]/80 border border-[#2d382f] hover:border-blue-500/40 transition-all flex flex-col justify-between relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-28 h-28 bg-blue-500/5 rounded-full blur-2xl pointer-events-none group-hover:bg-blue-500/10 transition-colors" />
+            <div className="liquid-glass-card p-5 rounded-2xl flex flex-col justify-between relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-28 h-28 bg-cyan-500/10 rounded-full blur-2xl pointer-events-none group-hover:bg-cyan-500/15 transition-colors" />
               <div>
                 <div className="flex items-center justify-between gap-2 mb-3">
                   <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center">
+                    <div className="w-7 h-7 rounded-lg bg-blue-500/20 text-blue-300 flex items-center justify-center">
                       <IndianRupee size={15} />
                     </div>
-                    <span className="text-xs font-bold text-gray-300 uppercase tracking-wider">
+                    <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">
                       1-Year Plan Collections
                     </span>
                   </div>
-                  <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20">
+                  <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-blue-500/15 text-blue-200 border border-blue-400/30">
                     1st Year (₹{paymentSummary?.firstYear?.configuredFee ?? 599})
                   </span>
                 </div>
@@ -1448,31 +1448,31 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between text-xs text-gray-400">
+              <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
                 <span className="flex items-center gap-1.5">
                   <Users size={13} className="text-blue-400" />
                   <strong className="text-white font-semibold">
                     {paymentSummary?.firstYear?.successfulCount ?? 0}
                   </strong> Paid Participants
                 </span>
-                <span className="text-[11px] text-gray-500">Confirmed</span>
+                <span className="text-[11px] text-slate-400">Confirmed</span>
               </div>
             </div>
 
             {/* 2nd Year Plan */}
-            <div className="p-5 rounded-2xl bg-[#1d2520]/80 border border-[#2d382f] hover:border-amber-500/40 transition-all flex flex-col justify-between relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-28 h-28 bg-amber-500/5 rounded-full blur-2xl pointer-events-none group-hover:bg-amber-500/10 transition-colors" />
+            <div className="liquid-glass-card p-5 rounded-2xl flex flex-col justify-between relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-28 h-28 bg-amber-500/10 rounded-full blur-2xl pointer-events-none group-hover:bg-amber-500/15 transition-colors" />
               <div>
                 <div className="flex items-center justify-between gap-2 mb-3">
                   <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center">
+                    <div className="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-300 flex items-center justify-center">
                       <IndianRupee size={15} />
                     </div>
-                    <span className="text-xs font-bold text-gray-300 uppercase tracking-wider">
+                    <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">
                       2-Year Plan Collections
                     </span>
                   </div>
-                  <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20">
+                  <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-amber-500/15 text-amber-200 border border-amber-400/30">
                     2nd Year (₹{paymentSummary?.secondYear?.configuredFee ?? 699})
                   </span>
                 </div>
@@ -1484,50 +1484,50 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between text-xs text-gray-400">
+              <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
                 <span className="flex items-center gap-1.5">
                   <Crown size={13} className="text-amber-400" />
                   <strong className="text-white font-semibold">
                     {paymentSummary?.secondYear?.successfulCount ?? 0}
                   </strong> Paid Participants
                 </span>
-                <span className="text-[11px] text-gray-500">Confirmed</span>
+                <span className="text-[11px] text-slate-400">Confirmed</span>
               </div>
             </div>
 
             {/* Grand Total Collections */}
-            <div className="p-5 rounded-2xl bg-gradient-to-br from-[#1b2b20] via-[#16221a] to-[#121914] border border-emerald-500/50 shadow-lg shadow-emerald-950/40 flex flex-col justify-between relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-36 h-36 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none group-hover:bg-emerald-500/20 transition-colors" />
+            <div className="liquid-glass-card p-5 rounded-2xl bg-gradient-to-br from-emerald-500/15 via-cyan-500/10 to-sky-500/10 !border-emerald-400/45 shadow-lg shadow-emerald-950/30 flex flex-col justify-between relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-36 h-36 bg-emerald-400/15 rounded-full blur-3xl pointer-events-none group-hover:bg-emerald-400/25 transition-colors" />
               <div>
                 <div className="flex items-center justify-between gap-2 mb-3">
                   <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                    <div className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-300 flex items-center justify-center">
                       <TrendingUp size={15} />
                     </div>
-                    <span className="text-xs font-bold text-emerald-300 uppercase tracking-wider">
+                    <span className="text-xs font-bold text-emerald-200 uppercase tracking-wider">
                       Grand Total Collections
                     </span>
                   </div>
-                  <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                  <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-200 border border-emerald-400/40">
                     All Plans
                   </span>
                 </div>
 
                 <div className="mt-2">
-                  <p className="text-2xl sm:text-3xl font-black text-emerald-300 tracking-tight glow-text-olive">
+                  <p className="text-2xl sm:text-3xl font-black text-emerald-300 tracking-tight">
                     {paymentSummaryLoading ? '...' : (paymentSummary?.grandTotal?.totalAmountFormatted ?? '₹0.00')}
                   </p>
                 </div>
               </div>
 
-              <div className="mt-4 pt-3 border-t border-emerald-500/20 flex items-center justify-between text-xs text-gray-300">
+              <div className="mt-4 pt-3 border-t border-emerald-400/20 flex items-center justify-between text-xs text-slate-200">
                 <span className="flex items-center gap-1.5">
-                  <ShieldCheck size={13} className="text-emerald-400" />
+                  <ShieldCheck size={13} className="text-emerald-300" />
                   <strong className="text-white font-semibold">
                     {paymentSummary?.grandTotal?.successfulCount ?? 0}
                   </strong> Total Confirmed Paid
                 </span>
-                <span className="text-[11px] text-emerald-400/80 font-mono">
+                <span className="text-[11px] text-emerald-300/80 font-mono">
                   1-Year + 2-Year
                 </span>
               </div>
@@ -1541,7 +1541,7 @@ export default function AdminDashboard() {
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
-                className="mt-6 pt-6 border-t border-[#2d382f] overflow-hidden"
+                className="mt-6 pt-6 border-t border-white/10 overflow-hidden"
               >
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
                   <div>
@@ -1571,10 +1571,10 @@ export default function AdminDashboard() {
                 </div>
 
                 {/* Breakdown Table */}
-                <div className="overflow-x-auto rounded-2xl border border-[#2d382f] bg-[#141915]/90 shadow-inner">
+                <div className="overflow-x-auto rounded-2xl border border-white/15 bg-white/[0.02] backdrop-blur-md">
                   <table className="w-full text-left text-xs min-w-[640px]">
                     <thead>
-                      <tr className="border-b border-[#2d382f] bg-[#1b221d] text-gray-400 font-semibold uppercase tracking-wider text-[10px]">
+                      <tr className="border-b border-white/10 bg-white/[0.05] text-slate-300 font-semibold uppercase tracking-wider text-[10px]">
                         <th className="py-3 px-4">Branch</th>
                         <th className="py-3 px-4 text-center">1st Year</th>
                         <th className="py-3 px-4 text-center">2nd Year</th>
@@ -1583,46 +1583,46 @@ export default function AdminDashboard() {
                         <th className="py-3 px-4 text-center hidden md:table-cell">Share</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#242d26]">
+                    <tbody className="divide-y divide-white/10">
                       {paymentSummaryLoading && !paymentSummary?.branchBreakdown?.length ? (
                         <tr>
-                          <td colSpan={6} className="py-8 text-center text-gray-400">
+                          <td colSpan={6} className="py-8 text-center text-slate-400">
                             <LoadingSpinner text="Loading branch & year distribution..." />
                           </td>
                         </tr>
                       ) : paymentSummary?.branchBreakdown?.length ? (
                         paymentSummary.branchBreakdown.map((item) => (
-                          <tr key={item.branch} className="hover:bg-white/[0.03] transition-colors">
+                          <tr key={item.branch} className="hover:bg-white/[0.04] transition-colors">
                             <td className="py-3 px-4">
                               <div className="flex items-center gap-2">
-                                <span className="w-2 h-2 rounded-full bg-emerald-400/80 shrink-0" />
+                                <span className="w-2 h-2 rounded-full bg-cyan-400/80 shrink-0" />
                                 <span className="font-semibold text-white">{item.branch}</span>
                               </div>
                             </td>
                             <td className="py-3 px-4 text-center">
-                              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-blue-500/10 border border-blue-500/20 text-blue-300 font-semibold">
+                              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-blue-500/15 border border-blue-400/25 text-blue-200 font-semibold">
                                 <span>{item.firstYearCount}</span>
-                                <span className="text-[10px] text-blue-200/70 font-normal">
+                                <span className="text-[10px] text-blue-200/75 font-normal">
                                   ({item.firstYearPaid} paid)
                                 </span>
                               </div>
                             </td>
                             <td className="py-3 px-4 text-center">
-                              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-500/10 border border-amber-500/20 text-amber-300 font-semibold">
+                              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-500/15 border border-amber-400/25 text-amber-200 font-semibold">
                                 <span>{item.secondYearCount}</span>
-                                <span className="text-[10px] text-amber-200/70 font-normal">
+                                <span className="text-[10px] text-amber-200/75 font-normal">
                                   ({item.secondYearPaid} paid)
                                 </span>
                               </div>
                             </td>
                             <td className="py-3 px-4 text-center">
                               <span className="font-bold text-white text-sm">{item.totalCount}</span>
-                              <span className="text-[10px] text-gray-400 block font-normal">
+                              <span className="text-[10px] text-slate-400 block font-normal">
                                 {item.totalPaid} confirmed paid
                               </span>
                             </td>
                             <td className="py-3 px-4 text-right">
-                              <span className="font-bold text-emerald-400 font-mono text-sm">
+                              <span className="font-bold text-emerald-300 font-mono text-sm">
                                 {item.totalAmountFormatted}
                               </span>
                             </td>
@@ -1630,11 +1630,11 @@ export default function AdminDashboard() {
                               <div className="flex items-center justify-center gap-2">
                                 <div className="w-16 h-1.5 rounded-full bg-white/10 overflow-hidden">
                                   <div
-                                    className="h-full bg-emerald-500 rounded-full"
+                                    className="h-full bg-cyan-400 rounded-full"
                                     style={{ width: `${Math.min(item.percentageOfTotal, 100)}%` }}
                                   />
                                 </div>
-                                <span className="text-[11px] text-gray-400 w-9 text-right font-mono">
+                                <span className="text-[11px] text-slate-400 w-9 text-right font-mono">
                                   {item.percentageOfTotal}%
                                 </span>
                               </div>
@@ -1643,7 +1643,7 @@ export default function AdminDashboard() {
                         ))
                       ) : (
                         <tr>
-                          <td colSpan={6} className="py-6 text-center text-gray-400">
+                          <td colSpan={6} className="py-6 text-center text-slate-400">
                             No registrations recorded yet.
                           </td>
                         </tr>
@@ -1651,9 +1651,9 @@ export default function AdminDashboard() {
                     </tbody>
                     {paymentSummary?.registrationTotals && (
                       <tfoot>
-                        <tr className="border-t-2 border-[#2d382f] bg-[#1a211b] font-bold text-white">
+                        <tr className="border-t-2 border-white/15 bg-white/[0.05] font-bold text-white">
                           <td className="py-3 px-4">
-                            <span className="uppercase text-[11px] tracking-wider text-emerald-400">
+                            <span className="uppercase text-[11px] tracking-wider text-cyan-300">
                               Total Across All Branches
                             </span>
                           </td>
@@ -1674,7 +1674,7 @@ export default function AdminDashboard() {
                             </span>
                           </td>
                           <td className="py-3 px-4 text-center">
-                            <span className="text-emerald-400 font-black text-base">
+                            <span className="text-emerald-300 font-black text-base">
                               {paymentSummary.registrationTotals.grandTotalRegistrations}
                             </span>
                             <span className="text-[10px] text-emerald-300/80 font-normal block">
@@ -1682,11 +1682,11 @@ export default function AdminDashboard() {
                             </span>
                           </td>
                           <td className="py-3 px-4 text-right">
-                            <span className="text-emerald-400 font-black text-base font-mono">
+                            <span className="text-emerald-300 font-black text-base font-mono">
                               {paymentSummary.grandTotal.totalAmountFormatted}
                             </span>
                           </td>
-                          <td className="py-3 px-4 text-center hidden md:table-cell text-gray-400 font-mono text-[11px]">
+                          <td className="py-3 px-4 text-center hidden md:table-cell text-slate-400 font-mono text-[11px]">
                             100%
                           </td>
                         </tr>
@@ -1704,20 +1704,20 @@ export default function AdminDashboard() {
         {/* ============================================================== */}
         <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           {/* Main Workspace Segment Switcher */}
-          <div className="flex flex-wrap items-center gap-1.5 p-1.5 rounded-2xl bg-[#141a15] border border-[#2d382f] shadow-lg">
+          <div className="flex flex-wrap items-center gap-1.5 p-1.5 rounded-2xl liquid-glass-card">
             <button
               type="button"
               onClick={() => setActiveWorkspaceTab('verified')}
               className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 ${
                 activeWorkspaceTab === 'verified'
-                  ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-950/40'
-                  : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  ? 'bg-gradient-to-r from-emerald-500/85 to-cyan-500/85 text-white shadow-md shadow-emerald-950/30 border border-white/25'
+                  : 'text-slate-300 hover:text-white hover:bg-white/[0.06]'
               }`}
             >
               <ShieldCheck size={16} className={activeWorkspaceTab === 'verified' ? 'text-white' : 'text-emerald-400'} />
               <span>Verified Paid List</span>
               <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
-                activeWorkspaceTab === 'verified' ? 'bg-black/30 text-white' : 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
+                activeWorkspaceTab === 'verified' ? 'bg-black/30 text-white' : 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/30'
               }`}>
                 {verifiedParticipants.length}
               </span>
@@ -1728,18 +1728,18 @@ export default function AdminDashboard() {
               onClick={() => setActiveWorkspaceTab('step1')}
               className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 ${
                 activeWorkspaceTab === 'step1'
-                  ? 'bg-amber-500 text-black shadow-md shadow-amber-950/40'
-                  : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  ? 'bg-amber-400 text-black shadow-md shadow-amber-950/30'
+                  : 'text-slate-300 hover:text-white hover:bg-white/[0.06]'
               }`}
             >
               <Clock size={16} className={activeWorkspaceTab === 'step1' ? 'text-black' : 'text-amber-400'} />
               <span>Step 1 Approvals</span>
               <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
                 activeWorkspaceTab === 'step1'
-                  ? 'bg-black/30 text-black'
+                  ? 'bg-black/25 text-black'
                   : (stats?.pendingApprovals ?? 0) > 0
                     ? 'bg-amber-400 text-black animate-pulse'
-                    : 'bg-white/10 text-gray-300'
+                    : 'bg-white/10 text-slate-300'
               }`}>
                 {stats?.pendingApprovals ?? 0}
               </span>
@@ -1750,18 +1750,18 @@ export default function AdminDashboard() {
               onClick={() => setActiveWorkspaceTab('step2')}
               className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 ${
                 activeWorkspaceTab === 'step2'
-                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md'
-                  : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  ? 'liquid-btn-primary'
+                  : 'text-slate-300 hover:text-white hover:bg-white/[0.06]'
               }`}
             >
-              <Wallet size={16} className={activeWorkspaceTab === 'step2' ? 'text-white' : 'text-blue-400'} />
+              <Wallet size={16} className={activeWorkspaceTab === 'step2' ? 'text-white' : 'text-cyan-400'} />
               <span>Step 2 Payments</span>
               {paymentPendingCount > 0 ? (
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-blue-400 text-black animate-pulse">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-cyan-300 text-black animate-pulse">
                   {paymentPendingCount}
                 </span>
               ) : (
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-white/10 text-gray-300">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-white/10 text-slate-300">
                   {paymentVerificationItems.length}
                 </span>
               )}
@@ -1772,27 +1772,27 @@ export default function AdminDashboard() {
               onClick={() => setActiveWorkspaceTab('all')}
               className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 ${
                 activeWorkspaceTab === 'all'
-                  ? 'bg-white/20 text-white shadow-md'
-                  : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  ? 'bg-white/20 text-white shadow-md border border-white/25'
+                  : 'text-slate-300 hover:text-white hover:bg-white/[0.06]'
               }`}
             >
-              <Users size={16} className={activeWorkspaceTab === 'all' ? 'text-white' : 'text-gray-300'} />
+              <Users size={16} className={activeWorkspaceTab === 'all' ? 'text-white' : 'text-slate-300'} />
               <span>All Registrations</span>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-white/10 text-gray-300">
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-white/10 text-slate-300">
                 {participants.length}
               </span>
             </button>
           </div>
 
           {/* View Mode Toggle: Workspace Tabs vs All Sections (Classic Stack) */}
-          <div className="flex items-center gap-2 self-end md:self-auto text-xs text-gray-400">
+          <div className="flex items-center gap-2 self-end md:self-auto text-xs text-slate-400">
             <span className="text-[11px] hidden sm:inline">Layout:</span>
             <button
               type="button"
               onClick={() => setViewMode(viewMode === 'workspace' ? 'classic' : 'workspace')}
-              className="px-3 py-1.5 rounded-xl border border-white/10 bg-[#19201b] hover:bg-[#202923] text-gray-300 text-xs font-semibold inline-flex items-center gap-1.5 transition-colors"
+              className="liquid-btn-glass px-3 py-1.5 text-xs inline-flex items-center gap-1.5"
             >
-              <Layers size={13} className="text-emerald-400" />
+              <Layers size={13} className="text-cyan-400" />
               {viewMode === 'workspace' ? 'Workspace Tabbed' : 'Classic All-in-One'}
             </button>
           </div>
@@ -1802,14 +1802,14 @@ export default function AdminDashboard() {
         {/* TAB 1: VERIFIED PAID PARTICIPANTS TABLE                       */}
         {/* ============================================================== */}
         {(viewMode === 'classic' || activeWorkspaceTab === 'verified') && (
-          <section className="mb-8 p-6 rounded-3xl bg-[#161c18]/95 border border-emerald-500/30 shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
+          <section className="mb-8 p-6 rounded-3xl liquid-glass-strong !border-emerald-400/30 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-400/8 rounded-full blur-3xl pointer-events-none" />
 
             {/* Section Header */}
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6 relative">
               <div>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shrink-0">
+                  <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-300 shrink-0">
                     <ShieldCheck size={22} />
                   </div>
                   <div>
@@ -1820,11 +1820,11 @@ export default function AdminDashboard() {
                       <span className="px-2.5 py-0.5 text-xs font-black rounded-full bg-emerald-400 text-black shadow-sm">
                         {verifiedParticipants.length} Verified
                       </span>
-                      <span className="px-2.5 py-0.5 text-xs font-bold rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 font-mono">
+                      <span className="px-2.5 py-0.5 text-xs font-bold rounded-full bg-emerald-500/15 text-emerald-200 border border-emerald-400/30 font-mono">
                         {verifiedStats.totalAmountFormatted}
                       </span>
                     </div>
-                    <p className="text-xs text-gray-400 mt-0.5">
+                    <p className="text-xs text-slate-400 mt-0.5">
                       Confirmed attendees with verified registration, payment confirmation, and entry pass authorization.
                     </p>
                   </div>
@@ -1833,15 +1833,15 @@ export default function AdminDashboard() {
 
               {/* Quick Metrics Badges & Export */}
               <div className="flex flex-wrap items-center gap-2">
-                <span className="px-3 py-1.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs font-medium flex items-center gap-1.5">
+                <span className="px-3 py-1.5 rounded-xl bg-blue-500/15 border border-blue-400/25 text-blue-200 text-xs font-medium flex items-center gap-1.5 backdrop-blur-md">
                   <GraduationCap size={13} className="text-blue-400" />
                   1st Year: <strong className="text-white">{verifiedStats.firstYearCount}</strong>
                 </span>
-                <span className="px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs font-medium flex items-center gap-1.5">
+                <span className="px-3 py-1.5 rounded-xl bg-amber-500/15 border border-amber-400/25 text-amber-200 text-xs font-medium flex items-center gap-1.5 backdrop-blur-md">
                   <Crown size={13} className="text-amber-400" />
                   2nd Year: <strong className="text-white">{verifiedStats.secondYearCount}</strong>
                 </span>
-                <span className="px-3 py-1.5 rounded-xl bg-[#202822] border border-[#2d382f] text-gray-300 text-xs font-medium flex items-center gap-1.5">
+                <span className="px-3 py-1.5 rounded-xl bg-white/[0.06] border border-white/15 text-slate-200 text-xs font-medium flex items-center gap-1.5 backdrop-blur-md">
                   <UserCheck size={13} className="text-emerald-400" />
                   Arrived: <strong className="text-white">{verifiedStats.checkedInCount} / {verifiedStats.totalCount}</strong>
                 </span>
@@ -1850,7 +1850,7 @@ export default function AdminDashboard() {
                   type="button"
                   onClick={exportVerifiedCsv}
                   disabled={!filteredVerifiedParticipants.length}
-                  className="px-3.5 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 text-xs font-bold flex items-center gap-1.5 transition-colors disabled:opacity-50"
+                  className="px-3.5 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/35 text-emerald-200 text-xs font-bold flex items-center gap-1.5 transition-colors disabled:opacity-50 backdrop-blur-md"
                   title="Download CSV of verified participants"
                 >
                   <Download size={13} />
@@ -1862,17 +1862,17 @@ export default function AdminDashboard() {
             {/* Filter & Search Bar */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 mb-5">
               <div className="relative">
-                <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500" />
+                <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
                   value={verifiedSearch}
                   onChange={(e) => setVerifiedSearch(e.target.value)}
                   placeholder="Search by name, roll, email, payment ID, holder..."
-                  className="w-full bg-[#121613] border border-[#2d382f] rounded-xl pl-9 pr-3 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500/50"
+                  className="liquid-input w-full pl-9 pr-3 py-2.5 text-xs"
                 />
                 {verifiedSearch && (
                   <button
                     onClick={() => setVerifiedSearch('')}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white text-xs"
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs"
                   >
                     <X size={13} />
                   </button>
@@ -1883,50 +1883,50 @@ export default function AdminDashboard() {
                 <select
                   value={verifiedYearFilter}
                   onChange={(e) => setVerifiedYearFilter(e.target.value as any)}
-                  className="w-full bg-[#121613] border border-[#2d382f] rounded-xl px-3 py-2.5 pr-8 text-xs text-white focus:outline-none focus:border-emerald-500/50 appearance-none"
+                  className="liquid-input w-full px-3 py-2.5 pr-8 text-xs appearance-none"
                 >
-                  <option value="all">All Academic Years</option>
-                  <option value="1st Year">1st Year (₹599)</option>
-                  <option value="2nd Year">2nd Year (₹699)</option>
+                  <option value="all" className="bg-[#081022] text-white">All Academic Years</option>
+                  <option value="1st Year" className="bg-[#081022] text-white">1st Year (₹599)</option>
+                  <option value="2nd Year" className="bg-[#081022] text-white">2nd Year (₹699)</option>
                 </select>
-                <ChevronDown size={13} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
+                <ChevronDown size={13} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
               </div>
 
               <div className="relative">
                 <select
                   value={verifiedBranchFilter}
                   onChange={(e) => setVerifiedBranchFilter(e.target.value)}
-                  className="w-full bg-[#121613] border border-[#2d382f] rounded-xl px-3 py-2.5 pr-8 text-xs text-white focus:outline-none focus:border-emerald-500/50 appearance-none truncate"
+                  className="liquid-input w-full px-3 py-2.5 pr-8 text-xs appearance-none truncate"
                 >
-                  <option value="all">All Branches</option>
+                  <option value="all" className="bg-[#081022] text-white">All Branches</option>
                   {branches.map((b) => (
-                    <option key={b} value={b}>
+                    <option key={b} value={b} className="bg-[#081022] text-white">
                       {b}
                     </option>
                   ))}
                 </select>
-                <ChevronDown size={13} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
+                <ChevronDown size={13} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
               </div>
 
               <div className="relative">
                 <select
                   value={verifiedCheckinFilter}
                   onChange={(e) => setVerifiedCheckinFilter(e.target.value as any)}
-                  className="w-full bg-[#121613] border border-[#2d382f] rounded-xl px-3 py-2.5 pr-8 text-xs text-white focus:outline-none focus:border-emerald-500/50 appearance-none"
+                  className="liquid-input w-full px-3 py-2.5 pr-8 text-xs appearance-none"
                 >
-                  <option value="all">All Check-in Status</option>
-                  <option value="checked_in">Checked In Only</option>
-                  <option value="pending">Awaiting Check-in</option>
+                  <option value="all" className="bg-[#081022] text-white">All Check-in Status</option>
+                  <option value="checked_in" className="bg-[#081022] text-white">Checked In Only</option>
+                  <option value="pending" className="bg-[#081022] text-white">Awaiting Check-in</option>
                 </select>
-                <ChevronDown size={13} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
+                <ChevronDown size={13} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
               </div>
             </div>
 
             {/* Verified Participants Table */}
-            <div className="overflow-x-auto rounded-2xl border border-emerald-500/20 bg-[#121613]/90">
+            <div className="overflow-x-auto rounded-2xl border border-emerald-400/25 bg-white/[0.02] backdrop-blur-md">
               <table className="w-full text-left text-xs min-w-[900px]">
                 <thead>
-                  <tr className="border-b border-[#2d382f] bg-[#1a221d] text-gray-400 font-semibold uppercase tracking-wider text-[10px]">
+                  <tr className="border-b border-white/10 bg-white/[0.05] text-slate-300 font-semibold uppercase tracking-wider text-[10px]">
                     <th className="py-3 px-3 text-center w-12">#</th>
                     <th className="py-3 px-3">Participant & Reg ID</th>
                     <th className="py-3 px-3">Roll / Enrolment No</th>
@@ -1937,7 +1937,7 @@ export default function AdminDashboard() {
                     <th className="py-3 px-3 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#242d26]">
+                <tbody className="divide-y divide-white/10">
                   {filteredVerifiedParticipants.length === 0 ? (
                     <tr>
                       <td colSpan={8} className="py-12 text-center text-gray-400">
@@ -2208,11 +2208,11 @@ export default function AdminDashboard() {
         {/* TAB 2: STEP 1 REGISTRATION APPROVALS QUEUE                     */}
         {/* ============================================================== */}
         {(viewMode === 'classic' || activeWorkspaceTab === 'step1') && (
-          <section className="mb-8 p-6 rounded-3xl bg-[#161c18]/95 border border-[#2d382f] shadow-2xl relative">
+          <section className="mb-8 p-6 rounded-3xl liquid-glass-strong relative">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
               <div>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                  <div className="w-10 h-10 rounded-2xl bg-amber-500/15 border border-amber-400/35 flex items-center justify-center text-amber-300">
                     <Clock size={20} />
                   </div>
                   <div>
@@ -2224,7 +2224,7 @@ export default function AdminDashboard() {
                         </span>
                       )}
                     </h2>
-                    <p className="text-xs text-gray-400 mt-0.5">
+                    <p className="text-xs text-slate-400 mt-0.5">
                       Verify participant identity & WhatsApp community membership before unlocking Step 2 payment access.
                     </p>
                   </div>
@@ -2232,18 +2232,18 @@ export default function AdminDashboard() {
               </div>
 
               {/* Filter Tabs */}
-              <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-xl bg-black/40 border border-white/5">
+              <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-xl bg-white/[0.04] border border-white/10 backdrop-blur-md">
                 <button
                   onClick={() => setApprovalTab('pending')}
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 ${
                     approvalTab === 'pending'
-                      ? 'bg-amber-500 text-black font-bold shadow'
-                      : 'text-gray-400 hover:text-white'
+                      ? 'bg-amber-400 text-black font-bold shadow'
+                      : 'text-slate-300 hover:text-white'
                   }`}
                 >
                   <Clock size={12} />
                   Pending
-                  <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${approvalTab === 'pending' ? 'bg-black/30 text-black' : 'bg-white/10 text-gray-300'}`}>
+                  <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${approvalTab === 'pending' ? 'bg-black/25 text-black' : 'bg-white/10 text-slate-300'}`}>
                     {stats?.pendingApprovals ?? 0}
                   </span>
                 </button>
@@ -2251,13 +2251,13 @@ export default function AdminDashboard() {
                   onClick={() => setApprovalTab('approved')}
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 ${
                     approvalTab === 'approved'
-                      ? 'bg-emerald-500 text-black font-bold shadow'
-                      : 'text-gray-400 hover:text-white'
+                      ? 'bg-emerald-400 text-black font-bold shadow'
+                      : 'text-slate-300 hover:text-white'
                   }`}
                 >
                   <CheckCircle2 size={12} />
                   Approved
-                  <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${approvalTab === 'approved' ? 'bg-black/30 text-black' : 'bg-white/10 text-gray-300'}`}>
+                  <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${approvalTab === 'approved' ? 'bg-black/25 text-black' : 'bg-white/10 text-slate-300'}`}>
                     {stats?.approvedRegistrations ?? 0}
                   </span>
                 </button>
@@ -2266,12 +2266,12 @@ export default function AdminDashboard() {
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 ${
                     approvalTab === 'rejected'
                       ? 'bg-red-500 text-white font-bold shadow'
-                      : 'text-gray-400 hover:text-white'
+                      : 'text-slate-300 hover:text-white'
                   }`}
                 >
                   <XCircle size={12} />
                   Rejected
-                  <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${approvalTab === 'rejected' ? 'bg-black/30 text-white' : 'bg-white/10 text-gray-300'}`}>
+                  <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${approvalTab === 'rejected' ? 'bg-black/25 text-white' : 'bg-white/10 text-slate-300'}`}>
                     {stats?.rejectedRegistrations ?? 0}
                   </span>
                 </button>
@@ -2280,7 +2280,7 @@ export default function AdminDashboard() {
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 ${
                     approvalTab === 'all'
                       ? 'bg-white/20 text-white font-bold shadow'
-                      : 'text-gray-400 hover:text-white'
+                      : 'text-slate-300 hover:text-white'
                   }`}
                 >
                   All ({participants.length})
@@ -2300,18 +2300,18 @@ export default function AdminDashboard() {
 
               if (queueItems.length === 0) {
                 return (
-                  <div className="py-10 text-center text-gray-500 bg-black/20 rounded-2xl border border-white/5">
-                    <ShieldCheck size={32} className="mx-auto mb-2 opacity-30 text-emerald-400" />
-                    <p className="text-sm font-semibold text-gray-400">No registrations found in this tab.</p>
+                  <div className="py-10 text-center text-slate-400 bg-white/[0.02] rounded-2xl border border-white/10">
+                    <ShieldCheck size={32} className="mx-auto mb-2 opacity-40 text-emerald-400" />
+                    <p className="text-sm font-semibold text-slate-300">No registrations found in this tab.</p>
                   </div>
                 );
               }
 
               return (
-                <div className="overflow-x-auto rounded-2xl border border-[#2d382f] bg-[#121613]/90">
+                <div className="overflow-x-auto rounded-2xl border border-white/15 bg-white/[0.02] backdrop-blur-md">
                   <table className="w-full text-left text-xs min-w-[750px]">
                     <thead>
-                      <tr className="border-b border-[#2d382f] bg-[#1a221d] text-gray-400 font-semibold uppercase tracking-wider text-[10px]">
+                      <tr className="border-b border-white/10 bg-white/[0.05] text-slate-300 font-semibold uppercase tracking-wider text-[10px]">
                         <th className="py-3 px-3">Reg ID & Participant</th>
                         <th className="py-3 px-3">WhatsApp / Phone</th>
                         <th className="py-3 px-3 hidden md:table-cell">Roll / Enrolment</th>
@@ -2320,7 +2320,7 @@ export default function AdminDashboard() {
                         <th className="py-3 px-3 text-right">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#242d26]">
+                    <tbody className="divide-y divide-white/10">
                       {queueItems.map((p) => {
                         const isPending = (p.approval_status || 'approved') === 'pending_approval';
                         const isApproved = (p.approval_status || 'approved') === 'approved';
@@ -2458,23 +2458,23 @@ export default function AdminDashboard() {
         {/* TAB 3: STEP 2 PAYMENT VERIFICATION QUEUE                       */}
         {/* ============================================================== */}
         {(viewMode === 'classic' || activeWorkspaceTab === 'step2') && (
-          <section className="mb-8 p-6 rounded-3xl bg-[#161c18]/95 border border-blue-500/30 shadow-2xl relative">
+          <section className="mb-8 p-6 rounded-3xl liquid-glass-strong !border-cyan-400/30 relative">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
               <div>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-blue-500/15 border border-blue-500/30 flex items-center justify-center text-blue-400">
+                  <div className="liquid-icon-bubble !rounded-2xl !w-10 !h-10 text-cyan-300 border-cyan-400/35">
                     <Wallet size={20} />
                   </div>
                   <div>
                     <h2 className="text-xl font-bold text-white flex items-center gap-2">
                       Step 2 Payment & Screenshot Verification
                       {paymentPendingCount > 0 && (
-                        <span className="px-2.5 py-0.5 text-xs font-black rounded-full bg-blue-400 text-black animate-pulse">
+                        <span className="px-2.5 py-0.5 text-xs font-black rounded-full bg-cyan-400 text-slate-950 animate-pulse shadow-[0_0_16px_rgba(34,211,238,0.45)]">
                           {paymentPendingCount} Needs Review
                         </span>
                       )}
                     </h2>
-                    <p className="text-xs text-gray-400 mt-0.5">
+                    <p className="text-xs text-slate-300/80 mt-0.5">
                       Verify transaction reference (UTR ID), bank account holder name, and uploaded receipt screenshots.
                     </p>
                   </div>
@@ -2482,27 +2482,27 @@ export default function AdminDashboard() {
               </div>
 
               {/* Filter Tabs */}
-              <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-xl bg-black/40 border border-white/5">
+              <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-xl bg-white/[0.04] backdrop-blur-md border border-white/10">
                 <button
                   onClick={() => setPaymentVerificationTab('pending')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
                     paymentVerificationTab === 'pending'
-                      ? 'bg-blue-500 text-white font-bold shadow'
-                      : 'text-gray-400 hover:text-white'
+                      ? 'liquid-btn-primary text-white font-bold'
+                      : 'text-slate-300/80 hover:text-white hover:bg-white/[0.06]'
                   }`}
                 >
                   <Clock size={12} />
                   Pending Verification
-                  <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${paymentVerificationTab === 'pending' ? 'bg-black/30 text-white' : 'bg-white/10 text-gray-300'}`}>
+                  <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${paymentVerificationTab === 'pending' ? 'bg-black/25 text-white' : 'bg-white/10 text-slate-200'}`}>
                     {paymentPendingCount}
                   </span>
                 </button>
                 <button
                   onClick={() => setPaymentVerificationTab('approved')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
                     paymentVerificationTab === 'approved'
-                      ? 'bg-emerald-500 text-black font-bold shadow'
-                      : 'text-gray-400 hover:text-white'
+                      ? 'bg-emerald-400/90 text-slate-950 font-bold shadow-[0_0_18px_rgba(52,211,153,0.35)]'
+                      : 'text-slate-300/80 hover:text-white hover:bg-white/[0.06]'
                   }`}
                 >
                   <CheckCircle2 size={12} />
@@ -2510,10 +2510,10 @@ export default function AdminDashboard() {
                 </button>
                 <button
                   onClick={() => setPaymentVerificationTab('rejected')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
                     paymentVerificationTab === 'rejected'
-                      ? 'bg-red-500 text-white font-bold shadow'
-                      : 'text-gray-400 hover:text-white'
+                      ? 'bg-red-500 text-white font-bold shadow-[0_0_18px_rgba(239,68,68,0.35)]'
+                      : 'text-slate-300/80 hover:text-white hover:bg-white/[0.06]'
                   }`}
                 >
                   <XCircle size={12} />
@@ -2521,10 +2521,10 @@ export default function AdminDashboard() {
                 </button>
                 <button
                   onClick={() => setPaymentVerificationTab('all')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
                     paymentVerificationTab === 'all'
-                      ? 'bg-white/20 text-white font-bold shadow'
-                      : 'text-gray-400 hover:text-white'
+                      ? 'bg-white/15 border border-white/25 text-white font-bold shadow'
+                      : 'text-slate-300/80 hover:text-white hover:bg-white/[0.06]'
                   }`}
                 >
                   All Submissions
@@ -2534,15 +2534,15 @@ export default function AdminDashboard() {
 
             {/* Payment Verification Table */}
             {paymentVerificationItems.length === 0 ? (
-              <div className="py-10 text-center text-gray-500 bg-black/20 rounded-2xl border border-white/5">
-                <Wallet size={32} className="mx-auto mb-2 opacity-30 text-blue-400" />
-                <p className="text-sm font-semibold text-gray-400">No payment submissions found in this tab.</p>
+              <div className="py-10 text-center text-slate-400 bg-white/[0.03] backdrop-blur-md rounded-2xl border border-white/10">
+                <Wallet size={32} className="mx-auto mb-2 opacity-40 text-cyan-400" />
+                <p className="text-sm font-semibold text-slate-300">No payment submissions found in this tab.</p>
               </div>
             ) : (
-              <div className="overflow-x-auto rounded-2xl border border-[#2d382f] bg-[#121613]/90">
+              <div className="overflow-x-auto rounded-2xl border border-white/15 bg-white/[0.03] backdrop-blur-md">
                 <table className="w-full text-left text-xs min-w-[800px]">
                   <thead>
-                    <tr className="border-b border-[#2d382f] bg-[#1a221d] text-gray-400 font-semibold uppercase tracking-wider text-[10px]">
+                    <tr className="border-b border-white/10 bg-white/[0.05] text-slate-300 font-semibold uppercase tracking-wider text-[10px]">
                       <th className="py-3 px-3">Participant</th>
                       <th className="py-3 px-3">Academic Year & Plan</th>
                       <th className="py-3 px-3">UTR / Transaction ID</th>
@@ -2552,7 +2552,7 @@ export default function AdminDashboard() {
                       <th className="py-3 px-3 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#242d26]">
+                  <tbody className="divide-y divide-white/10">
                     {paymentVerificationItems.map((p) => {
                       const isApproved = p.payment_status === 'approved' || Boolean(p.payment_verified);
                       const isRejected = p.payment_status === 'rejected';
@@ -2683,35 +2683,35 @@ export default function AdminDashboard() {
         {/* TAB 4: ALL REGISTRATIONS DIRECTORY & CHECK-IN                  */}
         {/* ============================================================== */}
         {(viewMode === 'classic' || activeWorkspaceTab === 'all') && (
-          <section className="mb-8 p-6 rounded-3xl bg-[#161c18]/95 border border-[#2d382f] shadow-2xl relative">
+          <section className="mb-8 p-6 rounded-3xl liquid-glass-strong relative">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
               <div>
                 <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                  <Users size={20} className="text-blue-400" />
+                  <Users size={20} className="text-cyan-400" />
                   Registration Master Directory
-                  <span className="text-xs font-normal text-gray-400">
+                  <span className="text-xs font-normal text-slate-300/80">
                     ({displayedMainParticipants.length} students)
                   </span>
                 </h3>
-                <p className="text-xs text-gray-400 mt-0.5">
+                <p className="text-xs text-slate-300/80 mt-0.5">
                   Full registration index with venue check-in controls, Step 1 & 2 indicators, and participant editing.
                 </p>
               </div>
 
               {/* Filter Tabs */}
-              <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-xl bg-black/40 border border-white/5">
+              <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-xl bg-white/[0.04] backdrop-blur-md border border-white/10">
                 <button
                   type="button"
                   onClick={() => setMainTableFilter('unverified')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
                     mainTableFilter === 'unverified'
-                      ? 'bg-amber-500 text-black font-bold shadow'
-                      : 'text-gray-400 hover:text-white'
+                      ? 'bg-amber-400/90 text-slate-950 font-bold shadow-[0_0_18px_rgba(251,191,36,0.35)]'
+                      : 'text-slate-300/80 hover:text-white hover:bg-white/[0.06]'
                   }`}
                 >
                   <Clock size={12} />
                   Awaiting Payment / Unverified
-                  <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${mainTableFilter === 'unverified' ? 'bg-black/30 text-black' : 'bg-white/10 text-gray-300'}`}>
+                  <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${mainTableFilter === 'unverified' ? 'bg-black/25 text-slate-950' : 'bg-white/10 text-slate-200'}`}>
                     {participants.filter(p => !(p.payment_status === 'approved' || Boolean(p.payment_verified))).length}
                   </span>
                 </button>
@@ -2719,10 +2719,10 @@ export default function AdminDashboard() {
                 <button
                   type="button"
                   onClick={() => setMainTableFilter('all')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
                     mainTableFilter === 'all'
-                      ? 'bg-white/20 text-white font-bold shadow'
-                      : 'text-gray-400 hover:text-white'
+                      ? 'bg-white/15 border border-white/25 text-white font-bold shadow'
+                      : 'text-slate-300/80 hover:text-white hover:bg-white/[0.06]'
                   }`}
                 >
                   <Users size={12} />
@@ -2732,10 +2732,10 @@ export default function AdminDashboard() {
                 <button
                   type="button"
                   onClick={() => setMainTableFilter('verified')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
                     mainTableFilter === 'verified'
-                      ? 'bg-emerald-500 text-black font-bold shadow'
-                      : 'text-gray-400 hover:text-white'
+                      ? 'bg-emerald-400/90 text-slate-950 font-bold shadow-[0_0_18px_rgba(52,211,153,0.35)]'
+                      : 'text-slate-300/80 hover:text-white hover:bg-white/[0.06]'
                   }`}
                 >
                   <ShieldCheck size={12} />
@@ -2747,38 +2747,38 @@ export default function AdminDashboard() {
             {/* Search and Branch Selector */}
             <div className="flex flex-col sm:flex-row gap-3 mb-5">
               <div className="relative flex-1">
-                <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500" />
+                <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
                   value={search}
                   onChange={e => setSearch(e.target.value)}
                   placeholder="Search by participant name, roll / enrolment no, or email..."
-                  className="w-full bg-[#121613] border border-[#2d382f] rounded-xl pl-10 pr-4 py-2.5 text-xs sm:text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
+                  className="liquid-input w-full pl-10 pr-4 py-2.5 text-xs sm:text-sm"
                 />
               </div>
               <div className="relative">
                 <select
                   value={branch}
                   onChange={e => setBranch(e.target.value)}
-                  className="bg-[#121613] border border-[#2d382f] rounded-xl px-4 py-2.5 pr-10 text-xs sm:text-sm text-white focus:outline-none focus:border-blue-500 appearance-none"
+                  className="liquid-input px-4 py-2.5 pr-10 text-xs sm:text-sm appearance-none"
                 >
-                  <option value="all">All Branches</option>
+                  <option value="all" className="bg-[#081022] text-white">All Branches</option>
                   {branches.map(b => (
-                    <option key={b} value={b}>
+                    <option key={b} value={b} className="bg-[#081022] text-white">
                       {b}
                     </option>
                   ))}
                 </select>
-                <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
+                <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
               </div>
             </div>
 
             {loading ? (
               <LoadingSpinner text="Loading participant directory..." />
             ) : (
-              <div className="overflow-x-auto rounded-2xl border border-[#2d382f] bg-[#121613]/90">
+              <div className="overflow-x-auto rounded-2xl border border-white/15 bg-white/[0.03] backdrop-blur-md">
                 <table className="w-full text-left text-xs min-w-[850px]">
                   <thead>
-                    <tr className="border-b border-[#2d382f] bg-[#1a221d] text-gray-400 font-semibold uppercase tracking-wider text-[10px]">
+                    <tr className="border-b border-white/10 bg-white/[0.05] text-slate-300 font-semibold uppercase tracking-wider text-[10px]">
                       <th className="py-3 px-3">Participant</th>
                       <th className="py-3 px-3 hidden sm:table-cell">Roll / Enrolment No</th>
                       <th className="py-3 px-3 hidden md:table-cell">Branch</th>
@@ -2789,7 +2789,7 @@ export default function AdminDashboard() {
                       <th className="py-3 px-3 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#242d26]">
+                  <tbody className="divide-y divide-white/10">
                     {displayedMainParticipants.length === 0 ? (
                       <tr>
                         <td colSpan={8} className="py-12 text-center text-gray-400">
@@ -2960,107 +2960,107 @@ export default function AdminDashboard() {
 
       {/* Edit Registration Modal */}
       {editingParticipant && editForm && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-2xl bg-[#171b18] border border-[#2d382f] rounded-3xl shadow-2xl overflow-hidden">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-[#141a15]">
+        <div className="fixed inset-0 bg-[#030712]/75 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-2xl liquid-glass-strong rounded-3xl overflow-hidden">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-white/[0.04]">
               <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                <Pencil size={16} className="text-emerald-400" />
+                <Pencil size={16} className="text-cyan-400" />
                 Edit Registration Details
               </h3>
-              <button onClick={closeEdit} className="w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-300">
+              <button onClick={closeEdit} className="liquid-icon-bubble !w-8 !h-8 !rounded-xl text-slate-200 hover:text-white">
                 <X size={16} />
               </button>
             </div>
 
             <form onSubmit={handleSaveEdit} className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs text-gray-400 mb-1.5 font-medium">Full Name</label>
+                <label className="block text-xs text-slate-300/80 mb-1.5 font-medium">Full Name</label>
                 <input
                   value={editForm.full_name}
                   onChange={e => setEditForm(prev => (prev ? { ...prev, full_name: e.target.value } : prev))}
-                  className="w-full bg-[#121613] border border-[#2d382f] rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-emerald-500 text-xs sm:text-sm"
+                  className="liquid-input w-full px-3 py-2.5 text-xs sm:text-sm"
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-400 mb-1.5 font-medium">Email Address</label>
+                <label className="block text-xs text-slate-300/80 mb-1.5 font-medium">Email Address</label>
                 <input
                   type="email"
                   value={editForm.email}
                   onChange={e => setEditForm(prev => (prev ? { ...prev, email: e.target.value } : prev))}
-                  className="w-full bg-[#121613] border border-[#2d382f] rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-emerald-500 text-xs sm:text-sm"
+                  className="liquid-input w-full px-3 py-2.5 text-xs sm:text-sm"
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-400 mb-1.5 font-medium">Roll Number / Enrolment No</label>
+                <label className="block text-xs text-slate-300/80 mb-1.5 font-medium">Roll Number / Enrolment No</label>
                 <input
                   value={editForm.roll_number}
                   onChange={e => setEditForm(prev => (prev ? { ...prev, roll_number: e.target.value } : prev))}
                   maxLength={15}
-                  className="w-full bg-[#121613] border border-[#2d382f] rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-emerald-500 text-xs sm:text-sm"
+                  className="liquid-input w-full px-3 py-2.5 text-xs sm:text-sm"
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-400 mb-1.5 font-medium">WhatsApp Number</label>
+                <label className="block text-xs text-slate-300/80 mb-1.5 font-medium">WhatsApp Number</label>
                 <input
                   value={editForm.whatsapp_number}
                   onChange={e => setEditForm(prev => (prev ? { ...prev, whatsapp_number: e.target.value } : prev))}
-                  className="w-full bg-[#121613] border border-[#2d382f] rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-emerald-500 text-xs sm:text-sm"
+                  className="liquid-input w-full px-3 py-2.5 text-xs sm:text-sm"
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-400 mb-1.5 font-medium">Branch</label>
+                <label className="block text-xs text-slate-300/80 mb-1.5 font-medium">Branch</label>
                 <input
                   value={editForm.branch}
                   onChange={e => setEditForm(prev => (prev ? { ...prev, branch: e.target.value } : prev))}
-                  className="w-full bg-[#121613] border border-[#2d382f] rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-emerald-500 text-xs sm:text-sm"
+                  className="liquid-input w-full px-3 py-2.5 text-xs sm:text-sm"
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-400 mb-1.5 font-medium">Academic Year</label>
+                <label className="block text-xs text-slate-300/80 mb-1.5 font-medium">Academic Year</label>
                 <select
                   value={editForm.year}
                   onChange={e => setEditForm(prev => (prev ? { ...prev, year: e.target.value } : prev))}
-                  className="w-full bg-[#121613] border border-[#2d382f] rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-emerald-500 text-xs sm:text-sm"
+                  className="liquid-input w-full px-3 py-2.5 text-xs sm:text-sm"
                 >
-                  <option value="1st Year">1st Year</option>
-                  <option value="2nd Year">2nd Year</option>
+                  <option value="1st Year" className="bg-[#081022] text-white">1st Year</option>
+                  <option value="2nd Year" className="bg-[#081022] text-white">2nd Year</option>
                 </select>
               </div>
               <div>
-                <label className="block text-xs text-gray-400 mb-1.5 font-medium">Payment ID / UTR</label>
+                <label className="block text-xs text-slate-300/80 mb-1.5 font-medium">Payment ID / UTR</label>
                 <input
                   value={editForm.payment_id}
                   onChange={e => setEditForm(prev => (prev ? { ...prev, payment_id: e.target.value } : prev))}
-                  className="w-full bg-[#121613] border border-[#2d382f] rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-emerald-500 text-xs sm:text-sm"
+                  className="liquid-input w-full px-3 py-2.5 text-xs sm:text-sm"
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-400 mb-1.5 font-medium">Account Holder Name</label>
+                <label className="block text-xs text-slate-300/80 mb-1.5 font-medium">Account Holder Name</label>
                 <input
                   value={editForm.account_holder_name}
                   onChange={e => setEditForm(prev => (prev ? { ...prev, account_holder_name: e.target.value } : prev))}
-                  className="w-full bg-[#121613] border border-[#2d382f] rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-emerald-500 text-xs sm:text-sm"
+                  className="liquid-input w-full px-3 py-2.5 text-xs sm:text-sm"
                 />
               </div>
               <div className="md:col-span-2">
-                <label className="block text-xs text-gray-400 mb-1.5 font-medium">Skills (comma-separated)</label>
+                <label className="block text-xs text-slate-300/80 mb-1.5 font-medium">Skills (comma-separated)</label>
                 <input
                   value={editForm.skills}
                   onChange={e => setEditForm(prev => (prev ? { ...prev, skills: e.target.value } : prev))}
-                  className="w-full bg-[#121613] border border-[#2d382f] rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-emerald-500 text-xs sm:text-sm"
+                  className="liquid-input w-full px-3 py-2.5 text-xs sm:text-sm"
                 />
               </div>
 
               {editError && <p className="md:col-span-2 text-xs text-red-400">{editError}</p>}
 
               <div className="md:col-span-2 flex justify-end gap-2.5 mt-2">
-                <button type="button" onClick={closeEdit} className="px-4 py-2 rounded-xl border border-white/10 text-gray-300 hover:bg-white/10 text-xs font-semibold">
+                <button type="button" onClick={closeEdit} className="liquid-btn-glass px-4 py-2 rounded-xl text-xs font-semibold">
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={savingEdit}
-                  className="px-5 py-2 rounded-xl bg-emerald-600 text-white font-bold text-xs hover:bg-emerald-500 disabled:opacity-50 shadow-md"
+                  className="liquid-btn-primary px-5 py-2 rounded-xl text-white font-bold text-xs disabled:opacity-50"
                 >
                   {savingEdit ? 'Saving...' : 'Save Changes'}
                 </button>
@@ -3077,7 +3077,7 @@ export default function AdminDashboard() {
         return (
           <div
             data-actions-menu="true"
-            className="fixed w-48 rounded-2xl border border-[#2d382f] bg-[#141a15] shadow-2xl z-[9999] overflow-hidden"
+            className="fixed w-48 rounded-2xl liquid-glass-strong !border-white/20 z-[9999] overflow-hidden"
             style={{
               top: openActionMenu.top,
               left: openActionMenu.left,
@@ -3210,7 +3210,7 @@ export default function AdminDashboard() {
       {openPanelMenu && (
         <div
           data-dashboard-menu="true"
-          className="fixed rounded-2xl border border-[#2d382f] bg-[#141a15] shadow-2xl z-[9999] overflow-hidden"
+          className="fixed rounded-2xl liquid-glass-strong !border-white/20 z-[9999] overflow-hidden"
           style={{
             top: openPanelMenu.top,
             left: openPanelMenu.left,
@@ -3332,14 +3332,14 @@ export default function AdminDashboard() {
 
       {/* Participant QR Entry Pass Modal */}
       {qrModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="w-full max-w-sm bg-[#161c18] border border-[#2d382f] rounded-3xl shadow-2xl overflow-hidden text-center">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 bg-[#121613]">
+        <div className="fixed inset-0 bg-[#030712]/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="w-full max-w-sm liquid-glass-strong rounded-3xl overflow-hidden text-center">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 bg-white/[0.04]">
               <h3 className="text-sm font-bold text-white flex items-center gap-1.5">
-                <QrCode size={16} className="text-emerald-400" />
+                <QrCode size={16} className="text-cyan-400" />
                 {qrModal.title}
               </h3>
-              <button onClick={() => setQrModal(null)} className="w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-300">
+              <button onClick={() => setQrModal(null)} className="liquid-icon-bubble !w-8 !h-8 !rounded-xl text-slate-200 hover:text-white">
                 <X size={16} />
               </button>
             </div>
@@ -3351,7 +3351,7 @@ export default function AdminDashboard() {
                   className="w-60 h-60 object-contain rounded-lg"
                 />
               </div>
-              <p className="mt-4 text-xs font-mono text-gray-400 break-all bg-black/40 p-2.5 rounded-xl border border-white/5">
+              <p className="mt-4 text-xs font-mono text-slate-300 break-all bg-white/[0.04] backdrop-blur-md p-2.5 rounded-xl border border-white/10">
                 {qrModal.value}
               </p>
             </div>
@@ -3361,21 +3361,21 @@ export default function AdminDashboard() {
 
       {/* Status & Email Dialog */}
       {statusDialog && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[10000] flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-[#030712]/80 backdrop-blur-md z-[10000] flex items-center justify-center p-4">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="w-full max-w-md bg-[#161c18] border border-[#2d382f] rounded-3xl shadow-2xl overflow-hidden"
+            className="w-full max-w-md liquid-glass-strong rounded-3xl overflow-hidden"
           >
-            <div className="px-5 py-4 border-b border-white/10 flex items-center justify-between bg-[#121613]">
+            <div className="px-5 py-4 border-b border-white/10 flex items-center justify-between bg-white/[0.04]">
               <div>
                 <h3 className="text-sm sm:text-base font-bold text-white">{statusDialog.title}</h3>
-                <p className="text-[11px] text-gray-400 mt-0.5">Admin Notification System</p>
+                <p className="text-[11px] text-slate-400 mt-0.5">Admin Notification System</p>
               </div>
               {statusDialog.tone !== 'loading' && (
                 <button
                   onClick={() => setStatusDialog(null)}
-                  className="w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-300"
+                  className="liquid-icon-bubble !w-8 !h-8 !rounded-xl text-slate-200 hover:text-white"
                 >
                   <X size={16} />
                 </button>
@@ -3384,12 +3384,12 @@ export default function AdminDashboard() {
             <div className="p-5">
               <div className="flex items-start gap-3.5">
                 <div
-                  className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 ${
+                  className={`liquid-icon-bubble !w-10 !h-10 !rounded-2xl shrink-0 ${
                     statusDialog.tone === 'loading'
-                      ? 'bg-sky-500/15 text-sky-300'
+                      ? 'border-cyan-400/35 text-cyan-300'
                       : statusDialog.tone === 'success'
-                        ? 'bg-emerald-500/15 text-emerald-300'
-                        : 'bg-red-500/15 text-red-300'
+                        ? 'border-emerald-400/35 text-emerald-300'
+                        : 'border-red-400/35 text-red-300'
                   }`}
                 >
                   {statusDialog.tone === 'loading' ? (
@@ -3400,14 +3400,14 @@ export default function AdminDashboard() {
                     <AlertCircle size={18} />
                   )}
                 </div>
-                <p className="text-xs sm:text-sm text-gray-200 leading-relaxed pt-1">{statusDialog.message}</p>
+                <p className="text-xs sm:text-sm text-slate-100 leading-relaxed pt-1">{statusDialog.message}</p>
               </div>
 
               {statusDialog.tone !== 'loading' && (
                 <div className="mt-5 flex justify-end">
                   <button
                     onClick={() => setStatusDialog(null)}
-                    className="px-4 py-2 rounded-xl bg-white/10 border border-white/15 text-white text-xs font-semibold hover:bg-white/15"
+                    className="liquid-btn-glass px-4 py-2 rounded-xl text-xs font-semibold"
                   >
                     Close
                   </button>
@@ -3420,27 +3420,27 @@ export default function AdminDashboard() {
 
       {/* Review Step 1 Registration Modal */}
       {reviewingParticipant && (
-        <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-[10000] flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-[#030712]/80 backdrop-blur-md z-[10000] flex items-center justify-center p-4">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="w-full max-w-2xl bg-[#161c18] border border-[#2d382f] rounded-3xl shadow-2xl overflow-hidden"
+            className="w-full max-w-2xl liquid-glass-strong rounded-3xl overflow-hidden"
           >
-            <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between bg-[#121613]">
+            <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between bg-white/[0.04]">
               <div>
                 <div className="flex items-center gap-2">
                   <h3 className="text-base sm:text-lg font-bold text-white">Review Step 1 Registration</h3>
                   {reviewingParticipant.registration_id && (
-                    <span className="font-mono text-xs px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 font-bold border border-emerald-500/30">
+                    <span className="font-mono text-xs px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-200 font-bold border border-cyan-400/35">
                       {reviewingParticipant.registration_id}
                     </span>
                   )}
                 </div>
-                <p className="text-xs text-gray-400 mt-0.5">Verify participant information before authorizing Step 2 payment access</p>
+                <p className="text-xs text-slate-300/80 mt-0.5">Verify participant information before authorizing Step 2 payment access</p>
               </div>
               <button
                 onClick={() => setReviewingParticipant(null)}
-                className="w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-300"
+                className="liquid-icon-bubble !w-8 !h-8 !rounded-xl text-slate-200 hover:text-white"
               >
                 <X size={16} />
               </button>
@@ -3448,8 +3448,8 @@ export default function AdminDashboard() {
 
             <div className="p-6 space-y-5 max-h-[75vh] overflow-y-auto">
               {/* WhatsApp Community Alert Box */}
-              <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-start gap-3.5">
-                <div className="w-9 h-9 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
+              <div className="p-4 rounded-2xl bg-emerald-500/10 backdrop-blur-md border border-emerald-400/30 flex items-start gap-3.5">
+                <div className="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-300 shrink-0">
                   <Phone size={18} />
                 </div>
                 <div className="flex-1">
@@ -3460,102 +3460,102 @@ export default function AdminDashboard() {
                       href={`https://wa.me/${reviewingParticipant.whatsapp_number.replace(/[^0-9]/g, '')}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-xs px-3 py-1 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold inline-flex items-center gap-1 transition-colors"
+                      className="text-xs px-3 py-1 rounded-xl bg-emerald-500/85 hover:bg-emerald-400 text-slate-950 font-bold inline-flex items-center gap-1 transition-colors"
                     >
                       <Phone size={12} /> Check on WhatsApp
                     </a>
                   </div>
-                  <p className="text-[11px] text-gray-400 mt-1">
+                  <p className="text-[11px] text-slate-300/80 mt-1">
                     Confirm that this phone number is a member in our Ignite 2.O WhatsApp community before approving.
                   </p>
                 </div>
               </div>
 
               {/* Details Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs sm:text-sm bg-black/20 p-4 rounded-2xl border border-white/5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs sm:text-sm bg-white/[0.04] backdrop-blur-md p-4 rounded-2xl border border-white/10">
                 <div>
-                  <span className="text-[11px] text-gray-400 block">Full Name</span>
+                  <span className="text-[11px] text-slate-400 block">Full Name</span>
                   <span className="font-semibold text-white">{reviewingParticipant.full_name}</span>
                 </div>
                 <div>
-                  <span className="text-[11px] text-gray-400 block">Email Address</span>
-                  <span className="font-mono text-gray-200">{reviewingParticipant.email}</span>
+                  <span className="text-[11px] text-slate-400 block">Email Address</span>
+                  <span className="font-mono text-slate-200">{reviewingParticipant.email}</span>
                 </div>
                 <div>
-                  <span className="text-[11px] text-gray-400 block">Roll / Enrolment No</span>
+                  <span className="text-[11px] text-slate-400 block">Roll / Enrolment No</span>
                   <span className="font-mono text-white font-semibold">{reviewingParticipant.roll_number}</span>
                 </div>
                 <div>
-                  <span className="text-[11px] text-gray-400 block">Branch & Academic Year</span>
-                  <span className="text-gray-200">{reviewingParticipant.branch} • {reviewingParticipant.year}</span>
+                  <span className="text-[11px] text-slate-400 block">Branch & Academic Year</span>
+                  <span className="text-slate-200">{reviewingParticipant.branch} • {reviewingParticipant.year}</span>
                 </div>
                 <div className="sm:col-span-2">
-                  <span className="text-[11px] text-gray-400 block">Skills / Interests</span>
+                  <span className="text-[11px] text-slate-400 block">Skills / Interests</span>
                   <div className="flex flex-wrap gap-1 mt-1">
                     {reviewingParticipant.skills.length > 0 ? (
                       reviewingParticipant.skills.map((skill, idx) => (
-                        <span key={idx} className="px-2 py-0.5 rounded-lg bg-white/10 text-xs text-gray-300">
+                        <span key={idx} className="px-2 py-0.5 rounded-lg bg-white/10 border border-white/10 text-xs text-slate-200">
                           {skill}
                         </span>
                       ))
                     ) : (
-                      <span className="text-gray-500 text-xs italic">None listed</span>
+                      <span className="text-slate-500 text-xs italic">None listed</span>
                     )}
                   </div>
                 </div>
               </div>
 
               {/* Step 2 Payment Verification Box */}
-              <div className="p-4 rounded-2xl bg-[#121613] border border-blue-500/30 space-y-3">
+              <div className="p-4 rounded-2xl bg-white/[0.04] backdrop-blur-md border border-cyan-400/30 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <ShieldCheck size={16} className="text-blue-400" />
+                    <ShieldCheck size={16} className="text-cyan-400" />
                     <p className="font-semibold text-white text-xs uppercase tracking-wider">
                       Step 2: Payment Details & Screenshot
                     </p>
                   </div>
                   <div>
                     {reviewingParticipant.payment_status === 'approved' || reviewingParticipant.payment_verified ? (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/40 text-emerald-300">
+                      <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-400/40 text-emerald-300">
                         <CheckCircle2 size={11} /> Approved
                       </span>
                     ) : reviewingParticipant.payment_status === 'rejected' ? (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-red-500/15 border border-red-500/40 text-red-300">
+                      <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-red-500/15 border border-red-400/40 text-red-300">
                         <XCircle size={11} /> Rejected
                       </span>
                     ) : (reviewingParticipant.payment_screenshot_url || reviewingParticipant.account_holder_name || reviewingParticipant.payment_id) ? (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/40 text-amber-300 animate-pulse">
+                      <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-400/40 text-amber-300 animate-pulse">
                         <Clock size={11} /> Pending Review
                       </span>
                     ) : (
-                      <span className="text-[11px] text-gray-500">Awaiting Submission</span>
+                      <span className="text-[11px] text-slate-400">Awaiting Submission</span>
                     )}
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs pt-1">
                   <div>
-                    <span className="text-gray-400 block text-[11px]">Academic Year:</span>
+                    <span className="text-slate-400 block text-[11px]">Academic Year:</span>
                     <span className="text-white font-medium">{reviewingParticipant.year || '1st Year'}</span>
                   </div>
                   <div>
-                    <span className="text-gray-400 block text-[11px]">Applicable Fee:</span>
-                    <span className="text-emerald-400 font-bold">
+                    <span className="text-slate-400 block text-[11px]">Applicable Fee:</span>
+                    <span className="text-emerald-300 font-bold">
                       INR {reviewingParticipant.payment_amount != null ? reviewingParticipant.payment_amount : (reviewingParticipant.year === '2nd Year' ? 699 : 599)}
                     </span>
                   </div>
                   <div>
-                    <span className="text-gray-400 block text-[11px]">Account Holder:</span>
+                    <span className="text-slate-400 block text-[11px]">Account Holder:</span>
                     <span className="text-white font-medium">{reviewingParticipant.account_holder_name || 'N/A'}</span>
                   </div>
                   <div className="sm:col-span-3">
-                    <span className="text-gray-400 block text-[11px]">Payment Reference / UTR ID:</span>
-                    <span className="font-mono text-blue-300 font-medium">{reviewingParticipant.payment_id || 'N/A'}</span>
+                    <span className="text-slate-400 block text-[11px]">Payment Reference / UTR ID:</span>
+                    <span className="font-mono text-cyan-300 font-medium">{reviewingParticipant.payment_id || 'N/A'}</span>
                   </div>
                 </div>
 
                 {reviewingParticipant.payment_screenshot_url && (
-                  <div className="pt-2 border-t border-white/5 flex items-center gap-4">
+                  <div className="pt-2 border-t border-white/10 flex items-center gap-4">
                     <img
                       src={reviewingParticipant.payment_screenshot_url}
                       alt="Payment Preview"
@@ -3569,7 +3569,7 @@ export default function AdminDashboard() {
                       }
                     />
                     <div>
-                      <p className="text-xs font-medium text-gray-200">Payment Screenshot Attached</p>
+                      <p className="text-xs font-medium text-slate-200">Payment Screenshot Attached</p>
                       <button
                         type="button"
                         onClick={() =>
@@ -3579,7 +3579,7 @@ export default function AdminDashboard() {
                             participant: reviewingParticipant,
                           })
                         }
-                        className="mt-1 px-3 py-1 rounded-lg bg-blue-500/20 text-blue-300 text-xs font-semibold inline-flex items-center gap-1 hover:bg-blue-500/30 transition-colors"
+                        className="mt-1 liquid-btn-glass px-3 py-1 rounded-lg text-cyan-200 text-xs font-semibold inline-flex items-center gap-1"
                       >
                         <Image size={12} /> View Screenshot
                       </button>
@@ -3590,11 +3590,11 @@ export default function AdminDashboard() {
             </div>
 
             {/* Modal Actions */}
-            <div className="px-6 py-4 border-t border-white/10 bg-[#121613] flex flex-wrap items-center justify-between gap-3">
+            <div className="px-6 py-4 border-t border-white/10 bg-white/[0.04] flex flex-wrap items-center justify-between gap-3">
               <button
                 type="button"
                 onClick={() => setReviewingParticipant(null)}
-                className="px-4 py-2 rounded-xl border border-white/10 text-gray-300 hover:bg-white/10 text-xs font-semibold"
+                className="liquid-btn-glass px-4 py-2 rounded-xl text-xs font-semibold"
               >
                 Close
               </button>
@@ -3606,7 +3606,7 @@ export default function AdminDashboard() {
                       type="button"
                       onClick={() => handleOpenRejectModal(reviewingParticipant)}
                       disabled={resolvingApprovalId === reviewingParticipant.id}
-                      className="px-4 py-2 rounded-xl bg-red-500/15 hover:bg-red-500/25 text-red-300 border border-red-500/30 text-xs font-bold inline-flex items-center gap-1.5 disabled:opacity-50"
+                      className="px-4 py-2 rounded-xl bg-red-500/15 hover:bg-red-500/25 text-red-300 border border-red-400/35 text-xs font-bold inline-flex items-center gap-1.5 disabled:opacity-50 transition-all"
                     >
                       <X size={14} /> Reject
                     </button>
@@ -3614,7 +3614,7 @@ export default function AdminDashboard() {
                       type="button"
                       onClick={() => handleApproveRegistration(reviewingParticipant)}
                       disabled={resolvingApprovalId === reviewingParticipant.id}
-                      className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black inline-flex items-center gap-1.5 shadow-lg shadow-emerald-600/30 disabled:opacity-50"
+                      className="px-5 py-2 rounded-xl bg-emerald-500/90 hover:bg-emerald-400 text-slate-950 text-xs font-black inline-flex items-center gap-1.5 shadow-[0_0_20px_rgba(16,185,129,0.35)] disabled:opacity-50 transition-all"
                     >
                       <Check size={14} />
                       {resolvingApprovalId === reviewingParticipant.id ? 'Approving...' : 'Approve & Unlock Step 2'}
@@ -3627,7 +3627,7 @@ export default function AdminDashboard() {
                     type="button"
                     onClick={() => handleResendApprovalEmail(reviewingParticipant)}
                     disabled={resendingApprovalId === reviewingParticipant.id}
-                    className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold inline-flex items-center gap-1.5 shadow-lg disabled:opacity-50"
+                    className="liquid-btn-primary px-4 py-2 rounded-xl text-white text-xs font-bold inline-flex items-center gap-1.5 disabled:opacity-50"
                   >
                     <Send size={13} />
                     {resendingApprovalId === reviewingParticipant.id ? 'Sending...' : 'Resend Step 2 Link Email'}
@@ -3641,37 +3641,37 @@ export default function AdminDashboard() {
 
       {/* Reject Registration Modal */}
       {rejectModalParticipant && (
-        <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-[10001] flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-[#030712]/80 backdrop-blur-md z-[10001] flex items-center justify-center p-4">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="w-full max-w-md bg-[#181316] border border-red-500/30 rounded-3xl shadow-2xl overflow-hidden"
+            className="w-full max-w-md liquid-glass-strong !border-red-400/35 rounded-3xl overflow-hidden"
           >
-            <div className="px-5 py-4 border-b border-red-500/20 bg-red-950/30 flex items-center justify-between">
+            <div className="px-5 py-4 border-b border-red-400/20 bg-red-500/10 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-red-500/20 text-red-400 flex items-center justify-center">
+                <div className="liquid-icon-bubble !w-8 !h-8 !rounded-xl border-red-400/35 text-red-300">
                   <XCircle size={18} />
                 </div>
                 <div>
                   <h3 className="text-sm sm:text-base font-bold text-white">Reject Step 1 Registration</h3>
-                  <p className="text-xs text-gray-400">{rejectModalParticipant.full_name}</p>
+                  <p className="text-xs text-slate-300/80">{rejectModalParticipant.full_name}</p>
                 </div>
               </div>
               <button
                 onClick={() => setRejectModalParticipant(null)}
-                className="w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-300"
+                className="liquid-icon-bubble !w-8 !h-8 !rounded-xl text-slate-200 hover:text-white"
               >
                 <X size={16} />
               </button>
             </div>
 
             <div className="p-5 space-y-4">
-              <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-200 leading-relaxed">
                 Rejecting will lock the participant out of Step 2. Specify a reason that will be emailed to the student.
               </p>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-300 mb-1.5">
+                <label className="block text-xs font-semibold text-slate-200 mb-1.5">
                   Rejection Reason (Recommended)
                 </label>
                 <textarea
@@ -3679,20 +3679,20 @@ export default function AdminDashboard() {
                   onChange={(e) => setRejectionReasonInput(e.target.value)}
                   placeholder="e.g. Phone number not present in official Ignite 2.O WhatsApp community..."
                   rows={3}
-                  className="w-full bg-[#111411] border border-red-500/30 rounded-xl px-3 py-2.5 text-xs sm:text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-400"
+                  className="liquid-input w-full !border-red-400/35 focus:!border-red-400 px-3 py-2.5 text-xs sm:text-sm"
                 />
               </div>
 
-              <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-[11px] text-red-300">
+              <div className="p-3 rounded-xl bg-red-500/10 backdrop-blur-sm border border-red-400/25 text-[11px] text-red-200">
                 Notification email will be dispatched to <span className="font-mono text-white">{rejectModalParticipant.email}</span>.
               </div>
             </div>
 
-            <div className="px-5 py-3.5 border-t border-white/10 bg-black/40 flex items-center justify-end gap-2">
+            <div className="px-5 py-3.5 border-t border-white/10 bg-white/[0.04] flex items-center justify-end gap-2">
               <button
                 type="button"
                 onClick={() => setRejectModalParticipant(null)}
-                className="px-4 py-2 rounded-xl border border-white/10 text-gray-300 hover:bg-white/10 text-xs font-semibold"
+                className="liquid-btn-glass px-4 py-2 rounded-xl text-xs font-semibold"
               >
                 Cancel
               </button>
@@ -3700,7 +3700,7 @@ export default function AdminDashboard() {
                 type="button"
                 onClick={handleRejectRegistration}
                 disabled={resolvingApprovalId === rejectModalParticipant.id}
-                className="px-5 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-black inline-flex items-center gap-1.5 disabled:opacity-50"
+                className="px-5 py-2 rounded-xl bg-red-600/90 hover:bg-red-500 text-white text-xs font-black inline-flex items-center gap-1.5 shadow-[0_0_18px_rgba(239,68,68,0.35)] disabled:opacity-50 transition-all"
               >
                 <X size={14} />
                 {resolvingApprovalId === rejectModalParticipant.id ? 'Rejecting...' : 'Confirm Rejection'}
@@ -3712,15 +3712,15 @@ export default function AdminDashboard() {
 
       {/* Payment Screenshot Viewer Modal */}
       {screenshotModal && (
-        <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-[10002] flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-[#030712]/80 backdrop-blur-md z-[10002] flex items-center justify-center p-4">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="w-full max-w-2xl bg-[#161c18] border border-[#2d382f] rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+            className="w-full max-w-2xl liquid-glass-strong rounded-3xl overflow-hidden flex flex-col max-h-[90vh]"
           >
-            <div className="px-5 py-3.5 border-b border-white/10 flex items-center justify-between bg-[#121613]">
+            <div className="px-5 py-3.5 border-b border-white/10 flex items-center justify-between bg-white/[0.04]">
               <div className="flex items-center gap-2">
-                <Image size={18} className="text-blue-400" />
+                <Image size={18} className="text-cyan-400" />
                 <h3 className="text-xs sm:text-sm font-bold text-white truncate max-w-xs sm:max-w-md">
                   {screenshotModal.title}
                 </h3>
@@ -3730,41 +3730,41 @@ export default function AdminDashboard() {
                   href={screenshotModal.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-gray-300 inline-flex items-center gap-1 border border-white/10"
+                  className="liquid-btn-glass px-2.5 py-1 rounded-lg text-xs inline-flex items-center gap-1"
                 >
                   <ExternalLink size={12} /> Open Tab
                 </a>
                 <button
                   onClick={() => setScreenshotModal(null)}
-                  className="w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-300"
+                  className="liquid-icon-bubble !w-8 !h-8 !rounded-xl text-slate-200 hover:text-white"
                 >
                   <X size={16} />
                 </button>
               </div>
             </div>
 
-            <div className="p-4 flex-1 overflow-auto flex items-center justify-center bg-black/60 min-h-[300px]">
+            <div className="p-4 flex-1 overflow-auto flex items-center justify-center bg-black/40 backdrop-blur-sm min-h-[300px]">
               <img
                 src={screenshotModal.url}
                 alt="Payment Screenshot Full"
-                className="max-h-[60vh] max-w-full object-contain rounded-xl shadow-xl"
+                className="max-h-[60vh] max-w-full object-contain rounded-xl shadow-xl border border-white/10"
               />
             </div>
 
             {screenshotModal.participant && (
-              <div className="px-5 py-3 border-t border-white/10 bg-[#121613] flex flex-wrap items-center justify-between gap-3 text-xs">
+              <div className="px-5 py-3 border-t border-white/10 bg-white/[0.04] flex flex-wrap items-center justify-between gap-3 text-xs">
                 <div>
-                  <span className="text-gray-400">Account Holder: </span>
+                  <span className="text-slate-400">Account Holder: </span>
                   <span className="text-white font-medium">{screenshotModal.participant.account_holder_name || 'N/A'}</span>
-                  <span className="text-gray-400 ml-3">Ref ID: </span>
-                  <span className="text-blue-300 font-mono font-medium">{screenshotModal.participant.payment_id || 'N/A'}</span>
+                  <span className="text-slate-400 ml-3">Ref ID: </span>
+                  <span className="text-cyan-300 font-mono font-medium">{screenshotModal.participant.payment_id || 'N/A'}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
                     onClick={() => handleOpenRejectPaymentModal(screenshotModal.participant!)}
                     disabled={resolvingPaymentId === screenshotModal.participant.id}
-                    className="px-3 py-1.5 rounded-xl bg-red-500/15 hover:bg-red-500/25 text-red-300 border border-red-500/30 text-xs font-semibold inline-flex items-center gap-1 disabled:opacity-50"
+                    className="px-3 py-1.5 rounded-xl bg-red-500/15 hover:bg-red-500/25 text-red-300 border border-red-400/35 text-xs font-semibold inline-flex items-center gap-1 disabled:opacity-50 transition-all"
                   >
                     <X size={13} /> Reject Payment
                   </button>
@@ -3772,7 +3772,7 @@ export default function AdminDashboard() {
                     type="button"
                     onClick={() => handleApprovePayment(screenshotModal.participant!)}
                     disabled={resolvingPaymentId === screenshotModal.participant.id}
-                    className="px-4 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold inline-flex items-center gap-1 disabled:opacity-50"
+                    className="px-4 py-1.5 rounded-xl bg-emerald-500/90 hover:bg-emerald-400 text-slate-950 text-xs font-bold inline-flex items-center gap-1 shadow-[0_0_18px_rgba(16,185,129,0.35)] disabled:opacity-50 transition-all"
                   >
                     <Check size={13} />
                     {resolvingPaymentId === screenshotModal.participant.id ? 'Approving...' : 'Approve Payment'}
@@ -3786,37 +3786,37 @@ export default function AdminDashboard() {
 
       {/* Reject Payment Modal */}
       {rejectPaymentModalParticipant && (
-        <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-[10002] flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-[#030712]/80 backdrop-blur-md z-[10002] flex items-center justify-center p-4">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="w-full max-w-md bg-[#181316] border border-red-500/30 rounded-3xl shadow-2xl overflow-hidden"
+            className="w-full max-w-md liquid-glass-strong !border-red-400/35 rounded-3xl overflow-hidden"
           >
-            <div className="px-5 py-4 border-b border-red-500/20 bg-red-950/30 flex items-center justify-between">
+            <div className="px-5 py-4 border-b border-red-400/20 bg-red-500/10 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-red-500/20 text-red-400 flex items-center justify-center">
+                <div className="liquid-icon-bubble !w-8 !h-8 !rounded-xl border-red-400/35 text-red-300">
                   <XCircle size={18} />
                 </div>
                 <div>
                   <h3 className="text-sm sm:text-base font-bold text-white">Reject Payment Verification</h3>
-                  <p className="text-xs text-gray-400">{rejectPaymentModalParticipant.full_name}</p>
+                  <p className="text-xs text-slate-300/80">{rejectPaymentModalParticipant.full_name}</p>
                 </div>
               </div>
               <button
                 onClick={() => setRejectPaymentModalParticipant(null)}
-                className="w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-300"
+                className="liquid-icon-bubble !w-8 !h-8 !rounded-xl text-slate-200 hover:text-white"
               >
                 <X size={16} />
               </button>
             </div>
 
             <div className="p-5 space-y-4">
-              <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-200 leading-relaxed">
                 Rejecting will mark the participant's payment as Rejected. Specify a reason so the participant can resubmit valid payment proof.
               </p>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-300 mb-1.5">
+                <label className="block text-xs font-semibold text-slate-200 mb-1.5">
                   Rejection Reason (Recommended)
                 </label>
                 <textarea
@@ -3824,22 +3824,22 @@ export default function AdminDashboard() {
                   onChange={(e) => setRejectPaymentReasonInput(e.target.value)}
                   placeholder="e.g. UTR transaction ID not found in bank statement, blurred screenshot..."
                   rows={3}
-                  className="w-full bg-[#111411] border border-red-500/30 rounded-xl px-3 py-2.5 text-xs sm:text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-400"
+                  className="liquid-input w-full !border-red-400/35 focus:!border-red-400 px-3 py-2.5 text-xs sm:text-sm"
                 />
               </div>
 
               {rejectPaymentModalParticipant.account_holder_name && (
-                <div className="text-xs text-gray-400">
+                <div className="text-xs text-slate-300/80">
                   Account Holder: <span className="text-white font-medium">{rejectPaymentModalParticipant.account_holder_name}</span>
                 </div>
               )}
             </div>
 
-            <div className="px-5 py-3.5 border-t border-white/10 bg-black/40 flex items-center justify-end gap-2">
+            <div className="px-5 py-3.5 border-t border-white/10 bg-white/[0.04] flex items-center justify-end gap-2">
               <button
                 type="button"
                 onClick={() => setRejectPaymentModalParticipant(null)}
-                className="px-4 py-2 rounded-xl border border-white/10 text-gray-300 hover:bg-white/10 text-xs font-semibold"
+                className="liquid-btn-glass px-4 py-2 rounded-xl text-xs font-semibold"
               >
                 Cancel
               </button>
@@ -3847,7 +3847,7 @@ export default function AdminDashboard() {
                 type="button"
                 onClick={handleRejectPayment}
                 disabled={resolvingPaymentId === rejectPaymentModalParticipant.id}
-                className="px-5 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-black inline-flex items-center gap-1.5 disabled:opacity-50"
+                className="px-5 py-2 rounded-xl bg-red-600/90 hover:bg-red-500 text-white text-xs font-black inline-flex items-center gap-1.5 shadow-[0_0_18px_rgba(239,68,68,0.35)] disabled:opacity-50 transition-all"
               >
                 <X size={14} />
                 {resolvingPaymentId === rejectPaymentModalParticipant.id ? 'Rejecting...' : 'Confirm Reject Payment'}

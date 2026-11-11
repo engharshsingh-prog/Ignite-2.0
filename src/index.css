@@ -2,24 +2,24 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #111411;
-  --color-surface: #191e1b;
-  --color-surface2: #222923;
+  --color-background: #040814;
+  --color-surface: #0a1328;
+  --color-surface2: #101d3b;
   --color-foreground: #ffffff;
-  --color-muted: #8892b0;
+  --color-muted: #94a3b8;
   --color-primary: #3b82f6;
-  --color-secondary: #718044;
-  --color-accent: #a3b46a;
-  --color-olive-50: #f4f6ed;
-  --color-olive-100: #e8ecd9;
-  --color-olive-200: #d5ddb9;
-  --color-olive-300: #bdca91;
-  --color-olive-400: #9dab68;
-  --color-olive-500: #7f914c;
-  --color-olive-600: #65783e;
-  --color-olive-700: #4f6035;
-  --color-olive-800: #414e2f;
-  --color-olive-900: #37422b;
+  --color-secondary: #06b6d4;
+  --color-accent: #8b5cf6;
+  --color-olive-50: #ecfeff;
+  --color-olive-100: #cffafe;
+  --color-olive-200: #a5f3fc;
+  --color-olive-300: #67e8f9;
+  --color-olive-400: #22d3ee;
+  --color-olive-500: #06b6d4;
+  --color-olive-600: #0891b2;
+  --color-olive-700: #0e7490;
+  --color-olive-800: #155e75;
+  --color-olive-900: #164e63;
 }
 
 * {
@@ -29,30 +29,33 @@
 html {
   scroll-behavior: smooth;
   scrollbar-gutter: stable;
+  background-color: #040814;
 }
 
 body {
-  background-color: #111411;
+  background-color: #040814;
   color: #ffffff;
   font-family: "Rajdhani", system-ui, sans-serif;
   font-weight: 500;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   overscroll-behavior-y: none;
+  overflow-x: hidden;
 }
 
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 7px;
+  height: 7px;
 }
 ::-webkit-scrollbar-track {
-  background: #111411;
+  background: #040814;
 }
 ::-webkit-scrollbar-thumb {
-  background: #3b82f6;
-  border-radius: 3px;
+  background: linear-gradient(180deg, #22d3ee, #3b82f6, #8b5cf6);
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #718044;
+  background: linear-gradient(180deg, #67e8f9, #60a5fa, #a78bfa);
 }
 
 .font-display {
@@ -83,36 +86,279 @@ label {
   font-weight: 600;
 }
 
+/* ==========================================================================
+   APPLE-INSPIRED LIQUID GLASS UI DESIGN SYSTEM
+   ========================================================================== */
+
+.liquid-glass {
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.09) 0%,
+    rgba(186, 230, 253, 0.04) 48%,
+    rgba(139, 92, 246, 0.05) 100%
+  );
+  -webkit-backdrop-filter: blur(22px) saturate(165%);
+  backdrop-filter: blur(22px) saturate(165%);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow:
+    0 14px 40px -10px rgba(0, 0, 0, 0.55),
+    0 0 28px -8px rgba(56, 189, 248, 0.16),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.24),
+    inset 0 -1px 0 0 rgba(255, 255, 255, 0.05);
+}
+
+.liquid-glass-card {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.095) 0%,
+    rgba(147, 197, 253, 0.045) 45%,
+    rgba(139, 92, 246, 0.05) 100%
+  );
+  -webkit-backdrop-filter: blur(22px) saturate(165%);
+  backdrop-filter: blur(22px) saturate(165%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow:
+    0 16px 42px -12px rgba(0, 0, 0, 0.6),
+    0 0 26px -8px rgba(34, 211, 238, 0.14),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.25),
+    inset 0 -1px 0 0 rgba(255, 255, 255, 0.05);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.35s ease,
+    box-shadow 0.35s ease;
+}
+
+.liquid-glass-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    115deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.12) 45%,
+    rgba(103, 232, 249, 0.12) 50%,
+    transparent 75%
+  );
+  transform: translateX(-140%) skewX(-18deg);
+  transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.liquid-glass-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(103, 232, 249, 0.42);
+  box-shadow:
+    0 24px 56px -14px rgba(0, 0, 0, 0.7),
+    0 0 36px -6px rgba(34, 211, 238, 0.28),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.34);
+}
+
+.liquid-glass-card:hover::before {
+  transform: translateX(140%) skewX(-18deg);
+}
+
+.liquid-glass-strong {
+  background: linear-gradient(
+    155deg,
+    rgba(14, 26, 52, 0.86) 0%,
+    rgba(9, 18, 38, 0.92) 60%,
+    rgba(16, 20, 48, 0.88) 100%
+  );
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid rgba(147, 197, 253, 0.24);
+  box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.72),
+    0 0 38px -8px rgba(59, 130, 246, 0.24),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.25);
+}
+
+.liquid-glass-pill {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(56, 189, 248, 0.08) 50%,
+    rgba(139, 92, 246, 0.08) 100%
+  );
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  backdrop-filter: blur(18px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow:
+    0 8px 24px -6px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.26);
+}
+
+.liquid-btn-primary {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #2563eb 0%, #06b6d4 52%, #7c3aed 100%);
+  background-size: 180% 180%;
+  border: 1px solid rgba(255, 255, 255, 0.34);
+  box-shadow:
+    0 12px 30px -6px rgba(6, 182, 212, 0.48),
+    0 0 22px rgba(59, 130, 246, 0.35),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.45);
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.25s ease,
+    background-position 0.5s ease;
+}
+
+.liquid-btn-primary::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.32) 50%,
+    transparent 80%
+  );
+  transform: translateX(-140%);
+  transition: transform 0.65s ease;
+  pointer-events: none;
+}
+
+.liquid-btn-primary:hover {
+  background-position: 100% 50%;
+  transform: translateY(-2px) scale(1.015);
+  box-shadow:
+    0 16px 36px -6px rgba(34, 211, 238, 0.6),
+    0 0 32px rgba(139, 92, 246, 0.42),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.55);
+}
+
+.liquid-btn-primary:hover::after {
+  transform: translateX(140%);
+}
+
+.liquid-btn-primary:active {
+  transform: scale(0.97);
+}
+
+.liquid-btn-glass {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(56, 189, 248, 0.08) 100%
+  );
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  backdrop-filter: blur(18px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow:
+    0 10px 26px -8px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.32);
+  transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+}
+
+.liquid-btn-glass:hover {
+  transform: translateY(-2px);
+  border-color: rgba(103, 232, 249, 0.55);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.18) 0%,
+    rgba(34, 211, 238, 0.14) 100%
+  );
+  box-shadow:
+    0 14px 32px -8px rgba(34, 211, 238, 0.35),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.42);
+}
+
+.liquid-btn-glass:active {
+  transform: scale(0.97);
+}
+
+.liquid-input {
+  background: rgba(255, 255, 255, 0.045);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
+}
+
+.liquid-input:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.075);
+  border-color: rgba(34, 211, 238, 0.72);
+  box-shadow:
+    0 0 0 3px rgba(34, 211, 238, 0.14),
+    0 0 22px rgba(34, 211, 238, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+
+.liquid-icon-bubble {
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.18) 0%,
+    rgba(56, 189, 248, 0.12) 55%,
+    rgba(139, 92, 246, 0.12) 100%
+  );
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  box-shadow:
+    0 8px 20px -6px rgba(6, 182, 212, 0.32),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.38);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.liquid-icon-bubble:hover {
+  transform: translateY(-2px) scale(1.06);
+  border-color: rgba(103, 232, 249, 0.65);
+  box-shadow:
+    0 12px 26px -6px rgba(34, 211, 238, 0.5),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
+}
+
+/* Preserved semantic utility aliases updated for Liquid Glass palette */
 .neon-olive {
-  text-shadow: 0 0 10px rgba(59, 130, 246, 0.55), 0 0 22px rgba(59, 130, 246, 0.3);
+  text-shadow: 0 0 14px rgba(34, 211, 238, 0.55), 0 0 30px rgba(59, 130, 246, 0.35);
 }
 
 .neon-blue {
-  text-shadow: 0 0 10px rgba(163, 180, 106, 0.55), 0 0 22px rgba(163, 180, 106, 0.3);
+  text-shadow: 0 0 14px rgba(103, 232, 249, 0.6), 0 0 28px rgba(139, 92, 246, 0.35);
 }
 
 .glow-box-olive {
-  box-shadow: 0 0 15px rgba(59, 130, 246, 0.22), 0 0 35px rgba(59, 130, 246, 0.12), inset 0 0 20px rgba(59, 130, 246, 0.06);
+  box-shadow:
+    0 0 20px rgba(34, 211, 238, 0.24),
+    0 0 42px rgba(59, 130, 246, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
 }
 
 .glow-box-blue {
-  box-shadow: 0 0 15px rgba(163, 180, 106, 0.22), 0 0 35px rgba(163, 180, 106, 0.12), inset 0 0 20px rgba(163, 180, 106, 0.06);
+  box-shadow:
+    0 0 20px rgba(56, 189, 248, 0.26),
+    0 0 42px rgba(139, 92, 246, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
 }
 
 .gradient-border {
-  background: linear-gradient(#191e1b, #191e1b) padding-box, linear-gradient(135deg, #3b82f6, #718044, #a3b46a) border-box;
+  background:
+    linear-gradient(rgba(10, 19, 40, 0.78), rgba(10, 19, 40, 0.78)) padding-box,
+    linear-gradient(135deg, rgba(34, 211, 238, 0.7), rgba(59, 130, 246, 0.7), rgba(168, 85, 247, 0.7)) border-box;
   border: 1px solid transparent;
 }
 
 .grid-bg {
-  background-image: linear-gradient(rgba(163, 180, 106, 0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(163, 180, 106, 0.06) 1px, transparent 1px);
-  background-size: 50px 50px;
+  background-image:
+    linear-gradient(rgba(56, 189, 248, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(139, 92, 246, 0.045) 1px, transparent 1px);
+  background-size: 56px 56px;
 }
 
 :focus-visible {
-  outline: 2px solid #60a5fa;
+  outline: 2px solid #22d3ee;
   outline-offset: 3px;
 }
+
+/* ==========================================================================
+   ANIMATIONS: WATER WAVES, CAUSTICS, LIQUID REFLECTIONS & ORBS
+   ========================================================================== */
 
 @keyframes scannerLine {
   0% {
@@ -129,13 +375,135 @@ label {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
+@keyframes waterWaveFlowLeft {
+  0% {
+    transform: translate3d(0, 0px, 0);
   }
+  50% {
+    transform: translate3d(-25%, 3px, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0px, 0);
+  }
+}
+
+@keyframes waterWaveFlowRight {
+  0% {
+    transform: translate3d(-50%, 2px, 0);
+  }
+  50% {
+    transform: translate3d(-25%, -3px, 0);
+  }
+  100% {
+    transform: translate3d(0%, 2px, 0);
+  }
+}
+
+@keyframes waterWaveCrest {
+  0% {
+    transform: translate3d(0%, 0px, 0);
+  }
+  25% {
+    transform: translate3d(-12.5%, -3px, 0);
+  }
+  50% {
+    transform: translate3d(-25%, 2px, 0);
+  }
+  75% {
+    transform: translate3d(-37.5%, -2px, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0px, 0);
+  }
+}
+
+@keyframes liquidCausticShift {
+  0% {
+    transform: translate3d(-8%, -4%, 0) scale(1);
+    opacity: 0.45;
+  }
+  50% {
+    transform: translate3d(8%, 4%, 0) scale(1.06);
+    opacity: 0.72;
+  }
+  100% {
+    transform: translate3d(-8%, -4%, 0) scale(1);
+    opacity: 0.45;
+  }
+}
+
+@keyframes lightStreakSweep {
+  0% {
+    transform: translateX(-120%) skewX(-22deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.55;
+  }
+  80% {
+    opacity: 0.55;
+  }
+  100% {
+    transform: translateX(220%) skewX(-22deg);
+    opacity: 0;
+  }
+}
+
+@keyframes ambientOrbDriftA {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  33% {
+    transform: translate3d(4vw, 3vh, 0) scale(1.08);
+  }
+  66% {
+    transform: translate3d(-3vw, 6vh, 0) scale(0.95);
+  }
+}
+
+@keyframes ambientOrbDriftB {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  40% {
+    transform: translate3d(-5vw, -4vh, 0) scale(1.1);
+  }
+  75% {
+    transform: translate3d(3vw, -2vh, 0) scale(0.96);
+  }
+}
+
+.animate-wave-slow {
+  animation: waterWaveFlowLeft 18s linear infinite;
+  will-change: transform;
+}
+
+.animate-wave-mid {
+  animation: waterWaveFlowRight 13s linear infinite;
+  will-change: transform;
+}
+
+.animate-wave-fast {
+  animation: waterWaveCrest 9.5s linear infinite;
+  will-change: transform;
+}
+
+.animate-caustics {
+  animation: liquidCausticShift 11s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.animate-light-streak {
+  animation: lightStreakSweep 9s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.animate-orb-a {
+  animation: ambientOrbDriftA 24s ease-in-out infinite;
+}
+
+.animate-orb-b {
+  animation: ambientOrbDriftB 28s ease-in-out infinite;
 }
 
 .scroll-snap-section {
@@ -144,6 +512,12 @@ label {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
   html {
     scroll-behavior: auto;
     scroll-snap-type: none;

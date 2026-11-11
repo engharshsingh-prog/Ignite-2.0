@@ -30,12 +30,12 @@ export default function Countdown({ targetDateIso }: { targetDateIso?: string })
     return () => clearInterval(id);
   }, [eventDate]);
 
-  if (!eventDate) return <p className="text-slate-300 text-lg">Event date and time: To be announced</p>;
+  if (!eventDate) return <p className="text-cyan-100/80 text-lg">Event date and time: To be announced</p>;
 
   if (timeLeft.ended) {
     return (
       <div className="text-center">
-        <div className="inline-block px-8 py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-olive-500 text-white font-bold text-2xl animate-pulse">
+        <div className="inline-block px-8 py-4 rounded-2xl liquid-btn-primary text-white font-bold text-2xl animate-pulse">
           🎉 The Event Has Begun!
         </div>
       </div>
@@ -50,19 +50,27 @@ export default function Countdown({ targetDateIso }: { targetDateIso?: string })
   ];
 
   return (
-    <div className="flex items-center justify-center gap-3 sm:gap-5">
+    <div className="flex items-center justify-center gap-2.5 sm:gap-5">
       {units.map((u, i) => (
-        <div key={u.label} className="flex items-center gap-3 sm:gap-5">
+        <div key={u.label} className="flex items-center gap-2.5 sm:gap-5">
           <div className="text-center">
-            <div className="relative">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-white/5 border border-blue-500/30 backdrop-blur-sm flex items-center justify-center">
-                <span className="font-mono font-bold text-2xl sm:text-3xl text-white tabular-nums">{pad(u.value)}</span>
+            <div className="relative group">
+              <div className="w-16 h-16 sm:w-22 sm:h-22 rounded-2xl liquid-glass-card flex items-center justify-center border-cyan-300/30">
+                <div className="absolute inset-x-2 top-0 h-px bg-gradient-to-r from-transparent via-white/55 to-transparent pointer-events-none" />
+                <span className="relative z-10 font-mono font-black text-2xl sm:text-4xl bg-gradient-to-b from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent tabular-nums drop-shadow-sm">
+                  {pad(u.value)}
+                </span>
               </div>
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-b from-blue-500/10 to-transparent pointer-events-none" />
             </div>
-            <p className="text-xs text-blue-300 mt-1.5 font-medium tracking-widest uppercase">{u.label}</p>
+            <p className="text-[11px] sm:text-xs text-cyan-200/85 mt-2 font-semibold tracking-[0.2em] uppercase">
+              {u.label}
+            </p>
           </div>
-          {i < 3 && <span className="text-blue-400 font-bold text-2xl -mt-5">:</span>}
+          {i < 3 && (
+            <span className="text-cyan-300/80 font-bold text-2xl sm:text-3xl -mt-6 animate-pulse">
+              :
+            </span>
+          )}
         </div>
       ))}
     </div>

@@ -148,14 +148,14 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-[#111411] grid-bg flex items-center justify-center px-4">
-      <div className="absolute inset-0">
-        <div className="absolute top-1/3 left-1/3 w-96 h-96 bg-blue-700/20 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/3 right-1/3 w-80 h-80 bg-olive-600/10 rounded-full blur-3xl" />
+    <div className="min-h-screen flex items-center justify-center px-4 pt-24 pb-16 relative">
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-1/3 left-1/3 w-96 h-96 bg-cyan-500/15 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/3 right-1/3 w-80 h-80 bg-violet-500/15 rounded-full blur-3xl" />
       </div>
 
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="relative w-full max-w-md">
-        <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl p-8">
+        <div className="liquid-glass-strong rounded-3xl p-8">
           
           {/* WAITING FOR SUPER ADMIN APPROVAL VIEW */}
           {pendingRequest ? (
@@ -163,19 +163,19 @@ export default function AdminLogin() {
               <div className="relative w-20 h-20 mx-auto mb-6 flex items-center justify-center">
                 {pollStatus === 'pending' && (
                   <>
-                    <div className="absolute inset-0 rounded-full border-2 border-blue-400/40 border-t-blue-500 animate-spin" />
-                    <div className="w-14 h-14 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400">
+                    <div className="absolute inset-0 rounded-full border-2 border-cyan-400/40 border-t-cyan-300 animate-spin" />
+                    <div className="liquid-icon-bubble w-14 h-14 text-cyan-300">
                       <Clock size={28} />
                     </div>
                   </>
                 )}
                 {pollStatus === 'approved' && (
-                  <div className="w-16 h-16 rounded-full bg-emerald-500/20 border border-emerald-500/50 flex items-center justify-center text-emerald-400">
+                  <div className="w-16 h-16 rounded-full bg-emerald-500/20 border border-emerald-400/50 backdrop-blur-md flex items-center justify-center text-emerald-300 shadow-[0_0_24px_rgba(52,211,153,0.25)]">
                     <CheckCircle2 size={36} />
                   </div>
                 )}
                 {(pollStatus === 'rejected' || pollStatus === 'expired') && (
-                  <div className="w-16 h-16 rounded-full bg-red-500/20 border border-red-500/50 flex items-center justify-center text-red-400">
+                  <div className="w-16 h-16 rounded-full bg-red-500/20 border border-red-400/50 backdrop-blur-md flex items-center justify-center text-red-300 shadow-[0_0_24px_rgba(248,113,113,0.25)]">
                     <XCircle size={36} />
                   </div>
                 )}
@@ -188,28 +188,28 @@ export default function AdminLogin() {
                 {pollStatus === 'expired' && 'Request Expired'}
               </h2>
 
-              <p className="text-sm text-gray-300 max-w-sm mx-auto mb-4 leading-relaxed">
+              <p className="text-sm text-slate-300/90 max-w-sm mx-auto mb-4 leading-relaxed">
                 {pollMessage}
               </p>
 
-              <div className="bg-[#191e1b] border border-[#303a32] rounded-2xl p-4 text-left text-xs space-y-2 mb-6">
+              <div className="liquid-glass rounded-2xl p-4 text-left text-xs space-y-2 mb-6">
                 <div className="flex justify-between">
-                  <span className="text-gray-400">Account:</span>
+                  <span className="text-slate-400">Account:</span>
                   <span className="text-white font-mono font-medium">{pendingRequest.email}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-400">Status:</span>
+                  <span className="text-slate-400">Status:</span>
                   <span className={`font-semibold capitalize ${
-                    pollStatus === 'pending' ? 'text-amber-400 flex items-center gap-1' :
-                    pollStatus === 'approved' ? 'text-emerald-400' : 'text-red-400'
+                    pollStatus === 'pending' ? 'text-amber-300 flex items-center gap-1' :
+                    pollStatus === 'approved' ? 'text-emerald-300' : 'text-red-300'
                   }`}>
                     {pollStatus === 'pending' && <RefreshCw size={11} className="animate-spin inline" />}
                     {pollStatus}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-400">Request ID:</span>
-                  <span className="text-gray-500 font-mono text-[10px]">{pendingRequest.requestId.slice(0, 12)}...</span>
+                  <span className="text-slate-400">Request ID:</span>
+                  <span className="text-slate-400/80 font-mono text-[10px]">{pendingRequest.requestId.slice(0, 12)}...</span>
                 </div>
               </div>
 
@@ -217,7 +217,7 @@ export default function AdminLogin() {
                 <button
                   type="button"
                   onClick={handleCancelRequest}
-                  className="w-full py-3 rounded-xl border border-white/20 text-gray-300 hover:text-white hover:bg-white/5 transition-colors text-sm font-semibold"
+                  className="liquid-btn-glass w-full py-3 rounded-xl text-slate-200 hover:text-white text-sm font-semibold"
                 >
                   Cancel Request
                 </button>
@@ -225,7 +225,7 @@ export default function AdminLogin() {
                 <button
                   type="button"
                   onClick={handleCancelRequest}
-                  className="w-full py-3 rounded-xl bg-gradient-to-r from-[#3b82f6] to-[#718044] text-white font-bold hover:opacity-90 transition-opacity text-sm"
+                  className="liquid-btn-primary w-full py-3 rounded-xl text-white font-bold text-sm"
                 >
                   Return to Login
                 </button>
@@ -235,23 +235,25 @@ export default function AdminLogin() {
             /* STANDARD LOGIN FORM */
             <>
               <div className="text-center mb-8">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#3b82f6] to-[#718044] flex items-center justify-center mx-auto mb-4">
-                  <Shield size={28} className="text-white" />
+                <div className="liquid-icon-bubble w-16 h-16 rounded-2xl mx-auto mb-4 text-cyan-200 shadow-[0_0_28px_rgba(34,211,238,0.28)]">
+                  <Shield size={28} />
                 </div>
-                <h1 className="text-2xl font-black text-white">Admin Access</h1>
-                <p className="text-gray-400 text-sm mt-1">Ignite 2.O Control Panel</p>
+                <h1 className="text-2xl font-black bg-gradient-to-r from-white via-cyan-100 to-blue-200 bg-clip-text text-transparent">
+                  Admin Access
+                </h1>
+                <p className="text-slate-300/80 text-sm mt-1">Ignite 2.O Control Panel</p>
               </div>
 
               {error && (
-                <div className="flex items-center gap-3 p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 mb-5">
-                  <AlertCircle size={16} />
+                <div className="flex items-center gap-3 p-3.5 rounded-xl bg-red-500/15 border border-red-400/35 backdrop-blur-md text-red-200 mb-5">
+                  <AlertCircle size={16} className="shrink-0 text-red-300" />
                   <p className="text-sm">{error}</p>
                 </div>
               )}
 
               <form onSubmit={handleLogin} className="space-y-4">
                 <div>
-                  <label htmlFor="admin-email" className="block text-sm font-medium text-gray-300 mb-1.5">Email</label>
+                  <label htmlFor="admin-email" className="block text-sm font-medium text-slate-200 mb-1.5">Email</label>
                   <input
                     id="admin-email"
                     name="email"
@@ -261,11 +263,11 @@ export default function AdminLogin() {
                     onChange={e => setEmail(e.target.value)}
                     placeholder="name@example.com"
                     required
-                    className="w-full bg-[#191e1b]/90 border border-[#303a32] rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-[#3b82f6]"
+                    className="liquid-input w-full rounded-xl px-4 py-3 text-white placeholder-slate-400/60"
                   />
                 </div>
                 <div>
-                  <label htmlFor="admin-password" className="block text-sm font-medium text-gray-300 mb-1.5">Password</label>
+                  <label htmlFor="admin-password" className="block text-sm font-medium text-slate-200 mb-1.5">Password</label>
                   <div className="relative">
                     <input
                       id="admin-password"
@@ -276,13 +278,13 @@ export default function AdminLogin() {
                       onChange={e => setPassword(e.target.value)}
                       placeholder="••••••••••••"
                       required
-                      className="w-full bg-[#191e1b]/90 border border-[#303a32] rounded-xl px-4 py-3 pr-12 text-white placeholder-gray-600 focus:outline-none focus:border-[#3b82f6]"
+                      className="liquid-input w-full rounded-xl px-4 py-3 pr-12 text-white placeholder-slate-400/60"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPw(!showPw)}
                       aria-label={showPw ? 'Hide password' : 'Show password'}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-cyan-200 transition-colors"
                     >
                       {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
@@ -291,13 +293,13 @@ export default function AdminLogin() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3 rounded-xl bg-gradient-to-r from-[#3b82f6] to-[#718044] text-white font-bold hover:opacity-90 transition-opacity disabled:opacity-50 mt-2"
+                  className="liquid-btn-primary w-full py-3 rounded-xl text-white font-bold disabled:opacity-50 mt-2"
                 >
                   {loading ? 'Signing In...' : 'Sign In to Dashboard'}
                 </button>
               </form>
 
-              <p className="text-center text-gray-500 text-xs mt-6">
+              <p className="text-center text-slate-400/80 text-xs mt-6">
                 First-time admin logins require Super Admin approval. Once approved, subsequent logins are direct.
               </p>
             </>

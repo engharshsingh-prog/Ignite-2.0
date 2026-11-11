@@ -509,22 +509,22 @@ export default function QrCheckinScannerModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md overflow-y-auto">
-      <div className="relative w-full max-w-lg bg-[#141815] border border-emerald-500/30 rounded-3xl shadow-2xl overflow-hidden flex flex-col my-auto max-h-[94vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-[#020612]/75 backdrop-blur-md overflow-y-auto">
+      <div className="liquid-glass-strong relative w-full max-w-lg border-emerald-400/30 rounded-3xl shadow-2xl overflow-hidden flex flex-col my-auto max-h-[94vh]">
         {/* Header Bar */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[#242e26] bg-[#1a211c]">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 bg-white/[0.04]">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+            <div className="liquid-icon-bubble w-9 h-9 rounded-xl border-emerald-400/30 bg-emerald-500/15 text-emerald-300">
               <QrCode size={18} />
             </div>
             <div>
               <h3 className="text-base font-bold text-white tracking-tight flex items-center gap-1.5">
                 Pass QR Scanner
-                <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">
+                <span className="liquid-glass-pill text-[10px] uppercase font-mono px-2 py-0.5 rounded-full text-emerald-300 font-bold border-emerald-400/30">
                   Live
                 </span>
               </h3>
-              <p className="text-[11px] text-gray-400">Scan event pass to approve venue check-in</p>
+              <p className="text-[11px] text-slate-300/75">Scan event pass to approve venue check-in</p>
             </div>
           </div>
 
@@ -533,7 +533,7 @@ export default function QrCheckinScannerModal({
               stopCamera();
               onClose();
             }}
-            className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
+            className="liquid-icon-bubble w-8 h-8 rounded-full text-slate-300 hover:text-white cursor-pointer"
             title="Close Scanner"
           >
             <X size={16} />
@@ -544,7 +544,7 @@ export default function QrCheckinScannerModal({
         <div className="p-4 sm:p-5 overflow-y-auto space-y-4">
           {/* CAMERA VIEWPORT - Kept alive in DOM so camera stream never drops */}
           <div
-            className={`relative rounded-2xl overflow-hidden bg-black aspect-video sm:aspect-[4/3] border border-white/10 flex items-center justify-center ${
+            className={`relative rounded-2xl overflow-hidden bg-black/70 aspect-video sm:aspect-[4/3] border border-white/15 flex items-center justify-center ${
               scannedParticipant ? 'hidden' : 'block'
             }`}
           >
@@ -561,7 +561,7 @@ export default function QrCheckinScannerModal({
             {/* Viewfinder Overlay with Animated Laser */}
             {cameraActive && !scannedParticipant && (
               <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-                <div className="relative w-56 h-56 sm:w-64 sm:h-64 border-2 border-emerald-400/40 rounded-2xl">
+                <div className="relative w-56 h-56 sm:w-64 sm:h-64 border-2 border-cyan-300/40 rounded-2xl">
                   {/* Glowing corners */}
                   <div className="absolute -top-1 -left-1 w-6 h-6 border-t-4 border-l-4 border-emerald-400 rounded-tl-lg" />
                   <div className="absolute -top-1 -right-1 w-6 h-6 border-t-4 border-r-4 border-emerald-400 rounded-tr-lg" />
@@ -576,28 +576,28 @@ export default function QrCheckinScannerModal({
 
             {/* Camera Starting / Error Overlay */}
             {(!cameraActive || cameraStarting) && (
-              <div className="absolute inset-0 bg-[#0d120f] flex flex-col items-center justify-center p-6 text-center text-gray-300 space-y-3 z-10">
+              <div className="absolute inset-0 bg-[#040918]/90 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center text-slate-200 space-y-3 z-10">
                 {cameraStarting ? (
                   <>
                     <LoadingSpinner text="Starting camera stream..." />
-                    <p className="text-xs text-gray-400">Please grant camera permissions if prompted</p>
+                    <p className="text-xs text-slate-400">Please grant camera permissions if prompted</p>
                   </>
                 ) : cameraError ? (
                   <>
-                    <Camera size={36} className="text-amber-400 opacity-60" />
-                    <p className="text-xs text-amber-200/90 max-w-sm">{cameraError}</p>
+                    <Camera size={36} className="text-amber-300 opacity-75" />
+                    <p className="text-xs text-amber-100/90 max-w-sm">{cameraError}</p>
                     <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
                       <button
                         type="button"
                         onClick={startCamera}
-                        className="px-3 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 text-xs font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer"
+                        className="liquid-btn-glass px-3 py-1.5 rounded-xl border-emerald-400/35 text-emerald-200 text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer"
                       >
                         <RefreshCw size={12} /> Retry Camera
                       </button>
                       <button
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
-                        className="px-3 py-1.5 rounded-xl bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 border border-blue-500/30 text-xs font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer"
+                        className="liquid-btn-glass px-3 py-1.5 rounded-xl border-cyan-400/35 text-cyan-200 text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer"
                       >
                         <Upload size={12} /> Upload Pass Image
                       </button>
@@ -613,7 +613,7 @@ export default function QrCheckinScannerModal({
                 <button
                   type="button"
                   onClick={flipCamera}
-                  className="p-2.5 rounded-full bg-black/60 hover:bg-black/80 text-white backdrop-blur-sm border border-white/20 transition-colors cursor-pointer"
+                  className="liquid-icon-bubble p-2.5 rounded-full text-white cursor-pointer"
                   title="Switch Camera (Front/Back)"
                 >
                   <RotateCw size={16} />
@@ -623,10 +623,10 @@ export default function QrCheckinScannerModal({
                   <button
                     type="button"
                     onClick={toggleTorch}
-                    className={`p-2.5 rounded-full backdrop-blur-sm border transition-colors cursor-pointer ${
+                    className={`p-2.5 rounded-full backdrop-blur-md border transition-colors cursor-pointer ${
                       torchOn
                         ? 'bg-amber-400 text-black border-amber-300'
-                        : 'bg-black/60 hover:bg-black/80 text-white border-white/20'
+                        : 'liquid-icon-bubble text-white'
                     }`}
                     title={torchOn ? 'Turn Flashlight Off' : 'Turn Flashlight On'}
                   >
@@ -637,7 +637,7 @@ export default function QrCheckinScannerModal({
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="p-2.5 rounded-full bg-black/60 hover:bg-black/80 text-white backdrop-blur-sm border border-white/20 transition-colors cursor-pointer"
+                  className="liquid-icon-bubble p-2.5 rounded-full text-white cursor-pointer"
                   title="Upload / Photo of Pass Image"
                 >
                   <Upload size={16} />
@@ -657,19 +657,19 @@ export default function QrCheckinScannerModal({
 
           {/* LOOKUP ERROR BANNER */}
           {lookupError && (
-            <div className="p-3.5 rounded-xl bg-red-500/15 border border-red-500/30 text-red-200 text-xs flex items-start gap-2.5">
-              <AlertTriangle size={16} className="text-red-400 shrink-0 mt-0.5" />
+            <div className="liquid-glass p-3.5 rounded-2xl border-red-400/35 text-red-200 text-xs flex items-start gap-2.5">
+              <AlertTriangle size={16} className="text-red-300 shrink-0 mt-0.5" />
               <div className="flex-1">
                 <p className="font-semibold text-red-100">{lookupError}</p>
                 {rawScannedData && (
-                  <p className="text-[10px] text-red-300/80 mt-1 font-mono break-all line-clamp-2">
+                  <p className="text-[10px] text-red-200/80 mt-1 font-mono break-all line-clamp-2">
                     Scanned content: {rawScannedData}
                   </p>
                 )}
               </div>
               <button
                 onClick={resumeScanning}
-                className="text-[11px] underline text-red-300 hover:text-white font-semibold shrink-0 cursor-pointer"
+                className="text-[11px] underline text-red-200 hover:text-white font-semibold shrink-0 cursor-pointer"
               >
                 Scan Next
               </button>
@@ -678,13 +678,13 @@ export default function QrCheckinScannerModal({
 
           {/* PERMISSION & CHECK-IN APPROVAL CARD (Appears when a pass is scanned) */}
           {scannedParticipant && (
-            <div className="rounded-2xl border border-emerald-500/40 bg-[#19221b] p-5 shadow-xl relative overflow-hidden space-y-4">
-              <div className="absolute top-0 right-0 w-36 h-36 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none" />
+            <div className="liquid-glass-card rounded-2xl border-emerald-400/35 p-5 relative overflow-hidden space-y-4">
+              <div className="absolute top-0 right-0 w-36 h-36 bg-cyan-400/10 rounded-full blur-2xl pointer-events-none" />
 
               {/* Student Header */}
               <div className="flex items-start justify-between gap-3 relative">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500/30 to-blue-500/30 border border-emerald-500/40 flex items-center justify-center text-lg font-black text-emerald-300 shrink-0">
+                  <div className="liquid-icon-bubble w-12 h-12 rounded-2xl border-emerald-400/40 bg-gradient-to-br from-emerald-500/25 to-cyan-500/25 text-lg font-black text-emerald-200 shrink-0">
                     {scannedParticipant.full_name?.charAt(0) || '?'}
                   </div>
                   <div>
@@ -693,11 +693,11 @@ export default function QrCheckinScannerModal({
                     </h4>
                     <div className="flex items-center gap-1.5 flex-wrap mt-0.5">
                       {scannedParticipant.registration_id && (
-                        <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                        <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-200 border border-emerald-400/30">
                           {scannedParticipant.registration_id}
                         </span>
                       )}
-                      <span className="font-mono text-xs text-gray-300">
+                      <span className="font-mono text-xs text-slate-300">
                         Roll: {scannedParticipant.roll_number}
                       </span>
                     </div>
@@ -707,11 +707,11 @@ export default function QrCheckinScannerModal({
                 {/* Plan Badge */}
                 <div className="shrink-0 text-right">
                   {scannedParticipant.year === '2nd Year' ? (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-500/15 text-amber-300 border border-amber-500/30 text-xs font-bold">
+                    <span className="liquid-glass-pill inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border-amber-400/35 text-amber-200 text-xs font-bold">
                       <Crown size={12} /> 2nd Year
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-500/15 text-blue-300 border border-blue-500/30 text-xs font-bold">
+                    <span className="liquid-glass-pill inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border-cyan-400/35 text-cyan-200 text-xs font-bold">
                       <GraduationCap size={12} /> 1st Year
                     </span>
                   )}
@@ -719,15 +719,15 @@ export default function QrCheckinScannerModal({
               </div>
 
               {/* Detail Grid */}
-              <div className="grid grid-cols-2 gap-2 text-xs bg-black/30 p-3 rounded-xl border border-white/5">
+              <div className="liquid-glass grid grid-cols-2 gap-2 text-xs p-3.5 rounded-xl">
                 <div>
-                  <span className="text-gray-400 text-[10px] uppercase font-semibold block">Branch</span>
-                  <span className="text-gray-200 font-medium truncate block" title={scannedParticipant.branch}>
+                  <span className="text-slate-400 text-[10px] uppercase font-semibold block">Branch</span>
+                  <span className="text-slate-100 font-medium truncate block" title={scannedParticipant.branch}>
                     {scannedParticipant.branch}
                   </span>
                 </div>
                 <div>
-                  <span className="text-gray-400 text-[10px] uppercase font-semibold block">Phone</span>
+                  <span className="text-slate-400 text-[10px] uppercase font-semibold block">Phone</span>
                   <a
                     href={`https://wa.me/${scannedParticipant.whatsapp_number.replace(/\D/g, '')}`}
                     target="_blank"
@@ -737,18 +737,18 @@ export default function QrCheckinScannerModal({
                     <Phone size={11} /> {scannedParticipant.whatsapp_number}
                   </a>
                 </div>
-                <div className="col-span-2 pt-1 border-t border-white/5 flex items-center justify-between">
-                  <span className="text-gray-400 text-[10px] uppercase font-semibold">Payment Status</span>
+                <div className="col-span-2 pt-1.5 border-t border-white/10 flex items-center justify-between">
+                  <span className="text-slate-400 text-[10px] uppercase font-semibold">Payment Status</span>
                   {scannedParticipant.payment_status === 'approved' || scannedParticipant.payment_verified ? (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 font-bold text-[11px] border border-emerald-500/30">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-200 font-bold text-[11px] border border-emerald-400/30">
                       <ShieldCheck size={11} /> Verified (Paid ₹{scannedParticipant.payment_amount || (scannedParticipant.year === '2nd Year' ? 699 : 599)})
                     </span>
                   ) : scannedParticipant.payment_status === 'rejected' ? (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-500/15 text-red-300 font-bold text-[11px] border border-red-500/30">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-500/15 text-red-200 font-bold text-[11px] border border-red-400/30">
                       <XCircle size={11} /> Payment Rejected
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 font-bold text-[11px] border border-amber-500/30 animate-pulse">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-200 font-bold text-[11px] border border-amber-400/30 animate-pulse">
                       <AlertTriangle size={11} /> Pending Verification
                     </span>
                   )}
@@ -757,24 +757,24 @@ export default function QrCheckinScannerModal({
 
               {/* SUCCESS MESSAGE BANNER */}
               {actionSuccessMessage && (
-                <div className="p-3 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-200 text-xs font-semibold flex items-center gap-2">
-                  <CheckCircle2 size={16} className="text-emerald-400 shrink-0" />
+                <div className="liquid-glass p-3 rounded-xl border-emerald-400/40 text-emerald-100 text-xs font-semibold flex items-center gap-2">
+                  <CheckCircle2 size={16} className="text-emerald-300 shrink-0" />
                   <span>{actionSuccessMessage}</span>
                 </div>
               )}
 
               {/* CHECK-IN STATUS & PERMISSION SECTION */}
-              <div className="p-4 rounded-xl border border-white/10 bg-black/40 space-y-3">
+              <div className="liquid-glass p-4 rounded-xl space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-gray-300 font-semibold flex items-center gap-1.5">
+                  <span className="text-xs text-slate-200 font-semibold flex items-center gap-1.5">
                     Venue Check-in Status:
                   </span>
                   {scannedParticipant.check_in_status ? (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-bold text-xs border border-emerald-500/30">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-200 font-bold text-xs border border-emerald-400/30">
                       <CheckCircle2 size={13} /> Checked In
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-gray-500/20 text-gray-300 font-semibold text-xs border border-gray-500/30">
+                    <span className="liquid-glass-pill inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-slate-200 font-semibold text-xs">
                       Not Checked In
                     </span>
                   )}
@@ -783,8 +783,8 @@ export default function QrCheckinScannerModal({
                 {/* If already checked in */}
                 {scannedParticipant.check_in_status ? (
                   <div className="space-y-3">
-                    <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-xs text-amber-200 flex items-center gap-2">
-                      <AlertTriangle size={15} className="text-amber-400 shrink-0" />
+                    <div className="liquid-glass p-3 rounded-lg border-amber-400/30 text-xs text-amber-100 flex items-center gap-2">
+                      <AlertTriangle size={15} className="text-amber-300 shrink-0" />
                       <span>
                         This student is already checked in
                         {scannedParticipant.check_in_time
@@ -798,7 +798,7 @@ export default function QrCheckinScannerModal({
                       <button
                         type="button"
                         onClick={resumeScanning}
-                        className="flex-1 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-2 transition-colors shadow-lg shadow-emerald-950/40 cursor-pointer"
+                        className="liquid-btn-primary flex-1 py-2.5 px-4 rounded-xl text-white font-bold text-xs flex items-center justify-center gap-2 cursor-pointer"
                       >
                         Scan Next Pass <ArrowRight size={14} />
                       </button>
@@ -807,7 +807,7 @@ export default function QrCheckinScannerModal({
                         type="button"
                         onClick={handleUndoCheckIn}
                         disabled={undoing}
-                        className="px-3 py-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-300 border border-red-500/25 text-xs font-semibold transition-colors disabled:opacity-50 cursor-pointer"
+                        className="px-3 py-2.5 rounded-xl bg-red-500/15 hover:bg-red-500/25 text-red-200 border border-red-400/30 text-xs font-semibold transition-colors disabled:opacity-50 cursor-pointer"
                         title="Revert check-in if marked by mistake"
                       >
                         {undoing ? 'Reverting...' : 'Undo Check-in'}
@@ -817,7 +817,7 @@ export default function QrCheckinScannerModal({
                 ) : (
                   /* PERMISSION PROMPT: NOT CHECKED IN YET */
                   <div className="space-y-3">
-                    <p className="text-xs text-emerald-200/90 font-medium leading-relaxed">
+                    <p className="text-xs text-emerald-100/90 font-medium leading-relaxed">
                       👉 <strong>Permission Required:</strong> Confirm to approve venue check-in entry for{' '}
                       <span className="text-white font-bold">{scannedParticipant.full_name}</span>?
                     </p>
@@ -827,7 +827,7 @@ export default function QrCheckinScannerModal({
                         type="button"
                         onClick={handleApproveCheckIn}
                         disabled={approving}
-                        className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-black font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 transition-all disabled:opacity-50 cursor-pointer"
+                        className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 transition-all disabled:opacity-50 cursor-pointer"
                       >
                         {approving ? (
                           <>
@@ -846,7 +846,7 @@ export default function QrCheckinScannerModal({
                         type="button"
                         onClick={resumeScanning}
                         disabled={approving}
-                        className="py-3 px-4 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10 text-xs font-semibold transition-colors cursor-pointer"
+                        className="liquid-btn-glass py-3 px-4 rounded-xl text-slate-200 hover:text-white text-xs font-semibold cursor-pointer"
                       >
                         Cancel / Next
                       </button>
@@ -859,13 +859,13 @@ export default function QrCheckinScannerModal({
 
           {/* BOTTOM UTILITY / MANUAL SEARCH ACCORDION */}
           {!scannedParticipant && (
-            <div className="pt-2 border-t border-[#242e26]">
-              <div className="flex items-center justify-between text-xs text-gray-400 mb-2">
+            <div className="pt-3 border-t border-white/10">
+              <div className="flex items-center justify-between text-xs text-slate-300/80 mb-2">
                 <span>Pass not scanning? Search manually:</span>
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="text-emerald-400 hover:underline flex items-center gap-1 font-medium cursor-pointer"
+                  className="text-cyan-300 hover:underline flex items-center gap-1 font-medium cursor-pointer"
                 >
                   <Upload size={12} /> Upload Pass Image
                 </button>
@@ -873,18 +873,18 @@ export default function QrCheckinScannerModal({
 
               <form onSubmit={handleManualSearch} className="flex gap-2">
                 <div className="relative flex-1">
-                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-cyan-300/70" />
                   <input
                     value={manualQuery}
                     onChange={(e) => setManualQuery(e.target.value)}
                     placeholder="Enter Roll No, Reg ID (IGN26-...), or Email..."
-                    className="w-full bg-[#121613] border border-[#303a32] rounded-xl pl-8 pr-3 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500/50"
+                    className="liquid-input w-full rounded-xl pl-8 pr-3 py-2 text-xs text-white placeholder-slate-400/60"
                   />
                 </div>
                 <button
                   type="submit"
                   disabled={searching || !manualQuery.trim()}
-                  className="px-3.5 py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 text-xs font-bold transition-colors disabled:opacity-50 shrink-0 cursor-pointer"
+                  className="liquid-btn-glass px-3.5 py-2 rounded-xl border-emerald-400/35 text-emerald-200 text-xs font-bold disabled:opacity-50 shrink-0 cursor-pointer"
                 >
                   {searching ? 'Finding...' : 'Lookup'}
                 </button>

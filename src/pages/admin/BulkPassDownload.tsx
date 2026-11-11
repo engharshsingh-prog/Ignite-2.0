@@ -180,22 +180,24 @@ export default function BulkPassDownload() {
   };
 
   return (
-    <div className="min-h-screen bg-[#111411] grid-bg text-white pt-20 pb-16">
+    <div className="min-h-screen text-white pt-24 pb-16">
       <div className="max-w-6xl mx-auto px-4">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div className="flex items-center gap-4">
-            <Link to="/admin" className="text-gray-400 hover:text-white">
+            <Link to="/admin" className="liquid-icon-bubble w-10 h-10 rounded-xl text-slate-300 hover:text-white">
               <ArrowLeft size={20} />
             </Link>
             <div>
-              <h1 className="text-3xl font-black">Bulk Pass Download</h1>
-              <p className="text-gray-400 text-sm">Select participants and download all passes in one ZIP.</p>
+              <h1 className="text-3xl font-black bg-gradient-to-r from-white via-cyan-100 to-blue-200 bg-clip-text text-transparent">
+                Bulk Pass Download
+              </h1>
+              <p className="text-slate-300/80 text-sm">Select participants and download all passes in one ZIP.</p>
             </div>
           </div>
           <button
             onClick={downloadZip}
             disabled={downloading || selected.size === 0}
-            className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#3b82f6] to-[#718044] text-white font-semibold hover:opacity-90 disabled:opacity-50 inline-flex items-center justify-center gap-2"
+            className="liquid-btn-primary w-full sm:w-auto px-5 py-2.5 rounded-xl text-white font-semibold disabled:opacity-50 inline-flex items-center justify-center gap-2"
           >
             <Download size={16} /> {downloading ? 'Working...' : `Download ZIP (${selected.size})`}
           </button>
@@ -203,19 +205,19 @@ export default function BulkPassDownload() {
 
         <div className="flex flex-col sm:flex-row gap-3 mb-5">
           <div className="relative flex-1">
-            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500" />
+            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-cyan-300/70" />
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search by name, roll / enrolment no, email, branch..."
-              className="w-full bg-[#191e1b]/90 border border-[#303a32] rounded-xl pl-10 pr-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-[#3b82f6]"
+              className="liquid-input w-full rounded-xl pl-10 pr-4 py-3 text-white placeholder-slate-400/60"
             />
           </div>
           <button
             type="button"
             onClick={toggleAllFiltered}
             disabled={filtered.length === 0}
-            className="w-full sm:w-auto px-4 py-3 rounded-xl border border-white/15 bg-white/5 text-gray-200 hover:bg-white/10 disabled:opacity-50 inline-flex items-center justify-center gap-2"
+            className="liquid-btn-glass w-full sm:w-auto px-4 py-3 rounded-xl text-slate-100 disabled:opacity-50 inline-flex items-center justify-center gap-2"
           >
             {allFilteredSelected ? <CheckSquare size={16} /> : <Square size={16} />}
             {allFilteredSelected ? 'Unselect Filtered' : 'Select Filtered'}
@@ -223,39 +225,39 @@ export default function BulkPassDownload() {
         </div>
 
         {error && (
-          <div className="mb-5 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-200 inline-flex items-start gap-2">
-            <AlertCircle size={16} className="mt-0.5" />
+          <div className="liquid-glass mb-5 rounded-2xl border-red-400/35 p-4 text-sm text-red-200 inline-flex items-start gap-2">
+            <AlertCircle size={16} className="mt-0.5 text-red-300" />
             <span>{error}</span>
           </div>
         )}
 
         {progress && (
-          <p className="mb-5 text-sm text-gray-300">{progress}</p>
+          <p className="mb-5 text-sm text-cyan-200">{progress}</p>
         )}
 
         {loading ? (
           <LoadingSpinner text="Loading participants..." />
         ) : (
-          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="rounded-2xl border border-white/10 overflow-hidden">
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="liquid-glass-strong rounded-3xl overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="bg-white/5 border-b border-white/10">
-                    <th className="w-12 px-4 py-3" />
-                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Participant</th>
-                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider hidden sm:table-cell">Roll / Enrolment No</th>
-                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider hidden md:table-cell">Branch</th>
-                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider hidden md:table-cell">Payment</th>
+                  <tr className="bg-white/[0.06] border-b border-white/10">
+                    <th className="w-12 px-4 py-3.5" />
+                    <th className="text-left px-4 py-3.5 text-xs font-semibold text-cyan-200/80 uppercase tracking-wider">Participant</th>
+                    <th className="text-left px-4 py-3.5 text-xs font-semibold text-cyan-200/80 uppercase tracking-wider hidden sm:table-cell">Roll / Enrolment No</th>
+                    <th className="text-left px-4 py-3.5 text-xs font-semibold text-cyan-200/80 uppercase tracking-wider hidden md:table-cell">Branch</th>
+                    <th className="text-left px-4 py-3.5 text-xs font-semibold text-cyan-200/80 uppercase tracking-wider hidden md:table-cell">Payment</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5">
+                <tbody className="divide-y divide-white/10">
                   {filtered.map((p) => (
-                    <tr key={p.id} className="hover:bg-white/[0.02] transition-colors">
+                    <tr key={p.id} className="hover:bg-white/[0.04] transition-colors">
                       <td className="px-4 py-3">
                         <button
                           type="button"
                           onClick={() => toggleOne(p.id)}
-                          className="w-9 h-9 rounded-lg border border-white/15 bg-white/5 text-gray-200 hover:bg-white/10 inline-flex items-center justify-center"
+                          className="liquid-icon-bubble w-9 h-9 rounded-lg text-cyan-200"
                           title={selected.has(p.id) ? 'Selected' : 'Select'}
                         >
                           {selected.has(p.id) ? <CheckSquare size={16} /> : <Square size={16} />}
@@ -264,20 +266,20 @@ export default function BulkPassDownload() {
                       <td className="px-4 py-3">
                         <div>
                           <p className="font-medium text-white text-sm">{p.full_name}</p>
-                          <p className="text-gray-500 text-xs">{p.email}</p>
+                          <p className="text-slate-400 text-xs">{p.email}</p>
                         </div>
                       </td>
                       <td className="px-4 py-3 hidden sm:table-cell">
-                        <span className="font-mono text-sm text-gray-300">{p.roll_number}</span>
+                        <span className="font-mono text-sm text-cyan-100">{p.roll_number}</span>
                       </td>
                       <td className="px-4 py-3 hidden md:table-cell">
-                        <span className="px-2 py-1 rounded-lg bg-blue-500/10 text-blue-300 text-xs font-medium">{p.branch}</span>
+                        <span className="liquid-glass-pill px-2.5 py-1 rounded-full text-cyan-200 text-xs font-medium">{p.branch}</span>
                       </td>
                       <td className="px-4 py-3 hidden md:table-cell">
                         {p.payment_verified ? (
-                          <span className="inline-flex items-center px-2 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold">Verified</span>
+                          <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-400/35 text-emerald-200 text-xs font-semibold">Verified</span>
                         ) : (
-                          <span className="inline-flex items-center px-2 py-1 rounded-lg bg-olive-500/10 border border-olive-500/30 text-olive-300 text-xs font-semibold">Pending</span>
+                          <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-amber-500/15 border border-amber-400/35 text-amber-200 text-xs font-semibold">Pending</span>
                         )}
                       </td>
                     </tr>
@@ -286,7 +288,7 @@ export default function BulkPassDownload() {
               </table>
 
               {filtered.length === 0 && (
-                <div className="text-center py-12 text-gray-500">
+                <div className="text-center py-12 text-slate-400">
                   <p>No participants found</p>
                 </div>
               )}

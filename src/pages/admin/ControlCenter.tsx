@@ -283,42 +283,42 @@ export default function ControlCenter() {
   }, [tabData, activeTab, searchTerm]);
 
   return (
-    <div className="min-h-screen bg-[#111411] text-white">
+    <div className="min-h-screen text-white">
       {/* TOP HEADER */}
-      <header className="border-b border-[#303a32] bg-[#141916]/95 backdrop-blur sticky top-0 z-40">
+      <header className="border-b border-white/15 bg-white/[0.05] backdrop-blur-2xl sticky top-0 z-40 shadow-[0_8px_32px_rgba(3,7,18,0.4)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-olive-500 flex items-center justify-center font-black">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center font-black border border-white/25 shadow-lg shadow-cyan-500/20">
               <ShieldAlert size={20} className="text-white" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-lg font-bold">Ignite 2.O</h1>
-                <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/40">
+                <h1 className="text-lg font-bold tracking-tight">Ignite 2.O</h1>
+                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-cyan-500/15 text-cyan-200 border border-cyan-400/35 backdrop-blur-md">
                   Super Admin Control Center
                 </span>
               </div>
-              <p className="text-xs text-gray-400">Master Access & Governance</p>
+              <p className="text-xs text-slate-400">Master Access & Governance</p>
             </div>
           </div>
 
           <div className="flex items-center gap-2 flex-wrap">
             <Link
               to="/admin"
-              className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-[#191e1b] border border-[#303a32] hover:bg-[#222924] transition-colors"
+              className="liquid-btn-glass px-3.5 py-2 text-xs"
             >
               Standard Dashboard
             </Link>
             <Link
               to="/admin/control/admins"
-              className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-olive-500/15 border border-olive-500/40 text-olive-300 hover:bg-olive-500/25 transition-colors flex items-center gap-1.5"
+              className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-cyan-500/15 border border-cyan-400/35 text-cyan-200 hover:bg-cyan-500/25 transition-colors flex items-center gap-1.5 backdrop-blur-md"
             >
               <Users size={14} />
               Manage Admins
             </Link>
             <button
               onClick={handleSignOut}
-              className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20 transition-colors flex items-center gap-1.5"
+              className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-red-500/15 border border-red-400/30 text-red-300 hover:bg-red-500/25 transition-colors flex items-center gap-1.5 backdrop-blur-md"
             >
               <LogOut size={14} />
               Sign Out
@@ -330,16 +330,16 @@ export default function ControlCenter() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         {actionMessage && (
           <div
-            className={`p-4 rounded-xl mb-6 text-sm flex items-center justify-between border ${
+            className={`p-4 rounded-2xl mb-6 text-sm flex items-center justify-between border backdrop-blur-md ${
               actionMessage.type === 'success'
-                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
-                : 'bg-red-500/10 border-red-500/30 text-red-300'
+                ? 'bg-emerald-500/15 border-emerald-400/35 text-emerald-200'
+                : 'bg-red-500/15 border-red-400/35 text-red-200'
             }`}
           >
             <span>{actionMessage.text}</span>
             <button
               onClick={() => setActionMessage(null)}
-              className="text-xs opacity-70 hover:opacity-100 ml-4 underline"
+              className="text-xs opacity-80 hover:opacity-100 ml-4 underline"
             >
               Dismiss
             </button>
@@ -347,13 +347,13 @@ export default function ControlCenter() {
         )}
 
         {/* TABS NAVIGATION */}
-        <div className="flex items-center gap-2 border-b border-[#303a32] pb-4 mb-6 overflow-x-auto">
+        <div className="flex items-center gap-2 border-b border-white/10 pb-4 mb-6 overflow-x-auto">
           <button
             onClick={() => setActiveTab('approvals')}
-            className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors flex items-center gap-2 whitespace-nowrap ${
+            className={`px-4 py-2 text-sm flex items-center gap-2 whitespace-nowrap ${
               activeTab === 'approvals'
-                ? 'bg-blue-600 text-white'
-                : 'bg-[#191e1b] text-gray-400 hover:text-white border border-[#303a32]'
+                ? 'liquid-btn-primary'
+                : 'liquid-btn-glass text-slate-300 hover:text-white'
             }`}
           >
             <Clock size={16} />
@@ -367,10 +367,10 @@ export default function ControlCenter() {
 
           <button
             onClick={() => setActiveTab('admins')}
-            className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors flex items-center gap-2 whitespace-nowrap ${
+            className={`px-4 py-2 text-sm flex items-center gap-2 whitespace-nowrap ${
               activeTab === 'admins'
-                ? 'bg-blue-600 text-white'
-                : 'bg-[#191e1b] text-gray-400 hover:text-white border border-[#303a32]'
+                ? 'liquid-btn-primary'
+                : 'liquid-btn-glass text-slate-300 hover:text-white'
             }`}
           >
             <Shield size={16} />
@@ -379,10 +379,10 @@ export default function ControlCenter() {
 
           <button
             onClick={() => setActiveTab('participants')}
-            className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors flex items-center gap-2 whitespace-nowrap ${
+            className={`px-4 py-2 text-sm flex items-center gap-2 whitespace-nowrap ${
               activeTab === 'participants'
-                ? 'bg-blue-600 text-white'
-                : 'bg-[#191e1b] text-gray-400 hover:text-white border border-[#303a32]'
+                ? 'liquid-btn-primary'
+                : 'liquid-btn-glass text-slate-300 hover:text-white'
             }`}
           >
             <Users size={16} />
@@ -391,10 +391,10 @@ export default function ControlCenter() {
 
           <button
             onClick={() => setActiveTab('sessions')}
-            className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors flex items-center gap-2 whitespace-nowrap ${
+            className={`px-4 py-2 text-sm flex items-center gap-2 whitespace-nowrap ${
               activeTab === 'sessions'
-                ? 'bg-blue-600 text-white'
-                : 'bg-[#191e1b] text-gray-400 hover:text-white border border-[#303a32]'
+                ? 'liquid-btn-primary'
+                : 'liquid-btn-glass text-slate-300 hover:text-white'
             }`}
           >
             <Laptop size={16} />
@@ -403,10 +403,10 @@ export default function ControlCenter() {
 
           <button
             onClick={() => setActiveTab('logs')}
-            className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors flex items-center gap-2 whitespace-nowrap ${
+            className={`px-4 py-2 text-sm flex items-center gap-2 whitespace-nowrap ${
               activeTab === 'logs'
-                ? 'bg-blue-600 text-white'
-                : 'bg-[#191e1b] text-gray-400 hover:text-white border border-[#303a32]'
+                ? 'liquid-btn-primary'
+                : 'liquid-btn-glass text-slate-300 hover:text-white'
             }`}
           >
             <History size={16} />
@@ -415,10 +415,10 @@ export default function ControlCenter() {
 
           <button
             onClick={() => setActiveTab('media')}
-            className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors flex items-center gap-2 whitespace-nowrap ${
+            className={`px-4 py-2 text-sm flex items-center gap-2 whitespace-nowrap ${
               activeTab === 'media'
-                ? 'bg-blue-600 text-white'
-                : 'bg-[#191e1b] text-gray-400 hover:text-white border border-[#303a32]'
+                ? 'liquid-btn-primary'
+                : 'liquid-btn-glass text-slate-300 hover:text-white'
             }`}
           >
             <Image size={16} />
@@ -429,7 +429,7 @@ export default function ControlCenter() {
         {/* TAB 1: PENDING APPROVALS */}
         {activeTab === 'approvals' && (
           <div className="space-y-6">
-            <div className="bg-[#191e1b] border border-[#303a32] rounded-2xl p-6">
+            <div className="liquid-glass-strong rounded-3xl p-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <Clock size={18} className="text-amber-400" />
@@ -438,7 +438,7 @@ export default function ControlCenter() {
                 <button
                   onClick={fetchApprovals}
                   disabled={approvalsLoading}
-                  className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 text-xs flex items-center gap-1.5 transition-colors"
+                  className="liquid-btn-glass px-3 py-1.5 text-xs flex items-center gap-1.5"
                 >
                   <RefreshCw size={12} className={approvalsLoading ? 'animate-spin' : ''} />
                   Refresh
@@ -446,10 +446,10 @@ export default function ControlCenter() {
               </div>
 
               {pendingApprovals.length === 0 ? (
-                <div className="text-center py-10 text-gray-400 border border-dashed border-[#303a32] rounded-xl">
+                <div className="text-center py-10 text-slate-400 border border-dashed border-white/15 rounded-2xl bg-white/[0.02]">
                   <CheckCircle2 size={32} className="mx-auto mb-2 text-emerald-400" />
-                  <p className="text-sm font-medium">No pending login authorization requests.</p>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-sm font-medium text-slate-200">No pending login authorization requests.</p>
+                  <p className="text-xs text-slate-400 mt-1">
                     When regular admins sign in, their requests will appear here in real time.
                   </p>
                 </div>
@@ -458,22 +458,22 @@ export default function ControlCenter() {
                   {pendingApprovals.map((req) => (
                     <div
                       key={req.id}
-                      className="p-5 rounded-xl bg-[#222924] border border-[#3a473d] flex flex-col md:flex-row md:items-center justify-between gap-4"
+                      className="liquid-glass-card p-5 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4"
                     >
                       <div>
                         <div className="flex items-center gap-2 mb-1">
                           <span className="font-bold text-white text-base">{req.email}</span>
-                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-400/35">
                             Pending Approval
                           </span>
                         </div>
-                        <div className="text-xs text-gray-400 flex flex-wrap gap-x-4 gap-y-1">
-                          <span>IP: <strong className="text-gray-300">{req.ip || 'Unknown'}</strong></span>
-                          <span>Requested: <strong className="text-gray-300">{new Date(req.requested_at).toLocaleTimeString()}</strong></span>
+                        <div className="text-xs text-slate-400 flex flex-wrap gap-x-4 gap-y-1">
+                          <span>IP: <strong className="text-slate-200">{req.ip || 'Unknown'}</strong></span>
+                          <span>Requested: <strong className="text-slate-200">{new Date(req.requested_at).toLocaleTimeString()}</strong></span>
                           <span>Expires: <strong className="text-amber-300">{new Date(req.expires_at).toLocaleTimeString()}</strong></span>
                         </div>
                         {req.user_agent && (
-                          <p className="text-[11px] text-gray-500 font-mono mt-1 truncate max-w-xl">
+                          <p className="text-[11px] text-slate-400 font-mono mt-1 truncate max-w-xl">
                             {req.user_agent}
                           </p>
                         )}
@@ -483,7 +483,7 @@ export default function ControlCenter() {
                         <button
                           onClick={() => handleResolve(req.id, 'approve')}
                           disabled={resolvingId === req.id}
-                          className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 transition-colors disabled:opacity-50"
+                          className="px-4 py-2 rounded-xl bg-emerald-500/80 hover:bg-emerald-500 border border-emerald-300/30 text-white font-bold text-xs flex items-center gap-1.5 transition-colors disabled:opacity-50 backdrop-blur-md"
                         >
                           <CheckCircle2 size={14} />
                           Approve
@@ -491,7 +491,7 @@ export default function ControlCenter() {
                         <button
                           onClick={() => handleResolve(req.id, 'reject')}
                           disabled={resolvingId === req.id}
-                          className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs flex items-center gap-1.5 transition-colors disabled:opacity-50"
+                          className="px-4 py-2 rounded-xl bg-red-500/80 hover:bg-red-500 border border-red-300/30 text-white font-bold text-xs flex items-center gap-1.5 transition-colors disabled:opacity-50 backdrop-blur-md"
                         >
                           <XCircle size={14} />
                           Reject
@@ -505,15 +505,15 @@ export default function ControlCenter() {
 
             {/* RECENT RESOLVED REQUESTS */}
             {recentApprovals.length > 0 && (
-              <div className="bg-[#191e1b] border border-[#303a32] rounded-2xl p-6">
+              <div className="liquid-glass-strong rounded-3xl p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <h3 className="text-sm font-bold text-gray-300">Recent Authorization History</h3>
-                    <p className="text-xs text-gray-500">History of resolved login approval requests.</p>
+                    <h3 className="text-sm font-bold text-slate-200">Recent Authorization History</h3>
+                    <p className="text-xs text-slate-400">History of resolved login approval requests.</p>
                   </div>
                   <button
                     onClick={handleClearAllApprovalHistory}
-                    className="px-3 py-1.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                    className="px-3 py-1.5 rounded-xl bg-red-500/15 border border-red-400/30 text-red-300 hover:bg-red-500/25 text-xs font-semibold flex items-center gap-1.5 transition-colors backdrop-blur-md"
                     title="Clear all authorization history"
                   >
                     <Trash2 size={12} />
@@ -523,7 +523,7 @@ export default function ControlCenter() {
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs">
                     <thead>
-                      <tr className="border-b border-[#303a32] text-gray-400">
+                      <tr className="border-b border-white/10 text-slate-400">
                         <th className="py-2 px-3">Admin Email</th>
                         <th className="py-2 px-3">Status</th>
                         <th className="py-2 px-3">IP Address</th>
@@ -531,9 +531,9 @@ export default function ControlCenter() {
                         <th className="py-2 px-3 text-right">Action</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#303a32]/50">
+                    <tbody className="divide-y divide-white/10">
                       {recentApprovals.map((item) => (
-                        <tr key={item.id} className="hover:bg-white/[0.02]">
+                        <tr key={item.id} className="hover:bg-white/[0.04] transition-colors">
                           <td className="py-2.5 px-3 font-medium text-white">{item.email}</td>
                           <td className="py-2.5 px-3">
                             <span
@@ -542,21 +542,21 @@ export default function ControlCenter() {
                                   ? 'bg-emerald-500/20 text-emerald-300'
                                   : item.status === 'rejected'
                                   ? 'bg-red-500/20 text-red-300'
-                                  : 'bg-gray-500/20 text-gray-300'
+                                  : 'bg-white/10 text-slate-300'
                               }`}
                             >
                               {item.status}
                             </span>
                           </td>
-                          <td className="py-2.5 px-3 text-gray-400">{item.ip || '—'}</td>
-                          <td className="py-2.5 px-3 text-gray-400">
+                          <td className="py-2.5 px-3 text-slate-400">{item.ip || '—'}</td>
+                          <td className="py-2.5 px-3 text-slate-400">
                             {new Date(item.requested_at).toLocaleString()}
                           </td>
                           <td className="py-2.5 px-3 text-right">
                             <div className="flex items-center justify-end gap-1.5">
                               <button
                                 onClick={() => handleRemoveAdminAccount(item.email)}
-                                className="px-2.5 py-1 rounded bg-red-600/20 border border-red-500/40 hover:bg-red-600/30 text-red-300 font-bold text-[11px] inline-flex items-center gap-1 transition-colors shadow-sm"
+                                className="px-2.5 py-1 rounded bg-red-500/20 border border-red-400/35 hover:bg-red-500/30 text-red-300 font-bold text-[11px] inline-flex items-center gap-1 transition-colors"
                                 title={`Completely remove Admin ID "${item.email}" and revoke all active sessions`}
                               >
                                 <UserX size={11} />
@@ -564,7 +564,7 @@ export default function ControlCenter() {
                               </button>
                               <button
                                 onClick={() => handleDeleteApprovalHistory(item.id)}
-                                className="p-1 rounded bg-white/5 border border-white/10 hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+                                className="p-1 rounded bg-white/[0.06] border border-white/15 hover:bg-white/15 text-slate-400 hover:text-white transition-colors"
                                 title="Clear this log record"
                               >
                                 <Trash2 size={11} />
@@ -585,15 +585,15 @@ export default function ControlCenter() {
         {activeTab !== 'approvals' && (
           <div className="space-y-4">
             {/* ACTION BAR: SEARCH & EXPORT */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#191e1b] border border-[#303a32] rounded-2xl p-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 liquid-glass-strong rounded-2xl p-4">
               <div className="relative flex-1 max-w-md">
-                <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder={`Search ${activeTab}...`}
-                  className="w-full bg-[#111411] border border-[#303a32] rounded-xl pl-10 pr-4 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
+                  className="liquid-input w-full pl-10 pr-4 py-2 text-sm"
                 />
               </div>
 
@@ -601,28 +601,28 @@ export default function ControlCenter() {
                 <button
                   onClick={() => fetchDataForTab(activeTab)}
                   disabled={dataLoading}
-                  className="px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                  className="liquid-btn-glass px-3.5 py-2 text-xs flex items-center gap-1.5"
                 >
                   <RefreshCw size={12} className={dataLoading ? 'animate-spin' : ''} />
                   Refresh
                 </button>
                 <button
                   onClick={() => handleExport('xlsx')}
-                  className="px-3.5 py-2 rounded-xl bg-emerald-600/20 border border-emerald-500/30 hover:bg-emerald-600/30 text-emerald-300 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                  className="px-3.5 py-2 rounded-xl bg-emerald-500/20 border border-emerald-400/35 hover:bg-emerald-500/30 text-emerald-200 text-xs font-semibold flex items-center gap-1.5 transition-colors backdrop-blur-md"
                 >
                   <FileSpreadsheet size={14} />
                   Export XLSX
                 </button>
                 <button
                   onClick={() => handleExport('csv')}
-                  className="px-3.5 py-2 rounded-xl bg-blue-600/20 border border-blue-500/30 hover:bg-blue-600/30 text-blue-300 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                  className="px-3.5 py-2 rounded-xl bg-cyan-500/20 border border-cyan-400/35 hover:bg-cyan-500/30 text-cyan-200 text-xs font-semibold flex items-center gap-1.5 transition-colors backdrop-blur-md"
                 >
                   <Download size={14} />
                   Export CSV
                 </button>
                 <button
                   onClick={() => handleExport('json')}
-                  className="px-3.5 py-2 rounded-xl bg-purple-600/20 border border-purple-500/30 hover:bg-purple-600/30 text-purple-300 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                  className="px-3.5 py-2 rounded-xl bg-violet-500/20 border border-violet-400/35 hover:bg-violet-500/30 text-violet-200 text-xs font-semibold flex items-center gap-1.5 transition-colors backdrop-blur-md"
                 >
                   <Database size={14} />
                   Export JSON
@@ -632,15 +632,15 @@ export default function ControlCenter() {
 
             {/* ADMIN ACCOUNTS SPECIFIC VIEW */}
             {activeTab === 'admins' ? (
-              <div className="bg-[#191e1b] border border-[#303a32] rounded-2xl overflow-hidden shadow-sm">
-                <div className="p-4 bg-[#141916] border-b border-[#303a32] flex items-center justify-between">
+              <div className="liquid-glass-strong rounded-3xl overflow-hidden">
+                <div className="p-4 bg-white/[0.04] border-b border-white/10 flex items-center justify-between">
                   <div>
                     <h3 className="text-sm font-bold text-white">Administrator Accounts</h3>
-                    <p className="text-xs text-gray-400">Super Admins can remove any Admin ID or manage access.</p>
+                    <p className="text-xs text-slate-400">Super Admins can remove any Admin ID or manage access.</p>
                   </div>
                   <Link
                     to="/admin/control/admins"
-                    className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-blue-600 to-olive-500 text-white font-bold text-xs flex items-center gap-1.5 hover:opacity-95 transition-opacity"
+                    className="liquid-btn-primary px-3 py-1.5 text-xs flex items-center gap-1.5"
                   >
                     <Users size={14} />
                     Add / Full Admin Manager
@@ -648,7 +648,7 @@ export default function ControlCenter() {
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs">
-                    <thead className="bg-[#141916] text-gray-400 border-b border-[#303a32]">
+                    <thead className="bg-white/[0.04] text-slate-300 border-b border-white/10">
                       <tr>
                         <th className="py-3 px-4 font-semibold">Admin Account</th>
                         <th className="py-3 px-4 font-semibold">Role</th>
@@ -658,10 +658,10 @@ export default function ControlCenter() {
                         <th className="py-3 px-4 font-semibold text-right">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#303a32]">
+                    <tbody className="divide-y divide-white/10">
                       {filteredData.length === 0 ? (
                         <tr>
-                          <td colSpan={6} className="py-8 text-center text-gray-400">
+                          <td colSpan={6} className="py-8 text-center text-slate-400">
                             {dataLoading ? 'Loading admin accounts...' : 'No admins found.'}
                           </td>
                         </tr>
@@ -673,11 +673,11 @@ export default function ControlCenter() {
                           const status = String(adm.status || 'active');
                           const isApproved = Boolean(adm.is_approved);
                           return (
-                            <tr key={String(adm.id || email)} className="hover:bg-white/[0.02] transition-colors">
+                            <tr key={String(adm.id || email)} className="hover:bg-white/[0.04] transition-colors">
                               <td className="py-3 px-4">
                                 <div className="flex items-center gap-2">
                                   <div className={`w-7 h-7 rounded-lg flex items-center justify-center font-bold text-[11px] ${
-                                    isSuper ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' : 'bg-olive-500/20 text-olive-300 border border-olive-500/30'
+                                    isSuper ? 'bg-blue-500/20 text-blue-300 border border-blue-400/35' : 'bg-cyan-500/20 text-cyan-200 border border-cyan-400/35'
                                   }`}>
                                     {isSuper ? <ShieldAlert size={14} /> : <Shield size={14} />}
                                   </div>
@@ -686,11 +686,11 @@ export default function ControlCenter() {
                               </td>
                               <td className="py-3 px-4">
                                 {isSuper ? (
-                                  <span className="px-2 py-0.5 rounded text-[10px] font-black bg-blue-500/20 text-blue-300 border border-blue-500/40">
+                                  <span className="px-2 py-0.5 rounded text-[10px] font-black bg-blue-500/20 text-blue-300 border border-blue-400/35">
                                     SUPER ADMIN
                                   </span>
                                 ) : (
-                                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-olive-500/20 text-olive-300 border border-olive-500/40">
+                                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-cyan-500/20 text-cyan-200 border border-cyan-400/35">
                                     ADMIN
                                   </span>
                                 )}
@@ -703,25 +703,25 @@ export default function ControlCenter() {
                                     {status.toUpperCase()}
                                   </span>
                                   {!isSuper && isApproved && (
-                                    <span className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-blue-500/10 text-blue-300 border border-blue-500/30">
+                                    <span className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-blue-500/15 text-blue-200 border border-blue-400/30">
                                       Approved
                                     </span>
                                   )}
                                 </div>
                               </td>
-                              <td className="py-3 px-4 text-gray-400">
+                              <td className="py-3 px-4 text-slate-400">
                                 {adm.created_at ? new Date(String(adm.created_at)).toLocaleDateString() : '—'}
                               </td>
-                              <td className="py-3 px-4 text-gray-400">
+                              <td className="py-3 px-4 text-slate-400">
                                 {adm.last_login_at ? new Date(String(adm.last_login_at)).toLocaleString() : 'Never'}
                               </td>
                               <td className="py-3 px-4 text-right">
                                 {isSuper ? (
-                                  <span className="text-[11px] text-gray-500 italic">Server Configured (Locked)</span>
+                                  <span className="text-[11px] text-slate-400 italic">Server Configured (Locked)</span>
                                 ) : (
                                   <button
                                     onClick={() => handleRemoveAdminAccount(email)}
-                                    className="px-3 py-1.5 rounded-xl bg-red-600/20 border border-red-500/40 hover:bg-red-600/30 text-red-300 font-bold text-xs inline-flex items-center gap-1.5 transition-colors shadow-sm"
+                                    className="px-3 py-1.5 rounded-xl bg-red-500/20 border border-red-400/35 hover:bg-red-500/30 text-red-200 font-bold text-xs inline-flex items-center gap-1.5 transition-colors backdrop-blur-md"
                                     title={`Remove Admin ID ${email}`}
                                   >
                                     <UserX size={13} />
@@ -738,10 +738,10 @@ export default function ControlCenter() {
                 </div>
               </div>
             ) : activeTab === 'sessions' ? (
-              <div className="bg-[#191e1b] border border-[#303a32] rounded-2xl overflow-hidden">
+              <div className="liquid-glass-strong rounded-3xl overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs">
-                    <thead className="bg-[#141916] text-gray-400 border-b border-[#303a32]">
+                    <thead className="bg-white/[0.04] text-slate-300 border-b border-white/10">
                       <tr>
                         <th className="py-3 px-4">Admin Email</th>
                         <th className="py-3 px-4">Status</th>
@@ -752,10 +752,10 @@ export default function ControlCenter() {
                         <th className="py-3 px-4 text-right">Action</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#303a32]">
+                    <tbody className="divide-y divide-white/10">
                       {filteredData.length === 0 ? (
                         <tr>
-                          <td colSpan={7} className="py-8 text-center text-gray-400">
+                          <td colSpan={7} className="py-8 text-center text-slate-400">
                             No sessions found.
                           </td>
                         </tr>
@@ -763,11 +763,11 @@ export default function ControlCenter() {
                         filteredData.map((raw) => {
                           const s = raw as unknown as SessionRecord;
                           return (
-                            <tr key={s.id} className="hover:bg-white/[0.02]">
+                            <tr key={s.id} className="hover:bg-white/[0.04] transition-colors">
                               <td className="py-3 px-4">
                                 <span className="font-bold text-white">{s.email}</span>
                                 {s.is_current && (
-                                  <span className="ml-2 px-1.5 py-0.5 rounded text-[10px] bg-blue-500/20 text-blue-300 border border-blue-500/40">
+                                  <span className="ml-2 px-1.5 py-0.5 rounded text-[10px] bg-blue-500/20 text-blue-300 border border-blue-400/35">
                                     Current
                                   </span>
                                 )}
@@ -783,14 +783,14 @@ export default function ControlCenter() {
                                   {s.status}
                                 </span>
                               </td>
-                              <td className="py-3 px-4 text-gray-300">{s.ip}</td>
-                              <td className="py-3 px-4 text-gray-400 font-mono text-[11px] truncate max-w-xs">
+                              <td className="py-3 px-4 text-slate-300">{s.ip}</td>
+                              <td className="py-3 px-4 text-slate-400 font-mono text-[11px] truncate max-w-xs">
                                 {s.user_agent}
                               </td>
-                              <td className="py-3 px-4 text-gray-400">
+                              <td className="py-3 px-4 text-slate-400">
                                 {new Date(s.created_at).toLocaleString()}
                               </td>
-                              <td className="py-3 px-4 text-gray-400">
+                              <td className="py-3 px-4 text-slate-400">
                                 {s.last_seen_at ? new Date(s.last_seen_at).toLocaleString() : '—'}
                               </td>
                               <td className="py-3 px-4 text-right">
@@ -799,13 +799,13 @@ export default function ControlCenter() {
                                     <div className="flex items-center justify-end gap-1.5">
                                       <button
                                         onClick={() => handleRevokeSession(s.id)}
-                                        className="px-2.5 py-1 rounded bg-red-600 text-white font-bold text-[11px]"
+                                        className="px-2.5 py-1 rounded bg-red-500/80 hover:bg-red-500 text-white font-bold text-[11px]"
                                       >
                                         Confirm
                                       </button>
                                       <button
                                         onClick={() => setRevokeConfirmId(null)}
-                                        className="px-2 py-1 rounded bg-gray-600 text-white text-[11px]"
+                                        className="px-2 py-1 rounded bg-white/15 hover:bg-white/25 text-white text-[11px]"
                                       >
                                         Cancel
                                       </button>
@@ -813,7 +813,7 @@ export default function ControlCenter() {
                                   ) : (
                                     <button
                                       onClick={() => setRevokeConfirmId(s.id)}
-                                      className="px-2.5 py-1 rounded bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20 font-semibold text-[11px]"
+                                      className="px-2.5 py-1 rounded bg-red-500/15 border border-red-400/30 text-red-300 hover:bg-red-500/25 font-semibold text-[11px]"
                                     >
                                       Revoke
                                     </button>
@@ -830,10 +830,10 @@ export default function ControlCenter() {
               </div>
             ) : (
               /* GENERIC DATA TABLE VIEW */
-              <div className="bg-[#191e1b] border border-[#303a32] rounded-2xl overflow-hidden">
+              <div className="liquid-glass-strong rounded-3xl overflow-hidden">
                 <div className="overflow-x-auto max-h-[600px]">
                   <table className="w-full text-left text-xs">
-                    <thead className="bg-[#141916] text-gray-400 border-b border-[#303a32] sticky top-0">
+                    <thead className="bg-white/[0.06] text-slate-300 border-b border-white/10 sticky top-0 backdrop-blur-xl">
                       <tr>
                         {filteredData.length > 0 &&
                           Object.keys(filteredData[0])
@@ -845,20 +845,20 @@ export default function ControlCenter() {
                             ))}
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#303a32]">
+                    <tbody className="divide-y divide-white/10">
                       {filteredData.length === 0 ? (
                         <tr>
-                          <td className="py-8 text-center text-gray-400" colSpan={8}>
+                          <td className="py-8 text-center text-slate-400" colSpan={8}>
                             {dataLoading ? 'Loading records...' : 'No records found.'}
                           </td>
                         </tr>
                       ) : (
                         filteredData.map((row, idx) => (
-                          <tr key={idx} className="hover:bg-white/[0.02]">
+                          <tr key={idx} className="hover:bg-white/[0.04] transition-colors">
                             {Object.entries(row)
                               .filter(([k]) => !k.includes('password') && !k.includes('token') && !k.includes('hash'))
                               .map(([col, val]) => (
-                                <td key={col} className="py-3 px-4 max-w-xs truncate text-gray-300">
+                                <td key={col} className="py-3 px-4 max-w-xs truncate text-slate-300">
                                   {typeof val === 'object' ? JSON.stringify(val) : String(val ?? '—')}
                                 </td>
                               ))}

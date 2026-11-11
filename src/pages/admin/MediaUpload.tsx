@@ -147,16 +147,18 @@ export default function MediaUpload() {
   };
 
   return (
-    <div className="min-h-screen bg-[#111411] grid-bg text-white pt-20 pb-16">
+    <div className="min-h-screen text-white pt-24 pb-16">
       <div className="max-w-7xl mx-auto px-4">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
-            <Link to="/admin" className="text-gray-400 hover:text-white">
+            <Link to="/admin" className="liquid-icon-bubble w-10 h-10 rounded-xl text-slate-300 hover:text-white">
               <ArrowLeft size={20} />
             </Link>
             <div>
-              <h1 className="text-3xl font-black">Media Manager</h1>
-              <p className="text-gray-400 text-sm">Manage approved media and verify public submissions</p>
+              <h1 className="text-3xl font-black bg-gradient-to-r from-white via-cyan-100 to-blue-200 bg-clip-text text-transparent">
+                Media Manager
+              </h1>
+              <p className="text-slate-300/80 text-sm">Manage approved media and verify public submissions</p>
             </div>
           </div>
           <button
@@ -164,27 +166,27 @@ export default function MediaUpload() {
               setShowForm(!showForm);
               if (!showForm) resetForm();
             }}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#3b82f6] text-white font-semibold hover:bg-[#3b82f6]/90 transition-colors"
+            className="liquid-btn-primary flex items-center gap-2 px-5 py-2.5 rounded-xl text-white font-semibold"
           >
             {showForm ? <X size={16} /> : <Plus size={16} />}
             {showForm ? 'Cancel' : 'Add Media'}
           </button>
         </div>
         <div className="mb-6">
-          <Link to="/admin/upload-bulk" className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-olive-500/20 border border-olive-500/30 text-olive-300 text-sm hover:bg-olive-500/30 transition-colors">
+          <Link to="/admin/upload-bulk" className="liquid-btn-glass inline-flex items-center gap-2 px-4 py-2 rounded-xl border-cyan-400/35 text-cyan-200 text-sm">
             <Upload size={15} /> Bulk Upload / Drive Import
           </Link>
         </div>
 
         {showForm && (
-          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="bg-[#191e1b]/90 border border-[#303a32] rounded-2xl p-6 mb-8">
-            <h2 className="font-bold text-lg mb-5 flex items-center gap-2"><Upload size={18} className="text-blue-400" /> Add New Media</h2>
+          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="liquid-glass-strong rounded-3xl p-6 mb-8">
+            <h2 className="font-bold text-lg mb-5 flex items-center gap-2"><Upload size={18} className="text-cyan-300" /> Add New Media</h2>
             <form onSubmit={handleAdd} className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="md:col-span-2 flex gap-2">
-                <button type="button" onClick={() => setMode('file')} className={`px-4 py-2 rounded-xl text-sm border ${mode === 'file' ? 'bg-blue-600/30 border-blue-500/50 text-blue-200' : 'bg-white/5 border-white/15 text-gray-400'}`}>
+                <button type="button" onClick={() => setMode('file')} className={`liquid-btn-glass px-4 py-2 rounded-xl text-sm ${mode === 'file' ? 'border-cyan-400/50 bg-cyan-500/20 text-cyan-100' : 'text-slate-300'}`}>
                   Upload File
                 </button>
-                <button type="button" onClick={() => setMode('url')} className={`px-4 py-2 rounded-xl text-sm border ${mode === 'url' ? 'bg-blue-600/30 border-blue-500/50 text-blue-200' : 'bg-white/5 border-white/15 text-gray-400'}`}>
+                <button type="button" onClick={() => setMode('url')} className={`liquid-btn-glass px-4 py-2 rounded-xl text-sm ${mode === 'url' ? 'border-cyan-400/50 bg-cyan-500/20 text-cyan-100' : 'text-slate-300'}`}>
                   Use URL
                 </button>
               </div>
@@ -192,39 +194,39 @@ export default function MediaUpload() {
               {mode === 'url' ? (
                 <>
                   <div className="md:col-span-2">
-                    <label className="block text-sm text-gray-400 mb-1.5">Image/Video URL *</label>
-                    <input value={form.url} onChange={e => setForm(f => ({ ...f, url: e.target.value }))} placeholder="https://..." className="w-full bg-[#191e1b]/90 border border-[#303a32] rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-[#3b82f6]" />
+                    <label className="block text-sm text-slate-300 mb-1.5">Image/Video URL *</label>
+                    <input value={form.url} onChange={e => setForm(f => ({ ...f, url: e.target.value }))} placeholder="https://..." className="liquid-input w-full rounded-xl px-4 py-3 text-white placeholder-slate-400/60" />
                   </div>
                   <div>
-                    <label className="block text-sm text-gray-400 mb-1.5">Type</label>
-                    <select value={form.type} onChange={e => setForm(f => ({ ...f, type: e.target.value }))} className="w-full bg-[#222923] border border-[#303a32] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#3b82f6]">
-                      <option value="image">Image</option>
-                      <option value="video">Video</option>
+                    <label className="block text-sm text-slate-300 mb-1.5">Type</label>
+                    <select value={form.type} onChange={e => setForm(f => ({ ...f, type: e.target.value }))} className="liquid-input w-full rounded-xl px-4 py-3 text-white">
+                      <option value="image" className="bg-[#081022] text-white">Image</option>
+                      <option value="video" className="bg-[#081022] text-white">Video</option>
                     </select>
                   </div>
                 </>
               ) : (
                 <div className="md:col-span-2">
-                  <label className="block text-sm text-gray-400 mb-1.5">Media File *</label>
-                  <input type="file" accept="image/*,video/*" onChange={e => setFile(e.target.files?.[0] || null)} className="w-full bg-[#191e1b]/90 border border-[#303a32] rounded-xl px-4 py-3 text-white file:mr-4 file:rounded-lg file:border-0 file:bg-blue-600/30 file:px-3 file:py-2 file:text-blue-200" />
+                  <label className="block text-sm text-slate-300 mb-1.5">Media File *</label>
+                  <input type="file" accept="image/*,video/*" onChange={e => setFile(e.target.files?.[0] || null)} className="liquid-input w-full rounded-xl px-4 py-3 text-white file:mr-4 file:rounded-lg file:border file:border-cyan-300/30 file:bg-cyan-500/20 file:px-3 file:py-2 file:text-cyan-100 file:text-xs file:font-semibold" />
                 </div>
               )}
 
               <div>
-                <label className="block text-sm text-gray-400 mb-1.5">Caption</label>
-                <input value={form.caption} onChange={e => setForm(f => ({ ...f, caption: e.target.value }))} placeholder="Optional caption" className="w-full bg-[#191e1b]/90 border border-[#303a32] rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-[#3b82f6]" />
+                <label className="block text-sm text-slate-300 mb-1.5">Caption</label>
+                <input value={form.caption} onChange={e => setForm(f => ({ ...f, caption: e.target.value }))} placeholder="Optional caption" className="liquid-input w-full rounded-xl px-4 py-3 text-white placeholder-slate-400/60" />
               </div>
               <div>
-                <label className="block text-sm text-gray-400 mb-1.5">Category</label>
-                <select value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} className="w-full bg-[#222923] border border-[#303a32] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#3b82f6]">
-                  <option value="general">General</option>
-                  <option value="winner">Winner</option>
+                <label className="block text-sm text-slate-300 mb-1.5">Category</label>
+                <select value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} className="liquid-input w-full rounded-xl px-4 py-3 text-white">
+                  <option value="general" className="bg-[#081022] text-white">General</option>
+                  <option value="winner" className="bg-[#081022] text-white">Winner</option>
                 </select>
               </div>
 
-              {error && <p className="md:col-span-2 text-red-400 text-sm">{error}</p>}
+              {error && <p className="md:col-span-2 text-red-300 text-sm">{error}</p>}
               <div className="md:col-span-2">
-                <button type="submit" disabled={submitting} className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#3b82f6] to-[#718044] text-white font-bold hover:opacity-90 transition-opacity disabled:opacity-50">
+                <button type="submit" disabled={submitting} className="liquid-btn-primary px-6 py-3 rounded-xl text-white font-bold disabled:opacity-50">
                   {submitting ? 'Uploading...' : 'Save Media'}
                 </button>
               </div>
@@ -237,33 +239,33 @@ export default function MediaUpload() {
         ) : (
           <>
             <div className="mb-8">
-              <h2 className="text-xl font-bold mb-3">Pending Public Uploads</h2>
+              <h2 className="text-xl font-bold mb-3 text-white">Pending Public Uploads</h2>
               {pendingMedia.length === 0 ? (
-                <div className="p-5 rounded-2xl bg-[#191e1b]/90 border border-[#303a32] text-sm text-gray-500">No pending submissions.</div>
+                <div className="liquid-glass-card p-5 rounded-2xl text-sm text-slate-400">No pending submissions.</div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                   {pendingMedia.map(item => (
-                    <div key={item.id} className="rounded-xl overflow-hidden bg-[#191e1b]/90 border border-[#303a32]">
+                    <div key={item.id} className="liquid-glass-card rounded-2xl overflow-hidden">
                       <img src={item.thumb_url || item.url} alt={item.caption || 'Pending media'} className="w-full aspect-square object-cover" />
-                      <div className="p-3">
-                        <p className="text-xs text-gray-400 mb-2">By: {item.uploaded_by}</p>
+                      <div className="p-3.5">
+                        <p className="text-xs text-slate-300/80 mb-2">By: {item.uploaded_by}</p>
                         {item.caption && <p className="text-sm text-white mb-2 line-clamp-2">{item.caption}</p>}
-                        <div className="mb-2">
-                          <label className="block text-[11px] text-gray-500 mb-1">Category on approval</label>
+                        <div className="mb-2.5">
+                          <label className="block text-[11px] text-slate-400 mb-1">Category on approval</label>
                           <select
                             value={pendingCategoryDrafts[item.id] || item.category || 'general'}
                             onChange={e => setPendingCategoryDrafts(prev => ({ ...prev, [item.id]: e.target.value }))}
-                            className="w-full bg-[#222923] border border-[#303a32] rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500"
+                            className="liquid-input w-full rounded-lg px-2.5 py-1.5 text-xs text-white"
                           >
-                            <option value="general">General</option>
-                            <option value="winner">Winner</option>
+                            <option value="general" className="bg-[#081022] text-white">General</option>
+                            <option value="winner" className="bg-[#081022] text-white">Winner</option>
                           </select>
                         </div>
                         <div className="flex gap-2">
-                          <button onClick={() => handleModerate(item.id, 'approved')} disabled={moderating === item.id} className="flex-1 px-3 py-2 rounded-lg bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-semibold flex items-center justify-center gap-1">
+                          <button onClick={() => handleModerate(item.id, 'approved')} disabled={moderating === item.id} className="flex-1 px-3 py-2 rounded-lg bg-emerald-500/20 border border-emerald-400/40 text-emerald-200 text-xs font-semibold flex items-center justify-center gap-1 hover:bg-emerald-500/30">
                             <Check size={13} /> Approve
                           </button>
-                          <button onClick={() => handleModerate(item.id, 'rejected')} disabled={moderating === item.id} className="flex-1 px-3 py-2 rounded-lg bg-red-500/20 border border-red-500/40 text-red-300 text-xs font-semibold flex items-center justify-center gap-1">
+                          <button onClick={() => handleModerate(item.id, 'rejected')} disabled={moderating === item.id} className="flex-1 px-3 py-2 rounded-lg bg-red-500/20 border border-red-400/40 text-red-200 text-xs font-semibold flex items-center justify-center gap-1 hover:bg-red-500/30">
                             <Ban size={13} /> Reject
                           </button>
                         </div>
@@ -275,36 +277,36 @@ export default function MediaUpload() {
             </div>
 
             <div>
-              <h2 className="text-xl font-bold mb-3">Approved Media</h2>
+              <h2 className="text-xl font-bold mb-3 text-white">Approved Media</h2>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                 {approvedMedia.map(item => (
-                  <motion.div key={item.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="group relative rounded-xl overflow-hidden aspect-square bg-[#191e1b]/90 border border-[#303a32]">
+                  <motion.div key={item.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="liquid-glass-card group relative rounded-2xl overflow-hidden aspect-square">
                     <img src={item.thumb_url || item.url} alt={item.caption} className="w-full h-full object-cover" />
                     {item.type === 'video' && (
-                      <div className="absolute left-2 top-2 px-2 py-1 rounded-full bg-black/60 text-xs text-white flex items-center gap-1">
+                      <div className="liquid-glass-pill absolute left-2 top-2 px-2.5 py-1 rounded-full text-xs text-cyan-100 flex items-center gap-1">
                         <Video size={12} /> Video
                       </div>
                     )}
-                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-3">
+                    <div className="absolute inset-0 bg-slate-950/65 backdrop-blur-xs opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-3">
                       <div className="flex justify-end">
-                        <button onClick={() => handleDelete(item.id)} disabled={deleting === item.id} className="w-8 h-8 rounded-full bg-red-500/80 flex items-center justify-center text-white hover:bg-red-600 transition-colors">
+                        <button onClick={() => handleDelete(item.id)} disabled={deleting === item.id} className="w-8 h-8 rounded-full bg-red-500/85 flex items-center justify-center text-white hover:bg-red-600 transition-colors shadow-lg">
                           {deleting === item.id ? '...' : <Trash2 size={14} />}
                         </button>
                       </div>
                       <div>
                         {item.caption && <p className="text-white text-xs font-medium truncate">{item.caption}</p>}
                         <div className="flex gap-1 mt-1">
-                          <span className="text-xs px-1.5 py-0.5 rounded bg-blue-500/50 text-blue-200">{item.type}</span>
-                          <span className="text-xs px-1.5 py-0.5 rounded bg-olive-500/50 text-olive-200">{item.category}</span>
+                          <span className="liquid-glass-pill text-[11px] px-2 py-0.5 rounded-full text-cyan-200">{item.type}</span>
+                          <span className="liquid-glass-pill text-[11px] px-2 py-0.5 rounded-full text-violet-200">{item.category}</span>
                         </div>
                       </div>
                     </div>
                   </motion.div>
                 ))}
                 {approvedMedia.length === 0 && (
-                  <div className="col-span-full text-center py-20">
-                    <Image size={40} className="mx-auto text-gray-700 mb-3" />
-                    <p className="text-gray-500">No approved media yet.</p>
+                  <div className="col-span-full liquid-glass-card rounded-3xl text-center py-20">
+                    <Image size={40} className="mx-auto text-cyan-300/60 mb-3" />
+                    <p className="text-slate-300">No approved media yet.</p>
                   </div>
                 )}
               </div>

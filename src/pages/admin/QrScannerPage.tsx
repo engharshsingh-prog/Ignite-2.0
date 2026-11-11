@@ -44,24 +44,24 @@ export default function QrScannerPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#111411] grid-bg text-white pt-20 pb-16">
+    <div className="min-h-screen text-white pt-24 pb-16">
       <div className="max-w-4xl mx-auto px-4">
         {/* Top Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div className="flex items-center gap-3">
             <Link
               to="/admin"
-              className="w-10 h-10 rounded-xl bg-[#191e1b] border border-[#303a32] flex items-center justify-center text-gray-400 hover:text-white hover:border-emerald-500/50 transition-colors"
+              className="liquid-icon-bubble w-10 h-10 rounded-xl text-slate-300 hover:text-white"
               title="Back to Dashboard"
             >
               <ArrowLeft size={18} />
             </Link>
             <div>
               <h1 className="text-2xl font-black text-white tracking-tight flex items-center gap-2">
-                <QrCode size={24} className="text-emerald-400" />
+                <QrCode size={24} className="text-emerald-300" />
                 Pass QR Scanner & Check-in
               </h1>
-              <p className="text-xs text-gray-400 mt-0.5">
+              <p className="text-xs text-slate-300/80 mt-0.5">
                 Scan attendee QR passes to verify payment and approve venue entry.
               </p>
             </div>
@@ -69,10 +69,10 @@ export default function QrScannerPage() {
 
           {stats && (
             <div className="flex items-center gap-2 text-xs">
-              <span className="px-3 py-1.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-bold flex items-center gap-1.5">
+              <span className="liquid-glass-pill px-3.5 py-1.5 rounded-full border-emerald-400/35 bg-emerald-500/15 text-emerald-200 font-bold flex items-center gap-1.5">
                 <UserCheck size={14} /> Checked In: {stats.checkedIn} / {stats.total}
               </span>
-              <span className="px-3 py-1.5 rounded-xl bg-[#191e1b] border border-[#303a32] text-gray-400 font-medium">
+              <span className="liquid-glass-pill px-3.5 py-1.5 rounded-full text-slate-300 font-medium">
                 {stats.notCheckedIn} Awaiting
               </span>
             </div>
@@ -80,18 +80,18 @@ export default function QrScannerPage() {
         </div>
 
         {/* Scanner Container */}
-        <div className="rounded-3xl border border-emerald-500/30 bg-[#141815]/95 shadow-2xl overflow-hidden p-6 text-center space-y-4">
-          <div className="w-16 h-16 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto mb-2">
+        <div className="liquid-glass-strong rounded-3xl border-emerald-400/30 overflow-hidden p-8 text-center space-y-4">
+          <div className="liquid-icon-bubble w-16 h-16 rounded-2xl border-emerald-400/40 bg-emerald-500/15 text-emerald-300 mx-auto mb-2 shadow-[0_0_24px_rgba(52,211,153,0.22)]">
             <QrCode size={32} />
           </div>
-          <h2 className="text-lg font-bold text-white">Live Check-in Scanner Active</h2>
-          <p className="text-xs text-gray-400 max-w-md mx-auto">
+          <h2 className="text-xl font-bold text-white">Live Check-in Scanner Active</h2>
+          <p className="text-xs text-slate-300/85 max-w-md mx-auto leading-relaxed">
             Point your camera at the QR code on the student&apos;s digital pass or printed badge. The system will prompt for check-in approval.
           </p>
 
           <button
             onClick={() => setScannerOpen(true)}
-            className="px-5 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-black font-black text-sm inline-flex items-center gap-2 shadow-lg shadow-emerald-500/20 transition-all cursor-pointer"
+            className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-400 to-cyan-400 hover:from-emerald-300 hover:to-cyan-300 text-slate-950 font-black text-sm inline-flex items-center gap-2 shadow-[0_8px_28px_rgba(52,211,153,0.28)] transition-all cursor-pointer"
           >
             <QrCode size={18} />
             Open Scanner Window

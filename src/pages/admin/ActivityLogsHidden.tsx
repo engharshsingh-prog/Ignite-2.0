@@ -58,7 +58,7 @@ export default function ActivityLogsHidden() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#111411] grid-bg text-white pt-20 pb-16">
+      <div className="min-h-screen text-white pt-24 pb-16">
         <div className="max-w-5xl mx-auto px-4">
           <LoadingSpinner text="Loading logs..." />
         </div>
@@ -67,27 +67,29 @@ export default function ActivityLogsHidden() {
   }
 
   return (
-    <div className="min-h-screen bg-[#111411] grid-bg text-white pt-20 pb-16">
+    <div className="min-h-screen text-white pt-24 pb-16">
       <div className="max-w-5xl mx-auto px-4">
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
-          <h1 className="text-2xl font-black">Activity Logs</h1>
-          <p className="text-sm text-gray-500">Hidden admin route</p>
+          <h1 className="text-3xl font-black bg-gradient-to-r from-white via-cyan-100 to-violet-200 bg-clip-text text-transparent">
+            Activity Logs
+          </h1>
+          <p className="text-sm text-slate-300/75">Hidden admin route</p>
         </motion.div>
 
-        <div className="rounded-2xl border border-white/10 overflow-hidden">
+        <div className="liquid-glass-strong rounded-3xl overflow-hidden">
           {logs.length === 0 ? (
-            <div className="px-5 py-8 text-sm text-gray-500">No activity logged yet.</div>
+            <div className="px-6 py-10 text-sm text-slate-400">No activity logged yet.</div>
           ) : (
-            <div className="divide-y divide-white/5">
+            <div className="divide-y divide-white/10">
               {logs.map(log => (
-                <div key={log.id} className="px-5 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5">
+                <div key={log.id} className="px-6 py-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 hover:bg-white/[0.04] transition-colors">
                   <div>
-                    <p className="text-sm text-gray-200">{actionLabel(log.action)}</p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-sm text-slate-100">{actionLabel(log.action)}</p>
+                    <p className="text-xs text-slate-400">
                       {log.actor_email} | {log.entity_type}{log.entity_id ? ` #${log.entity_id}` : ''}
                     </p>
                   </div>
-                  <p className="text-xs text-gray-500">{new Date(log.created_at).toLocaleString()}</p>
+                  <p className="text-xs text-cyan-200/75 font-mono">{new Date(log.created_at).toLocaleString()}</p>
                 </div>
               ))}
             </div>

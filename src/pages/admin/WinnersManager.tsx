@@ -256,17 +256,17 @@ export default function WinnersManager() {
   const isDriveConverted = (url: string) => url.includes('googleusercontent.com') || url.includes('drive.google.com');
 
   return (
-    <div className="min-h-screen bg-[#111411] grid-bg text-white pt-20 pb-16">
+    <div className="min-h-screen text-white pt-24 pb-16">
       <div className="max-w-5xl mx-auto px-4">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
-            <Link to="/admin" className="text-gray-400 hover:text-white p-2 rounded-xl bg-white/5 border border-white/10 transition-colors">
+            <Link to="/admin" className="liquid-icon-bubble text-slate-300 hover:text-white">
               <ArrowLeft size={20} />
             </Link>
             <div>
-              <h1 className="text-3xl font-black">Winners Manager</h1>
-              <p className="text-gray-400 text-sm">Manage Hall of Fame entries & photos</p>
+              <h1 className="text-3xl font-black tracking-tight">Winners Manager</h1>
+              <p className="text-slate-400 text-sm">Manage Hall of Fame entries & photos</p>
             </div>
           </div>
           <button
@@ -274,7 +274,9 @@ export default function WinnersManager() {
               setShowForm(!showForm);
               setEditingWinner(null);
             }}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-olive-500 text-black font-bold hover:bg-olive-400 transition-colors shadow-lg shadow-olive-500/20"
+            className={`flex items-center gap-2 px-5 py-2.5 text-sm ${
+              showForm ? 'liquid-btn-glass' : 'liquid-btn-primary'
+            }`}
           >
             {showForm ? <X size={16} /> : <Plus size={16} />}
             {showForm ? 'Cancel' : 'Add Winner'}
@@ -286,22 +288,22 @@ export default function WinnersManager() {
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-[#191e1b]/95 border border-[#303a32] rounded-2xl p-6 mb-8 shadow-2xl"
+            className="liquid-glass-strong rounded-3xl p-6 sm:p-7 mb-8"
           >
-            <h2 className="font-bold text-lg mb-5 flex items-center gap-2 text-olive-300">
-              <Crown size={20} className="text-olive-400" /> Add New Winner
+            <h2 className="font-bold text-lg mb-5 flex items-center gap-2 text-cyan-200">
+              <Crown size={20} className="text-cyan-400" /> Add New Winner
             </h2>
             <form onSubmit={handleAdd} className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm text-gray-400 mb-1.5">Select Participant (optional)</label>
+                <label className="block text-sm text-slate-300 mb-1.5">Select Participant (optional)</label>
                 <select
                   value={form.participant_id}
                   onChange={(e) => handleParticipantSelect(e.target.value)}
-                  className="w-full bg-[#222923] border border-[#303a32] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-olive-500"
+                  className="liquid-input w-full px-4 py-3"
                 >
-                  <option value="">-- Select participant --</option>
+                  <option value="" className="bg-[#081022] text-white">-- Select participant --</option>
                   {participants.map((p) => (
-                    <option key={p.id} value={p.id}>
+                    <option key={p.id} value={p.id} className="bg-[#081022] text-white">
                       {p.full_name} ({p.roll_number})
                     </option>
                   ))}
@@ -309,15 +311,15 @@ export default function WinnersManager() {
               </div>
 
               <div>
-                <label className="block text-sm text-gray-400 mb-1.5">Award Title *</label>
+                <label className="block text-sm text-slate-300 mb-1.5">Award Title *</label>
                 <select
                   value={form.award_title}
                   onChange={(e) => setForm((f) => ({ ...f, award_title: e.target.value }))}
-                  className="w-full bg-[#222923] border border-[#303a32] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-olive-500"
+                  className="liquid-input w-full px-4 py-3"
                 >
-                  <option value="">-- Select award --</option>
+                  <option value="" className="bg-[#081022] text-white">-- Select award --</option>
                   {AWARDS.map((a) => (
-                    <option key={a} value={a}>
+                    <option key={a} value={a} className="bg-[#081022] text-white">
                       {a}
                     </option>
                   ))}
@@ -327,46 +329,46 @@ export default function WinnersManager() {
                     value={customAward}
                     onChange={(e) => setCustomAward(e.target.value)}
                     placeholder="Enter custom award name"
-                    className="mt-2 w-full bg-[#191e1b]/90 border border-[#303a32] rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-olive-500"
+                    className="liquid-input mt-2 w-full px-4 py-3"
                   />
                 )}
               </div>
 
               <div>
-                <label className="block text-sm text-gray-400 mb-1.5">Name *</label>
+                <label className="block text-sm text-slate-300 mb-1.5">Name *</label>
                 <input
                   value={form.name}
                   onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                   placeholder="Winner's full name"
-                  className="w-full bg-[#191e1b]/90 border border-[#303a32] rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-olive-500"
+                  className="liquid-input w-full px-4 py-3"
                 />
               </div>
 
               <div>
-                <label className="block text-sm text-gray-400 mb-1.5">Roll No / Enrolment No</label>
+                <label className="block text-sm text-slate-300 mb-1.5">Roll No / Enrolment No</label>
                 <input
                   value={form.roll_no}
                   onChange={(e) => setForm((f) => ({ ...f, roll_no: e.target.value }))}
                   placeholder="e.g., 64001096"
-                  className="w-full bg-[#191e1b]/90 border border-[#303a32] rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-olive-500"
+                  className="liquid-input w-full px-4 py-3"
                 />
               </div>
 
               <div>
-                <label className="block text-sm text-gray-400 mb-1.5">Branch</label>
+                <label className="block text-sm text-slate-300 mb-1.5">Branch</label>
                 <input
                   value={form.branch}
                   onChange={(e) => setForm((f) => ({ ...f, branch: e.target.value }))}
                   placeholder="e.g., ECE"
-                  className="w-full bg-[#191e1b]/90 border border-[#303a32] rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-olive-500"
+                  className="liquid-input w-full px-4 py-3"
                 />
               </div>
 
               {/* Photo Input (URL + File Upload + Live Preview) */}
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="block text-sm text-gray-400">Winner Photo</label>
-                  <span className="text-xs text-gray-500">Google Drive, URL, or File</span>
+                  <label className="block text-sm text-slate-300">Winner Photo</label>
+                  <span className="text-xs text-slate-400">Google Drive, URL, or File</span>
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -374,7 +376,7 @@ export default function WinnersManager() {
                     value={form.image_url}
                     onChange={(e) => handleUrlInput(e.target.value, false)}
                     placeholder="Paste link (Google Drive, URL, etc.)"
-                    className="flex-1 bg-[#191e1b]/90 border border-[#303a32] rounded-xl px-4 py-3 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-olive-500"
+                    className="liquid-input flex-1 px-4 py-3 text-sm"
                   />
                   <input
                     ref={addFileInputRef}
@@ -386,7 +388,7 @@ export default function WinnersManager() {
                   <button
                     type="button"
                     onClick={() => addFileInputRef.current?.click()}
-                    className="px-3.5 py-3 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors shrink-0"
+                    className="liquid-btn-glass px-3.5 py-3 text-xs flex items-center gap-1.5 shrink-0"
                     title="Upload image from device"
                   >
                     <Upload size={14} />
@@ -396,24 +398,24 @@ export default function WinnersManager() {
 
                 {/* Status indicator & preview */}
                 {form.image_url && (
-                  <div className="mt-2.5 flex items-center gap-3 p-2.5 rounded-xl bg-black/40 border border-white/10">
+                  <div className="mt-2.5 flex items-center gap-3 p-2.5 rounded-xl bg-white/[0.04] border border-white/15 backdrop-blur-md">
                     <WinnerAvatar
                       src={form.image_url}
                       name={form.name || 'Preview'}
-                      className="w-10 h-10 rounded-full object-cover border border-emerald-500/50"
-                      fallbackClassName="w-10 h-10 rounded-full bg-olive-600/30 flex items-center justify-center font-bold text-sm text-olive-300"
+                      className="w-10 h-10 rounded-full object-cover border border-emerald-400/50"
+                      fallbackClassName="w-10 h-10 rounded-full bg-cyan-500/25 flex items-center justify-center font-bold text-sm text-cyan-200"
                     />
                     <div className="min-w-0 flex-1">
-                      <p className="text-xs text-emerald-400 font-medium flex items-center gap-1">
+                      <p className="text-xs text-emerald-300 font-medium flex items-center gap-1">
                         <Check size={12} />
                         {isDriveConverted(form.image_url) ? 'Direct Google Drive image ready' : 'Photo attached'}
                       </p>
-                      <p className="text-[11px] text-gray-500 truncate">{form.image_url.slice(0, 48)}...</p>
+                      <p className="text-[11px] text-slate-400 truncate">{form.image_url.slice(0, 48)}...</p>
                     </div>
                     <button
                       type="button"
                       onClick={() => setForm((prev) => ({ ...prev, image_url: '' }))}
-                      className="text-gray-400 hover:text-red-400 p-1"
+                      className="text-slate-400 hover:text-red-400 p-1"
                     >
                       <X size={14} />
                     </button>
@@ -422,18 +424,18 @@ export default function WinnersManager() {
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm text-gray-400 mb-1.5">Description / Citation</label>
+                <label className="block text-sm text-slate-300 mb-1.5">Description / Citation</label>
                 <textarea
                   value={form.description}
                   onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
                   placeholder="Why they won this award..."
                   rows={3}
-                  className="w-full bg-[#191e1b]/90 border border-[#303a32] rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-olive-500 resize-none"
+                  className="liquid-input w-full px-4 py-3 resize-none"
                 />
               </div>
 
               {error && (
-                <div className="md:col-span-2 flex items-center gap-2 p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
+                <div className="md:col-span-2 flex items-center gap-2 p-3 rounded-xl bg-red-500/15 border border-red-400/30 text-red-300 text-sm backdrop-blur-md">
                   <AlertCircle size={16} />
                   <span>{error}</span>
                 </div>
@@ -443,7 +445,7 @@ export default function WinnersManager() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-6 py-3 rounded-xl bg-gradient-to-r from-olive-500 to-olive-400 text-black font-bold hover:opacity-90 transition-opacity disabled:opacity-50 shadow-lg shadow-olive-500/20"
+                  className="liquid-btn-primary px-6 py-3 disabled:opacity-50"
                 >
                   {submitting ? 'Adding...' : 'Add to Hall of Fame'}
                 </button>
@@ -454,19 +456,19 @@ export default function WinnersManager() {
 
         {/* Edit Winner Modal */}
         {editingWinner && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#030712]/75 backdrop-blur-md">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="bg-[#191e1b] border border-[#303a32] rounded-2xl p-6 max-w-xl w-full shadow-2xl relative max-h-[90vh] overflow-y-auto"
+              className="liquid-glass-strong rounded-3xl p-6 max-w-xl w-full relative max-h-[90vh] overflow-y-auto"
             >
               <div className="flex items-center justify-between mb-5">
-                <h2 className="font-bold text-lg flex items-center gap-2 text-olive-300">
-                  <Edit2 size={18} className="text-olive-400" /> Edit Winner Details & Photo
+                <h2 className="font-bold text-lg flex items-center gap-2 text-cyan-200">
+                  <Edit2 size={18} className="text-cyan-400" /> Edit Winner Details & Photo
                 </h2>
                 <button
                   onClick={() => setEditingWinner(null)}
-                  className="text-gray-400 hover:text-white p-1.5 rounded-lg bg-white/5"
+                  className="liquid-icon-bubble !w-9 !h-9 text-slate-300 hover:text-white"
                 >
                   <X size={16} />
                 </button>
@@ -474,42 +476,42 @@ export default function WinnersManager() {
 
               <form onSubmit={handleEditSave} className="space-y-4">
                 <div>
-                  <label className="block text-xs text-gray-400 uppercase font-medium mb-1">Name</label>
+                  <label className="block text-xs text-slate-300 uppercase font-medium mb-1">Name</label>
                   <input
                     value={editForm.name}
                     onChange={(e) => setEditForm((f) => ({ ...f, name: e.target.value }))}
-                    className="w-full bg-[#222923] border border-[#303a32] rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-olive-500 text-sm"
+                    className="liquid-input w-full px-4 py-2.5 text-sm"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs text-gray-400 uppercase font-medium mb-1">Roll No</label>
+                    <label className="block text-xs text-slate-300 uppercase font-medium mb-1">Roll No</label>
                     <input
                       value={editForm.roll_no}
                       onChange={(e) => setEditForm((f) => ({ ...f, roll_no: e.target.value }))}
-                      className="w-full bg-[#222923] border border-[#303a32] rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-olive-500 text-sm"
+                      className="liquid-input w-full px-4 py-2.5 text-sm"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-400 uppercase font-medium mb-1">Branch</label>
+                    <label className="block text-xs text-slate-300 uppercase font-medium mb-1">Branch</label>
                     <input
                       value={editForm.branch}
                       onChange={(e) => setEditForm((f) => ({ ...f, branch: e.target.value }))}
-                      className="w-full bg-[#222923] border border-[#303a32] rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-olive-500 text-sm"
+                      className="liquid-input w-full px-4 py-2.5 text-sm"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs text-gray-400 uppercase font-medium mb-1">Award Title</label>
+                  <label className="block text-xs text-slate-300 uppercase font-medium mb-1">Award Title</label>
                   <select
                     value={editForm.award_title}
                     onChange={(e) => setEditForm((f) => ({ ...f, award_title: e.target.value }))}
-                    className="w-full bg-[#222923] border border-[#303a32] rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-olive-500 text-sm"
+                    className="liquid-input w-full px-4 py-2.5 text-sm"
                   >
                     {AWARDS.map((a) => (
-                      <option key={a} value={a}>
+                      <option key={a} value={a} className="bg-[#081022] text-white">
                         {a}
                       </option>
                     ))}
@@ -519,32 +521,32 @@ export default function WinnersManager() {
                       value={editCustomAward}
                       onChange={(e) => setEditCustomAward(e.target.value)}
                       placeholder="Custom award name"
-                      className="mt-2 w-full bg-[#222923] border border-[#303a32] rounded-xl px-4 py-2 text-white text-sm"
+                      className="liquid-input mt-2 w-full px-4 py-2 text-sm"
                     />
                   )}
                 </div>
 
                 {/* Photo Update Section */}
-                <div className="p-4 rounded-xl border border-white/10 bg-black/30">
-                  <label className="block text-xs text-gray-400 uppercase font-medium mb-2">Photo & Avatar</label>
+                <div className="p-4 rounded-2xl border border-white/15 bg-white/[0.04] backdrop-blur-md">
+                  <label className="block text-xs text-slate-300 uppercase font-medium mb-2">Photo & Avatar</label>
                   <div className="flex items-center gap-4 mb-3">
                     <WinnerAvatar
                       src={editForm.image_url}
                       name={editForm.name}
-                      className="w-16 h-16 rounded-full object-cover border-2 border-olive-400/50 shadow-md shrink-0"
-                      fallbackClassName="w-16 h-16 rounded-full bg-gradient-to-br from-[#3b82f6] to-[#718044] flex items-center justify-center font-bold text-xl text-white shrink-0 border-2 border-olive-400/50"
+                      className="w-16 h-16 rounded-full object-cover border-2 border-cyan-400/50 shadow-md shrink-0"
+                      fallbackClassName="w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500 to-violet-600 flex items-center justify-center font-bold text-xl text-white shrink-0 border-2 border-cyan-400/50"
                       textSize="text-xl"
                     />
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-semibold text-white">Live Photo Preview</p>
-                      <p className="text-xs text-gray-400 mt-0.5">
+                      <p className="text-xs text-slate-400 mt-0.5">
                         {editForm.image_url ? 'Photo loaded successfully' : 'No photo uploaded; using initial avatar'}
                       </p>
                       <div className="mt-2 flex gap-2">
                         <button
                           type="button"
                           onClick={() => editFileInputRef.current?.click()}
-                          className="px-3 py-1.5 rounded-lg bg-olive-500/20 border border-olive-500/40 text-olive-300 text-xs font-semibold flex items-center gap-1.5 hover:bg-olive-500/30 transition-colors"
+                          className="px-3 py-1.5 rounded-lg bg-cyan-500/20 border border-cyan-400/40 text-cyan-200 text-xs font-semibold flex items-center gap-1.5 hover:bg-cyan-500/30 transition-colors"
                         >
                           <Upload size={12} /> Upload Photo
                         </button>
@@ -552,7 +554,7 @@ export default function WinnersManager() {
                           <button
                             type="button"
                             onClick={() => setEditForm((f) => ({ ...f, image_url: '' }))}
-                            className="px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold hover:bg-red-500/20 transition-colors"
+                            className="px-3 py-1.5 rounded-lg bg-red-500/15 border border-red-400/25 text-red-300 text-xs font-semibold hover:bg-red-500/25 transition-colors"
                           >
                             Remove
                           </button>
@@ -570,28 +572,28 @@ export default function WinnersManager() {
                   />
 
                   <div className="mt-2">
-                    <label className="block text-[11px] text-gray-500 mb-1">Or paste direct link / Google Drive link:</label>
+                    <label className="block text-[11px] text-slate-400 mb-1">Or paste direct link / Google Drive link:</label>
                     <input
                       value={editForm.image_url}
                       onChange={(e) => handleUrlInput(e.target.value, true)}
                       placeholder="https://drive.google.com/..."
-                      className="w-full bg-[#191e1b] border border-[#303a32] rounded-lg px-3 py-2 text-white text-xs font-mono focus:outline-none focus:border-olive-500"
+                      className="liquid-input w-full px-3 py-2 text-xs font-mono"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs text-gray-400 uppercase font-medium mb-1">Description</label>
+                  <label className="block text-xs text-slate-300 uppercase font-medium mb-1">Description</label>
                   <textarea
                     value={editForm.description}
                     onChange={(e) => setEditForm((f) => ({ ...f, description: e.target.value }))}
                     rows={3}
-                    className="w-full bg-[#222923] border border-[#303a32] rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-olive-500 text-sm resize-none"
+                    className="liquid-input w-full px-4 py-2.5 text-sm resize-none"
                   />
                 </div>
 
                 {editError && (
-                  <div className="flex items-center gap-2 p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
+                  <div className="flex items-center gap-2 p-3 rounded-xl bg-red-500/15 border border-red-400/30 text-red-300 text-sm">
                     <AlertCircle size={16} />
                     <span>{editError}</span>
                   </div>
@@ -601,14 +603,14 @@ export default function WinnersManager() {
                   <button
                     type="button"
                     onClick={() => setEditingWinner(null)}
-                    className="px-5 py-2.5 rounded-xl border border-white/10 text-gray-300 hover:bg-white/5 text-sm font-semibold"
+                    className="liquid-btn-glass px-5 py-2.5 text-sm"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={updating}
-                    className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-olive-500 to-olive-400 text-black text-sm font-bold hover:opacity-90 disabled:opacity-50"
+                    className="liquid-btn-primary px-6 py-2.5 text-sm disabled:opacity-50"
                   >
                     {updating ? 'Saving...' : 'Save Changes'}
                   </button>
@@ -628,14 +630,14 @@ export default function WinnersManager() {
                 key={w.id}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="bg-[#191e1b]/90 border border-[#303a32] rounded-2xl p-5 relative group hover:border-olive-500/40 transition-all shadow-lg"
+                className="liquid-glass-card rounded-2xl p-5 relative group"
               >
                 {/* Actions: Edit & Delete */}
                 <div className="absolute top-4 right-4 flex items-center gap-1.5 opacity-90 group-hover:opacity-100 transition-opacity">
                   <button
                     onClick={() => startEdit(w)}
                     title="Edit Winner & Photo"
-                    className="w-8 h-8 rounded-full bg-white/5 border border-white/15 text-gray-300 flex items-center justify-center hover:bg-white/15 hover:text-white transition-colors"
+                    className="liquid-icon-bubble !w-8 !h-8 text-slate-300 hover:text-white"
                   >
                     <Edit2 size={13} />
                   </button>
@@ -643,7 +645,7 @@ export default function WinnersManager() {
                     onClick={() => handleDelete(w.id)}
                     disabled={deleting === w.id}
                     title="Delete Winner"
-                    className="w-8 h-8 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 flex items-center justify-center hover:bg-red-500/25 transition-colors"
+                    className="w-8 h-8 rounded-full bg-red-500/15 border border-red-400/25 text-red-300 flex items-center justify-center hover:bg-red-500/25 transition-colors backdrop-blur-md"
                   >
                     {deleting === w.id ? '...' : <Trash2 size={13} />}
                   </button>
@@ -654,12 +656,12 @@ export default function WinnersManager() {
                   <WinnerAvatar
                     src={w.image_url}
                     name={w.name}
-                    className="w-12 h-12 rounded-full object-cover border border-white/15 shadow shrink-0"
-                    fallbackClassName="w-12 h-12 rounded-full bg-gradient-to-br from-[#3b82f6] to-[#718044] flex items-center justify-center font-bold text-white shrink-0 border border-white/15"
+                    className="w-12 h-12 rounded-full object-cover border border-white/20 shadow shrink-0"
+                    fallbackClassName="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-500 to-violet-600 flex items-center justify-center font-bold text-white shrink-0 border border-white/20"
                   />
                   <div className="min-w-0">
                     <h3 className="font-bold text-white text-base leading-snug truncate">{w.name}</h3>
-                    <p className="text-gray-400 text-xs truncate mt-0.5">
+                    <p className="text-slate-400 text-xs truncate mt-0.5">
                       {w.roll_no || 'No Roll'} &bull; {w.branch || 'General'}
                     </p>
                   </div>
@@ -667,24 +669,24 @@ export default function WinnersManager() {
 
                 {/* Award Title Badge */}
                 <div className="flex items-center gap-2 mb-2.5">
-                  <Trophy size={15} className="text-olive-400 shrink-0" />
-                  <span className="text-olive-300 text-sm font-semibold tracking-wide truncate">{w.award_title}</span>
+                  <Trophy size={15} className="text-cyan-400 shrink-0" />
+                  <span className="text-cyan-200 text-sm font-semibold tracking-wide truncate">{w.award_title}</span>
                 </div>
 
                 {/* Description */}
                 {w.description && (
-                  <p className="text-gray-400 text-xs leading-relaxed line-clamp-4">{w.description}</p>
+                  <p className="text-slate-300 text-xs leading-relaxed line-clamp-4">{w.description}</p>
                 )}
               </motion.div>
             ))}
 
             {winners.length === 0 && (
-              <div className="col-span-full text-center py-16 bg-[#191e1b]/40 rounded-2xl border border-white/5">
-                <Trophy size={40} className="mx-auto text-gray-700 mb-3" />
-                <p className="text-gray-500">No winners added yet.</p>
+              <div className="col-span-full text-center py-16 liquid-glass-card rounded-3xl">
+                <Trophy size={40} className="mx-auto text-cyan-400/40 mb-3" />
+                <p className="text-slate-400">No winners added yet.</p>
                 <button
                   onClick={() => setShowForm(true)}
-                  className="mt-3 text-sm text-olive-400 hover:underline font-semibold"
+                  className="mt-3 text-sm text-cyan-300 hover:text-cyan-200 hover:underline font-semibold"
                 >
                   + Add First Winner
                 </button>

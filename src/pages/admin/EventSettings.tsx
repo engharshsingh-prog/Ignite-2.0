@@ -180,19 +180,23 @@ export default function EventSettings() {
   };
 
   return (
-    <div className="min-h-screen bg-[#111411] grid-bg text-white pt-20 pb-16">
+    <div className="min-h-screen text-white pt-24 pb-16">
       <div className="max-w-5xl mx-auto px-4">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
-            <Link to="/admin" className="text-gray-400 hover:text-white"><ArrowLeft size={20} /></Link>
+            <Link to="/admin" className="liquid-icon-bubble w-10 h-10 rounded-xl text-slate-300 hover:text-white">
+              <ArrowLeft size={20} />
+            </Link>
             <div>
-              <h1 className="text-3xl font-black flex items-center gap-2"><CalendarClock size={24} className="text-olive-300" /> Event Settings</h1>
-              <p className="text-gray-400 text-sm">Update venue, timing, countdown, dress code and day flow</p>
+              <h1 className="text-3xl font-black flex items-center gap-2.5 bg-gradient-to-r from-white via-cyan-100 to-blue-200 bg-clip-text text-transparent">
+                <CalendarClock size={24} className="text-cyan-300" /> Event Settings
+              </h1>
+              <p className="text-slate-300/80 text-sm">Update venue, timing, countdown, dress code and day flow</p>
             </div>
           </div>
           <button
             onClick={loadSettings}
-            className="px-4 py-2 rounded-xl border border-white/20 text-gray-300 hover:bg-white/10"
+            className="liquid-btn-glass px-4 py-2 rounded-xl text-slate-200 text-sm"
           >
             Refresh
           </button>
@@ -201,96 +205,96 @@ export default function EventSettings() {
         {loading ? (
           <LoadingSpinner text="Loading event settings..." />
         ) : !form ? (
-          <div role="alert" className="rounded-xl border border-red-400/30 bg-red-500/10 p-5 text-red-100">
+          <div role="alert" className="liquid-glass-strong rounded-2xl border-red-400/35 p-5 text-red-100">
             <p>{error || 'Event settings could not be loaded.'}</p>
-            <button onClick={loadSettings} className="mt-3 rounded-lg bg-blue-600 px-4 py-2 text-white">Try again</button>
+            <button onClick={loadSettings} className="liquid-btn-primary mt-3 rounded-xl px-4 py-2 text-white text-sm">Try again</button>
           </div>
         ) : (
           <form onSubmit={handleSave} className="space-y-6">
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-[#191e1b]/90 border border-[#303a32] rounded-2xl p-6">
-              <h2 className="text-lg font-bold mb-4">Core Details</h2>
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="liquid-glass-strong rounded-3xl p-6">
+              <h2 className="text-lg font-bold mb-4 text-white">Core Details</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="event-title" className="block text-sm text-gray-400 mb-1.5">Event Title</label>
+                  <label htmlFor="event-title" className="block text-sm text-slate-300 mb-1.5">Event Title</label>
                   <input
                     id="event-title"
                     value={form.title}
                     onChange={(e) => setForm((prev) => prev ? { ...prev, title: e.target.value } : prev)}
-                    className="w-full bg-[#191e1b]/90 border border-[#303a32] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-olive-500"
+                    className="liquid-input w-full rounded-xl px-4 py-3 text-white"
                   />
                 </div>
                 <div>
-                  <label htmlFor="event-venue" className="block text-sm text-gray-400 mb-1.5">Venue</label>
+                  <label htmlFor="event-venue" className="block text-sm text-slate-300 mb-1.5">Venue</label>
                   <input
                     id="event-venue"
                     value={form.venue}
                     onChange={(e) => setForm((prev) => prev ? { ...prev, venue: e.target.value } : prev)}
-                    className="w-full bg-[#191e1b]/90 border border-[#303a32] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-olive-500"
+                    className="liquid-input w-full rounded-xl px-4 py-3 text-white"
                   />
                 </div>
                 <div>
-                  <label htmlFor="event-date" className="block text-sm text-gray-400 mb-1.5">Display Date</label>
+                  <label htmlFor="event-date" className="block text-sm text-slate-300 mb-1.5">Display Date</label>
                   <input
                     id="event-date"
                     value={form.dateLabel}
                     onChange={(e) => setForm((prev) => prev ? { ...prev, dateLabel: e.target.value } : prev)}
                     placeholder="Enter event date"
-                    className="w-full bg-[#191e1b]/90 border border-[#303a32] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-olive-500"
+                    className="liquid-input w-full rounded-xl px-4 py-3 text-white"
                   />
                 </div>
                 <div>
-                  <label htmlFor="event-time" className="block text-sm text-gray-400 mb-1.5">Display Time</label>
+                  <label htmlFor="event-time" className="block text-sm text-slate-300 mb-1.5">Display Time</label>
                   <input
                     id="event-time"
                     value={form.timeLabel}
                     onChange={(e) => setForm((prev) => prev ? { ...prev, timeLabel: e.target.value } : prev)}
                     placeholder="Enter event time"
-                    className="w-full bg-[#191e1b]/90 border border-[#303a32] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-olive-500"
+                    className="liquid-input w-full rounded-xl px-4 py-3 text-white"
                   />
                 </div>
                 <div>
-                  <label htmlFor="countdown-date" className="block text-sm text-gray-400 mb-1.5">Countdown Date & Time</label>
+                  <label htmlFor="countdown-date" className="block text-sm text-slate-300 mb-1.5">Countdown Date & Time</label>
                   <input
                     id="countdown-date"
                     type="datetime-local"
                     value={form.countdownLocal}
                     onChange={(e) => setForm((prev) => prev ? { ...prev, countdownLocal: e.target.value } : prev)}
-                    className="w-full bg-[#191e1b]/90 border border-[#303a32] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-olive-500"
+                    className="liquid-input w-full rounded-xl px-4 py-3 text-white"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-400 mb-1.5">Last Updated</label>
-                  <div className="w-full rounded-xl border border-[#303a32] px-4 py-3 text-sm text-gray-300 bg-[#191e1b]/70">
+                  <label className="block text-sm text-slate-300 mb-1.5">Last Updated</label>
+                  <div className="liquid-glass w-full rounded-xl px-4 py-3 text-sm text-cyan-100/85">
                     {form.updatedAt ? new Date(form.updatedAt).toLocaleString() : 'Not yet updated'}
                   </div>
                 </div>
               </div>
             </motion.div>
 
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-[#191e1b]/90 border border-[#303a32] rounded-2xl p-6">
-              <div className="flex items-center gap-2 mb-2">
-                <QrCode size={20} className="text-olive-300" />
-                <h2 className="text-lg font-bold">Payment & QR Code Settings</h2>
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="liquid-glass-strong rounded-3xl p-6">
+              <div className="flex items-center gap-2.5 mb-2">
+                <QrCode size={20} className="text-cyan-300" />
+                <h2 className="text-lg font-bold text-white">Payment & QR Code Settings</h2>
               </div>
-              <p className="text-xs text-gray-400 mb-6">
+              <p className="text-xs text-slate-300/80 mb-6">
                 Configure independent registration fees, payment UPI accounts, and QR codes for 1st Year and 2nd Year participants.
               </p>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* 1st Year Configuration */}
-                <div className="bg-black/30 border border-[#303a32] rounded-xl p-5 space-y-4">
-                  <div className="flex items-center justify-between border-b border-[#303a32] pb-3">
+                <div className="liquid-glass rounded-2xl p-5 space-y-4">
+                  <div className="flex items-center justify-between border-b border-white/10 pb-3">
                     <h3 className="font-bold text-white text-base flex items-center gap-2">
-                      <span className="w-2.5 h-2.5 rounded-full bg-blue-400"></span>
+                      <span className="w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
                       1st Year Configuration
                     </h3>
-                    <span className="text-xs font-semibold px-2.5 py-1 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                    <span className="liquid-glass-pill text-xs font-semibold px-2.5 py-1 rounded-full text-cyan-200 border-cyan-400/35">
                       INR {form.fee1stYear}
                     </span>
                   </div>
 
                   <div>
-                    <label htmlFor="fee-1st-year" className="block text-sm text-gray-300 mb-1">
+                    <label htmlFor="fee-1st-year" className="block text-sm text-slate-200 mb-1">
                       Registration Fee (INR) *
                     </label>
                     <input
@@ -299,13 +303,13 @@ export default function EventSettings() {
                       min="0"
                       value={form.fee1stYear}
                       onChange={(e) => setForm((prev) => prev ? { ...prev, fee1stYear: Number(e.target.value) } : prev)}
-                      className="w-full bg-[#191e1b]/90 border border-[#303a32] rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-olive-500 font-mono"
+                      className="liquid-input w-full rounded-xl px-4 py-2.5 text-white font-mono"
                       placeholder="599"
                     />
                   </div>
 
                   <div>
-                    <label htmlFor="upi-id-1st-year" className="block text-sm text-gray-300 mb-1">
+                    <label htmlFor="upi-id-1st-year" className="block text-sm text-slate-200 mb-1">
                       UPI ID *
                     </label>
                     <input
@@ -313,13 +317,13 @@ export default function EventSettings() {
                       type="text"
                       value={form.upiId1stYear}
                       onChange={(e) => setForm((prev) => prev ? { ...prev, upiId1stYear: e.target.value } : prev)}
-                      className="w-full bg-[#191e1b]/90 border border-[#303a32] rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-olive-500 font-mono text-sm"
+                      className="liquid-input w-full rounded-xl px-4 py-2.5 text-white font-mono text-sm"
                       placeholder="e.g. ysamarjeetyadav2334@okaxis"
                     />
                   </div>
 
                   <div>
-                    <label htmlFor="upi-name-1st-year" className="block text-sm text-gray-300 mb-1">
+                    <label htmlFor="upi-name-1st-year" className="block text-sm text-slate-200 mb-1">
                       Payee / Account Name
                     </label>
                     <input
@@ -327,18 +331,18 @@ export default function EventSettings() {
                       type="text"
                       value={form.upiName1stYear}
                       onChange={(e) => setForm((prev) => prev ? { ...prev, upiName1stYear: e.target.value } : prev)}
-                      className="w-full bg-[#191e1b]/90 border border-[#303a32] rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-olive-500 text-sm"
+                      className="liquid-input w-full rounded-xl px-4 py-2.5 text-white text-sm"
                       placeholder="e.g. Samarjeet Yadav"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm text-gray-300 mb-1.5">
+                    <label className="block text-sm text-slate-200 mb-1.5">
                       1st Year Payment QR Code
                     </label>
-                    <div className="flex flex-col sm:flex-row items-center gap-4 bg-[#111411] border border-[#303a32] p-3 rounded-xl">
+                    <div className="liquid-glass flex flex-col sm:flex-row items-center gap-4 p-3 rounded-xl">
                       {form.qr1stYearUrl ? (
-                        <div className="w-24 h-24 bg-white rounded-lg p-1 flex items-center justify-center flex-shrink-0">
+                        <div className="w-24 h-24 bg-white rounded-xl p-1 flex items-center justify-center flex-shrink-0 shadow-md">
                           <img
                             src={form.qr1stYearUrl}
                             alt="1st Year QR Preview"
@@ -349,12 +353,12 @@ export default function EventSettings() {
                           />
                         </div>
                       ) : (
-                        <div className="w-24 h-24 bg-white/5 rounded-lg border border-dashed border-gray-600 flex items-center justify-center text-xs text-gray-500 text-center p-2 flex-shrink-0">
+                        <div className="w-24 h-24 bg-white/5 rounded-xl border border-dashed border-white/25 flex items-center justify-center text-xs text-slate-400 text-center p-2 flex-shrink-0">
                           No QR
                         </div>
                       )}
                       <div className="flex-1 w-full space-y-2">
-                        <label className="flex items-center justify-center gap-2 px-3 py-2 bg-blue-600/20 border border-blue-500/40 text-blue-300 text-xs font-semibold rounded-lg cursor-pointer hover:bg-blue-600/30 transition-colors">
+                        <label className="liquid-btn-glass flex items-center justify-center gap-2 px-3 py-2 border-cyan-400/35 text-cyan-200 text-xs font-semibold rounded-xl cursor-pointer">
                           <Upload size={14} /> Upload New QR Image
                           <input
                             type="file"
@@ -368,7 +372,7 @@ export default function EventSettings() {
                           value={form.qr1stYearUrl}
                           onChange={(e) => setForm((prev) => prev ? { ...prev, qr1stYearUrl: e.target.value } : prev)}
                           placeholder="/payment-qr-1st-year.png"
-                          className="w-full bg-[#191e1b]/90 border border-[#303a32] rounded-lg px-2.5 py-1.5 text-xs text-gray-300 font-mono focus:outline-none"
+                          className="liquid-input w-full rounded-lg px-2.5 py-1.5 text-xs text-slate-200 font-mono"
                         />
                       </div>
                     </div>
@@ -376,19 +380,19 @@ export default function EventSettings() {
                 </div>
 
                 {/* 2nd Year Configuration */}
-                <div className="bg-black/30 border border-[#303a32] rounded-xl p-5 space-y-4">
-                  <div className="flex items-center justify-between border-b border-[#303a32] pb-3">
+                <div className="liquid-glass rounded-2xl p-5 space-y-4">
+                  <div className="flex items-center justify-between border-b border-white/10 pb-3">
                     <h3 className="font-bold text-white text-base flex items-center gap-2">
                       <span className="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
                       2nd Year Configuration
                     </h3>
-                    <span className="text-xs font-semibold px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                    <span className="liquid-glass-pill text-xs font-semibold px-2.5 py-1 rounded-full text-emerald-200 border-emerald-400/35">
                       INR {form.fee2ndYear}
                     </span>
                   </div>
 
                   <div>
-                    <label htmlFor="fee-2nd-year" className="block text-sm text-gray-300 mb-1">
+                    <label htmlFor="fee-2nd-year" className="block text-sm text-slate-200 mb-1">
                       Registration Fee (INR) *
                     </label>
                     <input
@@ -397,13 +401,13 @@ export default function EventSettings() {
                       min="0"
                       value={form.fee2ndYear}
                       onChange={(e) => setForm((prev) => prev ? { ...prev, fee2ndYear: Number(e.target.value) } : prev)}
-                      className="w-full bg-[#191e1b]/90 border border-[#303a32] rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-olive-500 font-mono"
+                      className="liquid-input w-full rounded-xl px-4 py-2.5 text-white font-mono"
                       placeholder="699"
                     />
                   </div>
 
                   <div>
-                    <label htmlFor="upi-id-2nd-year" className="block text-sm text-gray-300 mb-1">
+                    <label htmlFor="upi-id-2nd-year" className="block text-sm text-slate-200 mb-1">
                       UPI ID *
                     </label>
                     <input
@@ -411,13 +415,13 @@ export default function EventSettings() {
                       type="text"
                       value={form.upiId2ndYear}
                       onChange={(e) => setForm((prev) => prev ? { ...prev, upiId2ndYear: e.target.value } : prev)}
-                      className="w-full bg-[#191e1b]/90 border border-[#303a32] rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-olive-500 font-mono text-sm"
+                      className="liquid-input w-full rounded-xl px-4 py-2.5 text-white font-mono text-sm"
                       placeholder="e.g. ysamarjeetyadav2334@okaxis"
                     />
                   </div>
 
                   <div>
-                    <label htmlFor="upi-name-2nd-year" className="block text-sm text-gray-300 mb-1">
+                    <label htmlFor="upi-name-2nd-year" className="block text-sm text-slate-200 mb-1">
                       Payee / Account Name
                     </label>
                     <input
@@ -425,18 +429,18 @@ export default function EventSettings() {
                       type="text"
                       value={form.upiName2ndYear}
                       onChange={(e) => setForm((prev) => prev ? { ...prev, upiName2ndYear: e.target.value } : prev)}
-                      className="w-full bg-[#191e1b]/90 border border-[#303a32] rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-olive-500 text-sm"
+                      className="liquid-input w-full rounded-xl px-4 py-2.5 text-white text-sm"
                       placeholder="e.g. Samarjeet Yadav"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm text-gray-300 mb-1.5">
+                    <label className="block text-sm text-slate-200 mb-1.5">
                       2nd Year Payment QR Code
                     </label>
-                    <div className="flex flex-col sm:flex-row items-center gap-4 bg-[#111411] border border-[#303a32] p-3 rounded-xl">
+                    <div className="liquid-glass flex flex-col sm:flex-row items-center gap-4 p-3 rounded-xl">
                       {form.qr2ndYearUrl ? (
-                        <div className="w-24 h-24 bg-white rounded-lg p-1 flex items-center justify-center flex-shrink-0">
+                        <div className="w-24 h-24 bg-white rounded-xl p-1 flex items-center justify-center flex-shrink-0 shadow-md">
                           <img
                             src={form.qr2ndYearUrl}
                             alt="2nd Year QR Preview"
@@ -447,12 +451,12 @@ export default function EventSettings() {
                           />
                         </div>
                       ) : (
-                        <div className="w-24 h-24 bg-white/5 rounded-lg border border-dashed border-gray-600 flex items-center justify-center text-xs text-gray-500 text-center p-2 flex-shrink-0">
+                        <div className="w-24 h-24 bg-white/5 rounded-xl border border-dashed border-white/25 flex items-center justify-center text-xs text-slate-400 text-center p-2 flex-shrink-0">
                           No QR
                         </div>
                       )}
                       <div className="flex-1 w-full space-y-2">
-                        <label className="flex items-center justify-center gap-2 px-3 py-2 bg-emerald-600/20 border border-emerald-500/40 text-emerald-300 text-xs font-semibold rounded-lg cursor-pointer hover:bg-emerald-600/30 transition-colors">
+                        <label className="liquid-btn-glass flex items-center justify-center gap-2 px-3 py-2 border-emerald-400/35 text-emerald-200 text-xs font-semibold rounded-xl cursor-pointer">
                           <Upload size={14} /> Upload New QR Image
                           <input
                             type="file"
@@ -466,7 +470,7 @@ export default function EventSettings() {
                           value={form.qr2ndYearUrl}
                           onChange={(e) => setForm((prev) => prev ? { ...prev, qr2ndYearUrl: e.target.value } : prev)}
                           placeholder="/payment-qr-2nd-year.png"
-                          className="w-full bg-[#191e1b]/90 border border-[#303a32] rounded-lg px-2.5 py-1.5 text-xs text-gray-300 font-mono focus:outline-none"
+                          className="liquid-input w-full rounded-lg px-2.5 py-1.5 text-xs text-slate-200 font-mono"
                         />
                       </div>
                     </div>
@@ -475,47 +479,47 @@ export default function EventSettings() {
               </div>
             </motion.div>
 
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-[#191e1b]/90 border border-[#303a32] rounded-2xl p-6">
-              <h2 className="text-lg font-bold mb-4">Dress Code & Support Note</h2>
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="liquid-glass-strong rounded-3xl p-6">
+              <h2 className="text-lg font-bold mb-4 text-white">Dress Code & Support Note</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="dress-code-male" className="block text-sm text-gray-400 mb-1.5">Dress Code (Boys)</label>
+                  <label htmlFor="dress-code-male" className="block text-sm text-slate-300 mb-1.5">Dress Code (Boys)</label>
                   <input
                     id="dress-code-male"
                     value={form.dressCodeMale}
                     onChange={(e) => setForm((prev) => prev ? { ...prev, dressCodeMale: e.target.value } : prev)}
-                    className="w-full bg-[#191e1b]/90 border border-[#303a32] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-olive-500"
+                    className="liquid-input w-full rounded-xl px-4 py-3 text-white"
                   />
                 </div>
                 <div>
-                  <label htmlFor="dress-code-female" className="block text-sm text-gray-400 mb-1.5">Dress Code (Girls)</label>
+                  <label htmlFor="dress-code-female" className="block text-sm text-slate-300 mb-1.5">Dress Code (Girls)</label>
                   <input
                     id="dress-code-female"
                     value={form.dressCodeFemale}
                     onChange={(e) => setForm((prev) => prev ? { ...prev, dressCodeFemale: e.target.value } : prev)}
-                    className="w-full bg-[#191e1b]/90 border border-[#303a32] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-olive-500"
+                    className="liquid-input w-full rounded-xl px-4 py-3 text-white"
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <label htmlFor="support-note" className="block text-sm text-gray-400 mb-1.5">Support Note (Pending Payment)</label>
+                  <label htmlFor="support-note" className="block text-sm text-slate-300 mb-1.5">Support Note (Pending Payment)</label>
                   <textarea
                     id="support-note"
                     value={form.supportNote}
                     onChange={(e) => setForm((prev) => prev ? { ...prev, supportNote: e.target.value } : prev)}
                     rows={2}
-                    className="w-full bg-[#191e1b]/90 border border-[#303a32] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-olive-500 resize-none"
+                    className="liquid-input w-full rounded-xl px-4 py-3 text-white resize-none"
                   />
                 </div>
               </div>
             </motion.div>
 
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-[#191e1b]/90 border border-[#303a32] rounded-2xl p-6">
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="liquid-glass-strong rounded-3xl p-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-bold">Day Flow</h2>
+                <h2 className="text-lg font-bold text-white">Day Flow</h2>
                 <button
                   type="button"
                   onClick={addFlowRow}
-                  className="px-3 py-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 text-sm flex items-center gap-2 hover:bg-emerald-500/20"
+                  className="liquid-btn-glass px-3.5 py-2 rounded-xl border-emerald-400/35 text-emerald-200 text-sm flex items-center gap-2"
                 >
                   <Plus size={14} /> Add Slot
                 </button>
@@ -528,26 +532,26 @@ export default function EventSettings() {
                       value={item.time}
                       onChange={(e) => updateFlow(idx, 'time', e.target.value)}
                       placeholder="11:00"
-                      className="w-full bg-[#191e1b]/90 border border-[#303a32] rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-olive-500"
+                      className="liquid-input w-full rounded-xl px-3 py-2.5 text-white"
                     />
                     <input
                       aria-label={`Slot ${idx + 1} title`}
                       value={item.title}
                       onChange={(e) => updateFlow(idx, 'title', e.target.value)}
                       placeholder="Session title"
-                      className="w-full bg-[#191e1b]/90 border border-[#303a32] rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-olive-500"
+                      className="liquid-input w-full rounded-xl px-3 py-2.5 text-white"
                     />
                     <input
                       aria-label={`Slot ${idx + 1} description`}
                       value={item.desc}
                       onChange={(e) => updateFlow(idx, 'desc', e.target.value)}
                       placeholder="Short description"
-                      className="w-full bg-[#191e1b]/90 border border-[#303a32] rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-olive-500"
+                      className="liquid-input w-full rounded-xl px-3 py-2.5 text-white"
                     />
                     <button
                       type="button"
                       onClick={() => removeFlowRow(idx)}
-                      className="w-10 h-10 rounded-xl border border-red-500/30 bg-red-500/10 text-red-300 flex items-center justify-center hover:bg-red-500/20"
+                      className="w-10 h-10 rounded-xl border border-red-400/35 bg-red-500/15 text-red-200 flex items-center justify-center hover:bg-red-500/25 transition-colors"
                       aria-label="Remove slot"
                     >
                       <Trash2 size={14} />
@@ -558,7 +562,7 @@ export default function EventSettings() {
             </motion.div>
 
             {(error || message) && (
-              <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm">
+              <div className="liquid-glass rounded-2xl px-4 py-3 text-sm">
                 {error && <p className="text-red-300">{error}</p>}
                 {message && <p className="text-emerald-300">{message}</p>}
               </div>
@@ -568,7 +572,7 @@ export default function EventSettings() {
               <button
                 type="submit"
                 disabled={saving}
-                className="px-6 py-3 rounded-xl bg-gradient-to-r from-olive-500 to-olive-400 text-black font-bold hover:opacity-90 disabled:opacity-50 flex items-center gap-2"
+                className="liquid-btn-primary px-6 py-3 rounded-xl text-white font-bold disabled:opacity-50 flex items-center gap-2"
               >
                 <Save size={16} /> {saving ? 'Saving...' : 'Save Changes'}
               </button>

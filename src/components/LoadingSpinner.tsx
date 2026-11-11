@@ -1,11 +1,10 @@
 export default function LoadingSpinner({ text = 'Loading...' }: { text?: string }) {
   return (
     <div className="flex flex-col items-center justify-center py-20 gap-4">
-      <div className="relative w-12 h-12">
-        <div className="absolute inset-0 rounded-full border-4 border-blue-900/40" />
-        <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-blue-500 animate-spin" />
+      <div className="relative w-14 h-14 p-1.5 rounded-full liquid-glass-pill flex items-center justify-center">
+        <div className="w-full h-full rounded-full border-4 border-cyan-400/20 border-t-cyan-300 border-r-violet-400 animate-spin" />
       </div>
-      <p className="text-blue-300 text-sm">{text}</p>
+      <p className="text-cyan-200 text-sm font-medium tracking-wide">{text}</p>
     </div>
   );
 }

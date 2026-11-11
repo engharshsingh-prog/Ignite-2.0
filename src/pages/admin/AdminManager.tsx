@@ -197,42 +197,42 @@ export default function AdminManager() {
   };
 
   return (
-    <div className="min-h-screen bg-[#111411] text-white">
+    <div className="min-h-screen text-white">
       {/* HEADER */}
-      <header className="border-b border-[#303a32] bg-[#141916]/95 backdrop-blur sticky top-0 z-40">
+      <header className="border-b border-white/10 bg-[#060d1f]/75 backdrop-blur-2xl sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-olive-500 to-blue-600 flex items-center justify-center font-black">
-              <Users size={20} className="text-white" />
+            <div className="liquid-icon-bubble w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400/35 to-blue-600/35 font-black">
+              <Users size={20} className="text-cyan-200" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-lg font-bold">Admin Governance</h1>
-                <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-olive-500/20 text-olive-300 border border-olive-500/40">
+                <h1 className="text-lg font-bold text-white">Admin Governance</h1>
+                <span className="liquid-glass-pill px-2.5 py-0.5 rounded-full text-[11px] font-bold text-cyan-200 border-cyan-400/35">
                   Super Admin Exclusive
                 </span>
               </div>
-              <p className="text-xs text-gray-400">Manage Portal Administrators & Access Roles</p>
+              <p className="text-xs text-slate-300/75">Manage Portal Administrators & Access Roles</p>
             </div>
           </div>
 
           <div className="flex items-center gap-2 flex-wrap">
             <Link
               to="/admin/control"
-              className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-blue-500/15 border border-blue-500/40 text-blue-300 hover:bg-blue-500/25 transition-colors flex items-center gap-1.5"
+              className="liquid-btn-glass px-3.5 py-2 rounded-xl text-xs font-semibold border-cyan-400/35 text-cyan-200 flex items-center gap-1.5"
             >
               <ShieldAlert size={14} />
               Control Center
             </Link>
             <Link
               to="/admin"
-              className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-[#191e1b] border border-[#303a32] hover:bg-[#222924] transition-colors"
+              className="liquid-btn-glass px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-200"
             >
               Dashboard
             </Link>
             <button
               onClick={handleSignOut}
-              className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20 transition-colors flex items-center gap-1.5"
+              className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-red-500/15 border border-red-400/35 text-red-200 hover:bg-red-500/25 transition-colors flex items-center gap-1.5"
             >
               <LogOut size={14} />
               Sign Out
@@ -244,16 +244,16 @@ export default function AdminManager() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         {actionMessage && (
           <div
-            className={`p-4 rounded-xl mb-6 text-sm flex items-center justify-between border ${
+            className={`liquid-glass p-4 rounded-2xl mb-6 text-sm flex items-center justify-between ${
               actionMessage.type === 'success'
-                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
-                : 'bg-red-500/10 border-red-500/30 text-red-300'
+                ? 'border-emerald-400/35 text-emerald-200'
+                : 'border-red-400/35 text-red-200'
             }`}
           >
             <span>{actionMessage.text}</span>
             <button
               onClick={() => setActionMessage(null)}
-              className="text-xs opacity-70 hover:opacity-100 ml-4 underline"
+              className="text-xs opacity-75 hover:opacity-100 ml-4 underline"
             >
               Dismiss
             </button>
@@ -261,10 +261,10 @@ export default function AdminManager() {
         )}
 
         {/* ACTION BAR */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#191e1b] border border-[#303a32] rounded-2xl p-5 mb-6">
+        <div className="liquid-glass-strong flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-3xl p-5 mb-6">
           <div>
             <h2 className="text-base font-bold text-white">Administrator Accounts</h2>
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-slate-300/80">
               Only Super Admins can add, suspend, reactivate, or remove admin portal users.
             </p>
           </div>
@@ -273,7 +273,7 @@ export default function AdminManager() {
             <button
               onClick={fetchAdmins}
               disabled={loading}
-              className="px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+              className="liquid-btn-glass px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 flex items-center gap-1.5"
             >
               <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
               Refresh
@@ -283,7 +283,7 @@ export default function AdminManager() {
                 setShowAddModal(true);
                 setFormError('');
               }}
-              className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-olive-500 hover:opacity-95 text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-md"
+              className="liquid-btn-primary px-4 py-2.5 rounded-xl text-white font-bold text-xs flex items-center gap-1.5"
             >
               <UserPlus size={16} />
               Add Administrator
@@ -292,10 +292,10 @@ export default function AdminManager() {
         </div>
 
         {/* ADMINS TABLE */}
-        <div className="bg-[#191e1b] border border-[#303a32] rounded-2xl overflow-hidden shadow-sm">
+        <div className="liquid-glass-strong rounded-3xl overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-[#141916] text-gray-400 border-b border-[#303a32]">
+              <thead className="bg-white/[0.06] text-cyan-200/80 border-b border-white/10">
                 <tr>
                   <th className="py-3.5 px-4 font-semibold">Admin Account</th>
                   <th className="py-3.5 px-4 font-semibold">Role</th>
@@ -306,16 +306,16 @@ export default function AdminManager() {
                   <th className="py-3.5 px-4 font-semibold text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#303a32]">
+              <tbody className="divide-y divide-white/10">
                 {admins.map((adm) => (
-                  <tr key={adm.id} className="hover:bg-white/[0.02] transition-colors">
+                  <tr key={adm.id} className="hover:bg-white/[0.04] transition-colors">
                     <td className="py-3.5 px-4">
                       <div className="flex items-center gap-2.5">
                         <div
-                          className={`w-7 h-7 rounded-lg flex items-center justify-center font-bold text-[11px] ${
+                          className={`liquid-icon-bubble w-7 h-7 rounded-lg font-bold text-[11px] ${
                             adm.is_super_admin
-                              ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
-                              : 'bg-olive-500/20 text-olive-300 border border-olive-500/30'
+                              ? 'border-cyan-400/40 text-cyan-200'
+                              : 'border-violet-400/35 text-violet-200'
                           }`}
                         >
                           {adm.is_super_admin ? <ShieldAlert size={14} /> : <Shield size={14} />}
@@ -326,11 +326,11 @@ export default function AdminManager() {
 
                     <td className="py-3.5 px-4">
                       {adm.is_super_admin ? (
-                        <span className="px-2 py-0.5 rounded text-[10px] font-black bg-blue-500/20 text-blue-300 border border-blue-500/40">
+                        <span className="liquid-glass-pill px-2.5 py-0.5 rounded-full text-[10px] font-black text-cyan-200 border-cyan-400/40">
                           SUPER ADMIN
                         </span>
                       ) : (
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-olive-500/20 text-olive-300 border border-olive-500/40">
+                        <span className="liquid-glass-pill px-2.5 py-0.5 rounded-full text-[10px] font-bold text-violet-200 border-violet-400/40">
                           ADMIN
                         </span>
                       )}
@@ -339,21 +339,21 @@ export default function AdminManager() {
                     <td className="py-3.5 px-4">
                       <div className="flex flex-col gap-1 items-start">
                         <span
-                          className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                          className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${
                             adm.status === 'active'
-                              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                              : 'bg-red-500/20 text-red-300 border border-red-500/40'
+                              ? 'bg-emerald-500/15 text-emerald-200 border-emerald-400/35'
+                              : 'bg-red-500/15 text-red-200 border-red-400/35'
                           }`}
                         >
                           {adm.status.toUpperCase()}
                         </span>
                         {!adm.is_super_admin && (
                           adm.is_approved ? (
-                            <span className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                            <span className="px-2 py-0.5 rounded-full text-[9px] font-semibold bg-emerald-500/10 text-emerald-200 border border-emerald-400/30 flex items-center gap-1">
                               <CheckCircle2 size={10} /> Approved
                             </span>
                           ) : (
-                            <span className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-amber-500/10 text-amber-300 border border-amber-500/30">
+                            <span className="px-2 py-0.5 rounded-full text-[9px] font-semibold bg-amber-500/15 text-amber-200 border border-amber-400/35">
                               Pending 1st Approval
                             </span>
                           )
@@ -361,25 +361,25 @@ export default function AdminManager() {
                       </div>
                     </td>
 
-                    <td className="py-3.5 px-4 text-gray-400 font-mono text-[11px]">{adm.added_by}</td>
+                    <td className="py-3.5 px-4 text-slate-300/80 font-mono text-[11px]">{adm.added_by}</td>
 
-                    <td className="py-3.5 px-4 text-gray-400">
+                    <td className="py-3.5 px-4 text-slate-300/80">
                       {adm.created_at ? new Date(adm.created_at).toLocaleDateString() : '—'}
                     </td>
 
-                    <td className="py-3.5 px-4 text-gray-400">
+                    <td className="py-3.5 px-4 text-slate-300/80">
                       {adm.last_login_at ? new Date(adm.last_login_at).toLocaleString() : 'Never'}
                     </td>
 
                     <td className="py-3.5 px-4 text-right">
                       {adm.is_super_admin ? (
-                        <span className="text-[11px] text-gray-500 italic">Server Configured (Locked)</span>
+                        <span className="text-[11px] text-slate-400 italic">Server Configured (Locked)</span>
                       ) : (
                         <div className="flex items-center justify-end gap-1.5">
                           {!adm.is_approved ? (
                             <button
                               onClick={() => handleToggleApproval(adm)}
-                              className="px-2.5 py-1 rounded text-[11px] font-semibold bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/20 transition-colors"
+                              className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-emerald-500/15 border border-emerald-400/35 text-emerald-200 hover:bg-emerald-500/25 transition-colors"
                               title="Pre-approve admin for direct login"
                             >
                               Approve
@@ -387,7 +387,7 @@ export default function AdminManager() {
                           ) : (
                             <button
                               onClick={() => handleToggleApproval(adm)}
-                              className="px-2 py-1 rounded text-[10px] font-semibold bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
+                              className="liquid-btn-glass px-2.5 py-1 rounded-lg text-[10px] font-semibold text-slate-300 hover:text-white"
                               title="Revoke approval (forces re-approval on next login)"
                             >
                               Revoke
@@ -396,10 +396,10 @@ export default function AdminManager() {
 
                           <button
                             onClick={() => handleToggleStatus(adm)}
-                            className={`px-2.5 py-1 rounded text-[11px] font-semibold transition-colors ${
+                            className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold border transition-colors ${
                               adm.status === 'active'
-                                ? 'bg-amber-500/10 border border-amber-500/30 text-amber-300 hover:bg-amber-500/20'
-                                : 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/20'
+                                ? 'bg-amber-500/15 border-amber-400/35 text-amber-200 hover:bg-amber-500/25'
+                                : 'bg-emerald-500/15 border-emerald-400/35 text-emerald-200 hover:bg-emerald-500/25'
                             }`}
                           >
                             {adm.status === 'active' ? 'Suspend' : 'Reactivate'}
@@ -410,7 +410,7 @@ export default function AdminManager() {
                               setResetTarget(adm);
                               setResetPassword('');
                             }}
-                            className="p-1.5 rounded bg-white/5 border border-white/10 hover:bg-white/10 text-gray-300"
+                            className="liquid-icon-bubble w-7 h-7 rounded-lg text-slate-200"
                             title="Reset Password"
                           >
                             <KeyRound size={13} />
@@ -418,7 +418,7 @@ export default function AdminManager() {
 
                           <button
                             onClick={() => setDeleteTarget(adm)}
-                            className="p-1.5 rounded bg-red-500/10 border border-red-500/30 hover:bg-red-500/20 text-red-400"
+                            className="w-7 h-7 rounded-lg bg-red-500/15 border border-red-400/35 hover:bg-red-500/25 text-red-200 flex items-center justify-center transition-colors"
                             title="Remove Admin"
                           >
                             <Trash2 size={13} />
@@ -436,20 +436,20 @@ export default function AdminManager() {
 
       {/* ADD ADMIN MODAL */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#191e1b] border border-[#303a32] rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl">
+        <div className="fixed inset-0 z-50 bg-[#020612]/75 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="liquid-glass-strong rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 font-bold">
+              <div className="liquid-icon-bubble w-10 h-10 rounded-xl border-cyan-400/35 text-cyan-200 font-bold">
                 <UserPlus size={20} />
               </div>
               <div>
                 <h3 className="text-lg font-bold text-white">Add Administrator</h3>
-                <p className="text-xs text-gray-400">Grant admin dashboard access</p>
+                <p className="text-xs text-slate-300/80">Grant admin dashboard access</p>
               </div>
             </div>
 
             {formError && (
-              <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-xs mb-4 flex items-center gap-2">
+              <div className="liquid-glass p-3 rounded-xl border-red-400/35 text-red-200 text-xs mb-4 flex items-center gap-2">
                 <AlertCircle size={14} />
                 <span>{formError}</span>
               </div>
@@ -457,19 +457,19 @@ export default function AdminManager() {
 
             <form onSubmit={handleAddAdmin} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-gray-300 mb-1.5">Admin Email</label>
+                <label className="block text-xs font-semibold text-slate-200 mb-1.5">Admin Email</label>
                 <input
                   type="email"
                   value={newEmail}
                   onChange={(e) => setNewEmail(e.target.value)}
                   placeholder="admin@example.com"
                   required
-                  className="w-full bg-[#111411] border border-[#303a32] rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500"
+                  className="liquid-input w-full rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-400/60"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-300 mb-1.5">Initial Password (min 8 chars)</label>
+                <label className="block text-xs font-semibold text-slate-200 mb-1.5">Initial Password (min 8 chars)</label>
                 <div className="relative">
                   <input
                     type={showPw ? 'text' : 'password'}
@@ -478,19 +478,19 @@ export default function AdminManager() {
                     placeholder="••••••••••••"
                     required
                     minLength={8}
-                    className="w-full bg-[#111411] border border-[#303a32] rounded-xl px-4 py-2.5 pr-10 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500"
+                    className="liquid-input w-full rounded-xl px-4 py-2.5 pr-10 text-sm text-white placeholder-slate-400/60"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPw(!showPw)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-cyan-200"
                   >
                     {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
               </div>
 
-              <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-300 text-[11px] leading-relaxed">
+              <div className="liquid-glass p-3 rounded-xl border-cyan-400/30 text-cyan-100 text-[11px] leading-relaxed">
                 When this admin signs in, you (Super Admin) will receive a real-time authorization request to approve their session.
               </div>
 
@@ -498,14 +498,14 @@ export default function AdminManager() {
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 rounded-xl border border-white/10 text-gray-300 hover:text-white text-xs font-semibold"
+                  className="liquid-btn-glass px-4 py-2 rounded-xl text-slate-200 text-xs font-semibold"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={formLoading}
-                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-olive-500 text-white font-bold text-xs hover:opacity-90 disabled:opacity-50"
+                  className="liquid-btn-primary px-5 py-2 rounded-xl text-white font-bold text-xs disabled:opacity-50"
                 >
                   {formLoading ? 'Creating...' : 'Create Admin'}
                 </button>
@@ -517,10 +517,10 @@ export default function AdminManager() {
 
       {/* RESET PASSWORD MODAL */}
       {resetTarget && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#191e1b] border border-[#303a32] rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl">
+        <div className="fixed inset-0 z-50 bg-[#020612]/75 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="liquid-glass-strong rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl">
             <h3 className="text-base font-bold text-white mb-2">Reset Password</h3>
-            <p className="text-xs text-gray-400 mb-4">
+            <p className="text-xs text-slate-300/80 mb-4">
               Enter a new password for <strong className="text-white">{resetTarget.email}</strong>:
             </p>
 
@@ -533,12 +533,12 @@ export default function AdminManager() {
                   placeholder="New password (min 8 chars)"
                   required
                   minLength={8}
-                  className="w-full bg-[#111411] border border-[#303a32] rounded-xl px-4 py-2.5 pr-10 text-sm text-white focus:outline-none focus:border-blue-500"
+                  className="liquid-input w-full rounded-xl px-4 py-2.5 pr-10 text-sm text-white"
                 />
                 <button
                   type="button"
                   onClick={() => setShowResetPw(!showResetPw)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-cyan-200"
                 >
                   {showResetPw ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
@@ -548,14 +548,14 @@ export default function AdminManager() {
                 <button
                   type="button"
                   onClick={() => setResetTarget(null)}
-                  className="px-4 py-2 rounded-xl border border-white/10 text-gray-300 text-xs font-semibold"
+                  className="liquid-btn-glass px-4 py-2 rounded-xl text-slate-200 text-xs font-semibold"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={resetLoading}
-                  className="px-5 py-2 rounded-xl bg-blue-600 text-white font-bold text-xs hover:bg-blue-500 disabled:opacity-50"
+                  className="liquid-btn-primary px-5 py-2 rounded-xl text-white font-bold text-xs disabled:opacity-50"
                 >
                   {resetLoading ? 'Updating...' : 'Update Password'}
                 </button>
@@ -567,27 +567,27 @@ export default function AdminManager() {
 
       {/* DELETE CONFIRM MODAL */}
       {deleteTarget && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#191e1b] border border-[#303a32] rounded-3xl p-6 sm:p-8 max-w-sm w-full shadow-2xl text-center">
-            <div className="w-12 h-12 rounded-full bg-red-500/20 border border-red-500/40 text-red-400 flex items-center justify-center mx-auto mb-4">
+        <div className="fixed inset-0 z-50 bg-[#020612]/75 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="liquid-glass-strong rounded-3xl p-6 sm:p-8 max-w-sm w-full shadow-2xl text-center">
+            <div className="liquid-icon-bubble w-12 h-12 rounded-full border-red-400/40 bg-red-500/15 text-red-300 mx-auto mb-4">
               <AlertCircle size={24} />
             </div>
             <h3 className="text-base font-bold text-white mb-2">Remove Administrator?</h3>
-            <p className="text-xs text-gray-400 mb-6 leading-relaxed">
+            <p className="text-xs text-slate-300/80 mb-6 leading-relaxed">
               Are you sure you want to remove <strong className="text-white">{deleteTarget.email}</strong>? All their active sessions will be revoked immediately.
             </p>
             <div className="flex items-center justify-center gap-3">
               <button
                 type="button"
                 onClick={() => setDeleteTarget(null)}
-                className="px-4 py-2 rounded-xl border border-white/10 text-gray-300 text-xs font-semibold"
+                className="liquid-btn-glass px-4 py-2 rounded-xl text-slate-200 text-xs font-semibold"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={handleDeleteAdmin}
-                className="px-5 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs"
+                className="px-5 py-2 rounded-xl bg-red-500/85 hover:bg-red-500 text-white font-bold text-xs shadow-lg shadow-red-500/20 transition-colors"
               >
                 Yes, Remove
               </button>

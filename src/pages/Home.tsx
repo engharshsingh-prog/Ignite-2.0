@@ -45,12 +45,12 @@ export default function Home() {
 
   const quickDetails = useMemo(() => [
     { icon: Calendar, label: 'Date', value: settings.dateLabel, tone: 'blue' as const },
-    { icon: Clock, label: 'Time', value: settings.timeLabel, tone: 'olive' as const },
+    { icon: Clock, label: 'Time', value: settings.timeLabel, tone: 'cyan' as const },
     {
       icon: MapPin,
       label: 'Venue',
       value: settings.venue || 'Institute Campus',
-      tone: 'olive' as const,
+      tone: 'purple' as const,
       link: VENUE_MAP_URL,
       actionText: 'Open in Maps',
     },
@@ -74,20 +74,18 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#111411] grid-bg text-white overflow-x-hidden relative">
+    <div className="min-h-screen text-white overflow-x-hidden relative">
       <SplashScreen show={showSplash} />
-      <div className="pointer-events-none absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_22%,rgba(113,128,68,0.24),transparent_34%),radial-gradient(circle_at_82%_14%,rgba(59,130,246,0.2),transparent_30%),radial-gradient(circle_at_50%_78%,rgba(163,180,106,0.12),transparent_34%)]" />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#111411]/20 via-[#141916]/35 to-[#111411]/30" />
-      </div>
+
+      {/* Floating Glass Elements */}
       <div className="pointer-events-none absolute inset-0 z-[1]">
         {FLOATING_ICONS.map((item, idx) => (
           <motion.div
             key={`floating-icon-${idx}`}
-            className="absolute hidden md:flex w-12 h-12 rounded-2xl border border-white/15 bg-white/5 backdrop-blur-sm items-center justify-center text-blue-200"
+            className="absolute hidden md:flex w-13 h-13 rounded-2xl liquid-icon-bubble items-center justify-center text-cyan-200"
             style={{ top: item.top, left: item.left, right: item.right }}
             initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: [0.4, 0.8, 0.4], y: [0, -14, 0], rotate: [0, 4, 0] }}
+            animate={{ opacity: [0.45, 0.9, 0.45], y: [0, -16, 0], rotate: [0, 5, 0] }}
             transition={{ delay: item.delay, duration: item.duration, repeat: Infinity, ease: 'easeInOut' }}
           >
             <item.icon size={20} />
@@ -95,70 +93,95 @@ export default function Home() {
         ))}
       </div>
 
-      <section className="relative min-h-screen flex items-center justify-center pt-8 scroll-snap-section">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#171b18]/20 via-[#171b18]/35 to-[#171b18]/45 pointer-events-none" />
-
-        <motion.div className="relative z-10 text-center px-4 max-w-5xl mx-auto" initial="hidden" animate="show" variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08 } } }}>
+      {/* HERO SECTION */}
+      <section className="relative min-h-screen flex items-center justify-center pt-20 pb-12 scroll-snap-section">
+        <motion.div
+          className="relative z-10 text-center px-4 max-w-5xl mx-auto"
+          initial="hidden"
+          animate="show"
+          variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08 } } }}
+        >
           <motion.div
             variants={fadeUp}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-blue-500/40 bg-blue-500/10 backdrop-blur-sm text-blue-300 text-sm font-medium mb-8"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full liquid-glass-pill text-cyan-200 text-sm font-medium mb-8"
           >
-            <Sparkles size={14} />
-            Institute of Engineering and Technology | Batch 2026
+            <Sparkles size={14} className="text-cyan-300" />
+            <span>Institute of Engineering and Technology | Batch 2026</span>
           </motion.div>
 
-          <motion.h1 variants={fadeUp} className="text-5xl sm:text-7xl md:text-8xl font-black tracking-tight mb-4">
+          <motion.h1 variants={fadeUp} className="text-5xl sm:text-7xl md:text-8xl font-black tracking-tight mb-4 drop-shadow-[0_6px_30px_rgba(34,211,238,0.2)]">
             <span className="text-white">Ignite</span>
-            <span className="bg-gradient-to-r from-olive-300 to-blue-300 bg-clip-text text-transparent">2.O</span>
+            <span className="bg-gradient-to-r from-cyan-300 via-sky-300 to-violet-300 bg-clip-text text-transparent">2.O</span>
             <br />
-            <span className="text-3xl sm:text-4xl md:text-5xl font-light text-blue-300 tracking-[0.26em]">2026</span>
+            <span className="text-3xl sm:text-4xl md:text-5xl font-light text-cyan-200/90 tracking-[0.28em]">2026</span>
           </motion.h1>
 
-          <motion.p variants={fadeUp} className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto mb-9">
+          <motion.p variants={fadeUp} className="text-lg sm:text-xl text-slate-200/90 max-w-3xl mx-auto mb-9 leading-relaxed">
             The unified campus celebration of talent, style, interaction, fresh energy and unforgettable moments. Music, motion, crowns, and a full-day social vibe.
           </motion.p>
 
           <motion.div variants={fadeUp} className="mb-10">
-            <p className="text-blue-300 text-sm font-medium tracking-widest uppercase mb-6">Event Countdown</p>
+            <p className="text-cyan-200/90 text-xs sm:text-sm font-semibold tracking-[0.25em] uppercase mb-5">Event Countdown</p>
             <Countdown targetDateIso={scheduleConfigured ? settings.countdownIso : ''} />
           </motion.div>
 
           <motion.div variants={fadeUp} className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link to="/register" className="group px-8 py-4 rounded-xl bg-gradient-to-r from-[#3b82f6] to-[#718044] text-white font-bold text-lg hover:opacity-90 transition-all hover:scale-[1.03] flex items-center gap-2">
-              Register Now
+            <Link
+              to="/register"
+              className="group px-8 py-4 rounded-2xl liquid-btn-primary text-white font-bold text-lg flex items-center gap-2"
+            >
+              <span>Register Now</span>
               <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
             </Link>
-            <Link to="/gallery" className="px-8 py-4 rounded-xl border border-white/20 text-white font-semibold hover:bg-white/5 transition-all">
+            <Link
+              to="/gallery"
+              className="px-8 py-4 rounded-2xl liquid-btn-glass text-white font-semibold text-lg"
+            >
               View Gallery
             </Link>
           </motion.div>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }} className="absolute top-24 right-6 sm:right-14 px-4 py-3 rounded-2xl border border-white/15 bg-white/5 backdrop-blur-sm hidden md:block z-10">
-          <p className="text-xs text-gray-400 uppercase tracking-widest mb-1">Live Energy</p>
-          <div className="flex items-center gap-2 text-emerald-300 text-sm font-semibold">
-            <BadgeCheck size={14} /> Campus Pulse: High
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.45 }}
+          className="absolute top-24 right-6 sm:right-14 px-4 py-3 rounded-2xl liquid-glass-pill hidden md:block z-10"
+        >
+          <p className="text-[11px] text-cyan-200/70 uppercase tracking-widest mb-1">Live Energy</p>
+          <div className="flex items-center gap-2 text-cyan-200 text-sm font-semibold">
+            <BadgeCheck size={15} className="text-cyan-300" /> Campus Pulse: High
           </div>
         </motion.div>
       </section>
 
-      <section className="py-20 px-4 relative z-10 scroll-snap-section">
+      {/* QUICK DETAILS SECTION */}
+      <section className="py-16 px-4 relative z-10 scroll-snap-section">
         <div className="max-w-6xl mx-auto">
           <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {quickDetails.map((item, i) => {
+              const toneClass =
+                item.tone === 'blue'
+                  ? 'text-blue-300'
+                  : item.tone === 'cyan'
+                  ? 'text-cyan-300'
+                  : 'text-violet-300';
+
               const content = (
                 <>
-                  <div className={`w-12 h-12 min-w-12 min-h-12 aspect-square shrink-0 rounded-xl flex items-center justify-center ${item.tone === 'blue' ? 'bg-blue-500/20 text-blue-400' : 'bg-olive-500/20 text-olive-300'}`}>
+                  <div className={`w-13 h-13 min-w-13 min-h-13 aspect-square shrink-0 rounded-2xl liquid-icon-bubble flex items-center justify-center ${toneClass}`}>
                     <item.icon size={22} className="shrink-0" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-xs text-gray-500 uppercase tracking-wider">{item.label}</p>
-                    <p className="text-white font-semibold truncate">{loading ? 'Loading…' : error ? 'Details unavailable' : (item.value || 'To be announced')}</p>
+                    <p className="text-xs text-cyan-200/70 uppercase tracking-wider font-semibold">{item.label}</p>
+                    <p className="text-white font-bold text-base truncate mt-0.5">
+                      {loading ? 'Loading…' : error ? 'Details unavailable' : (item.value || 'To be announced')}
+                    </p>
                     {'link' in item && item.link ? (
-                      <span className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-emerald-400 group-hover:text-emerald-300 transition-colors">
+                      <span className="mt-1.5 inline-flex items-center gap-1 text-xs font-semibold text-cyan-300 group-hover:text-cyan-200 transition-colors">
                         <Navigation size={12} className="shrink-0" />
                         {item.actionText}
-                        <ExternalLink size={11} className="shrink-0 opacity-70" />
+                        <ExternalLink size={11} className="shrink-0 opacity-75" />
                       </span>
                     ) : null}
                   </div>
@@ -176,7 +199,7 @@ export default function Home() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: i * 0.1 }}
-                    className="group flex items-center gap-4 p-6 rounded-2xl bg-[#191e1b]/90 border border-[#303a32] hover:border-emerald-500/40 hover:bg-[#1f2622] transition-all backdrop-blur-sm shadow-md"
+                    className="group flex items-center gap-4 p-6 rounded-3xl liquid-glass-card border-cyan-300/25"
                   >
                     {content}
                   </motion.a>
@@ -190,7 +213,7 @@ export default function Home() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.1 }}
-                  className="flex items-center gap-4 p-6 rounded-2xl bg-[#191e1b]/90 border border-[#303a32] hover:border-blue-500/30 transition-colors backdrop-blur-sm"
+                  className="flex items-center gap-4 p-6 rounded-3xl liquid-glass-card"
                 >
                   {content}
                 </motion.div>
@@ -200,14 +223,18 @@ export default function Home() {
         </div>
       </section>
 
+      {/* MARQUEE STRIP */}
       <section className="py-8 px-4 relative z-10 scroll-snap-section">
         <div className="max-w-6xl mx-auto">
-          <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-sm">
-            <motion.div className="flex gap-6 py-4 whitespace-nowrap" animate={{ x: ['0%', '-50%'] }} transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}>
+          <div className="relative overflow-hidden rounded-2xl liquid-glass border-cyan-200/15">
+            <motion.div className="flex gap-5 py-4 whitespace-nowrap" animate={{ x: ['0%', '-50%'] }} transition={{ duration: 22, repeat: Infinity, ease: 'linear' }}>
               {Array.from({ length: 2 }).map((_, loop) => (
-                <div key={loop} className="flex gap-6">
+                <div key={loop} className="flex gap-5 px-2">
                   {['Music', 'Dance', 'Fashion Walk', 'Open Mic', 'Crown Finale', 'Afterparty'].map(tag => (
-                    <span key={`${loop}-${tag}`} className="px-4 py-2 rounded-full bg-blue-500/15 border border-blue-500/30 text-blue-200 text-sm">
+                    <span
+                      key={`${loop}-${tag}`}
+                      className="px-4 py-1.5 rounded-full liquid-glass-pill text-cyan-100 text-sm font-medium"
+                    >
                       {tag}
                     </span>
                   ))}
@@ -218,43 +245,44 @@ export default function Home() {
         </div>
       </section>
 
+      {/* DRESS CODE */}
       <section className="py-12 px-4 relative z-10 scroll-snap-section">
         <div className="max-w-4xl mx-auto">
-          <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-6">
+          <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-7">
             <h2 className="text-3xl sm:text-4xl font-bold mb-2">Dress Code</h2>
-            <p className="text-gray-400">Come dressed to match the Ignite 2.O vibe.</p>
+            <p className="text-slate-300">Come dressed to match the Ignite 2.O vibe.</p>
           </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <motion.div initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="p-5 rounded-2xl border border-blue-500/30 bg-blue-500/10">
-              <p className="text-xs text-blue-300 uppercase tracking-wider mb-1">For Boys / Male</p>
-              <p className="text-xl font-bold text-white">{settings.dressCodeMale}</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <motion.div initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="p-6 rounded-3xl liquid-glass-card border-sky-400/30">
+              <p className="text-xs text-cyan-300 uppercase tracking-widest font-bold mb-1.5">For Boys / Male</p>
+              <p className="text-xl sm:text-2xl font-bold text-white">{settings.dressCodeMale}</p>
             </motion.div>
-            <motion.div initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.06 }} className="p-5 rounded-2xl border border-olive-500/30 bg-olive-500/10">
-              <p className="text-xs text-olive-300 uppercase tracking-wider mb-1">For Girls / Ladies</p>
-              <p className="text-xl font-bold text-white">{settings.dressCodeFemale}</p>
+            <motion.div initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.06 }} className="p-6 rounded-3xl liquid-glass-card border-violet-400/30">
+              <p className="text-xs text-violet-300 uppercase tracking-widest font-bold mb-1.5">For Girls / Ladies</p>
+              <p className="text-xl sm:text-2xl font-bold text-white">{settings.dressCodeFemale}</p>
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Venue & Location Section */}
+      {/* VENUE & LOCATION SECTION */}
       <section className="py-16 px-4 relative z-10 scroll-snap-section">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="relative overflow-hidden rounded-3xl border border-emerald-500/20 bg-gradient-to-br from-[#191e1b] via-[#141916] to-[#1a221d] p-7 sm:p-10 shadow-2xl backdrop-blur-md"
+            className="relative overflow-hidden rounded-3xl liquid-glass p-7 sm:p-10 border-cyan-300/25 shadow-2xl"
           >
-            {/* Ambient Glows */}
-            <div className="absolute -top-24 -right-24 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute -bottom-24 -left-24 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+            {/* Ambient Liquid Highlights */}
+            <div className="absolute -top-24 -right-24 w-80 h-80 bg-cyan-400/15 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-24 -left-24 w-80 h-80 bg-violet-500/15 rounded-full blur-3xl pointer-events-none" />
 
             <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
               <div className="lg:col-span-7 space-y-5">
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 text-xs font-semibold uppercase tracking-wider">
-                  <MapPin size={13} className="shrink-0 text-emerald-400" />
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full liquid-glass-pill text-cyan-200 text-xs font-semibold uppercase tracking-wider">
+                  <MapPin size={13} className="shrink-0 text-cyan-300" />
                   Event Venue & Navigation
                 </div>
 
@@ -262,21 +290,21 @@ export default function Home() {
                   Reach the Celebration Venue
                 </h2>
 
-                <p className="text-gray-300 text-base leading-relaxed">
+                <p className="text-slate-200 text-base leading-relaxed">
                   Join us at the official venue for Ignite 2.O. Find your way effortlessly using Google Maps navigation with real-time route directions and live traffic updates.
                 </p>
 
-                <div className="p-4 rounded-2xl border border-white/10 bg-black/30 backdrop-blur-sm flex items-start gap-3.5">
-                  <div className="w-11 h-11 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+                <div className="p-4 rounded-2xl bg-white/[0.05] border border-white/15 backdrop-blur-md flex items-start gap-3.5">
+                  <div className="w-11 h-11 rounded-xl liquid-icon-bubble text-cyan-300 flex items-center justify-center shrink-0 mt-0.5">
                     <MapPin size={22} />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-xs text-gray-400 uppercase tracking-wider font-medium">Venue Location</p>
+                    <p className="text-xs text-cyan-200/75 uppercase tracking-wider font-semibold">Venue Location</p>
                     <p className="text-white font-bold text-lg sm:text-xl">
                       {settings.venue || 'Institute Campus Grounds'}
                     </p>
-                    <p className="text-xs text-emerald-400/90 mt-1 flex items-center gap-1.5 font-medium">
-                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse inline-block" />
+                    <p className="text-xs text-cyan-300 mt-1 flex items-center gap-1.5 font-medium">
+                      <span className="w-2 h-2 rounded-full bg-cyan-300 animate-pulse inline-block" />
                       Live Location Pin Ready • Tap below to start navigation
                     </p>
                   </div>
@@ -287,18 +315,18 @@ export default function Home() {
                     href={VENUE_MAP_URL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-bold text-base hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-emerald-500/20 group"
+                    className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-2xl liquid-btn-primary text-white font-bold text-base group"
                   >
                     <Navigation size={18} className="group-hover:rotate-12 transition-transform" />
                     <span>Open in Google Maps</span>
-                    <ExternalLink size={15} className="opacity-80" />
+                    <ExternalLink size={15} className="opacity-85" />
                   </a>
 
                   <a
                     href={VENUE_MAP_URL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl border border-white/20 bg-white/5 hover:bg-white/10 text-white font-semibold text-sm transition-all"
+                    className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl liquid-btn-glass text-white font-semibold text-sm"
                   >
                     <span>Get Directions</span>
                     <ArrowRight size={16} />
@@ -306,31 +334,29 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Visual Map / Location Preview Card */}
+              {/* Visual Map Preview Glass Card */}
               <div className="lg:col-span-5">
                 <a
                   href={VENUE_MAP_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group block relative overflow-hidden rounded-2xl border border-emerald-500/30 bg-gradient-to-b from-[#1b231e] to-[#121714] p-6 hover:border-emerald-400 transition-all shadow-xl hover:shadow-emerald-500/15"
+                  className="group block relative overflow-hidden rounded-3xl liquid-glass-card p-5 border-cyan-300/30"
                 >
-                  <div className="aspect-[4/3] w-full rounded-xl bg-black/40 border border-white/10 relative flex flex-col items-center justify-center text-center p-6 overflow-hidden">
-                    <div className="absolute inset-0 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:16px_16px] opacity-20" />
-                    <div className="absolute -inset-4 bg-gradient-to-t from-[#121714] via-transparent to-transparent pointer-events-none" />
+                  <div className="aspect-[4/3] w-full rounded-2xl bg-[#051024]/70 border border-white/15 relative flex flex-col items-center justify-center text-center p-6 overflow-hidden">
+                    <div className="absolute inset-0 bg-[radial-gradient(#22d3ee_1px,transparent_1px)] [background-size:18px_18px] opacity-20" />
+                    <div className="absolute -inset-4 bg-gradient-to-t from-[#040814]/80 via-transparent to-transparent pointer-events-none" />
 
                     <div className="relative z-10 flex flex-col items-center">
-                      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 p-0.5 shadow-lg shadow-emerald-500/30 mb-3 group-hover:scale-110 transition-transform">
-                        <div className="w-full h-full rounded-[14px] bg-[#111411] flex items-center justify-center text-emerald-400">
-                          <MapPin size={28} className="group-hover:-translate-y-1 transition-transform" />
-                        </div>
+                      <div className="w-16 h-16 rounded-2xl liquid-icon-bubble text-cyan-300 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                        <MapPin size={28} className="group-hover:-translate-y-1 transition-transform" />
                       </div>
-                      <p className="text-white font-bold text-base group-hover:text-emerald-300 transition-colors">
+                      <p className="text-white font-bold text-base group-hover:text-cyan-200 transition-colors">
                         Tap to View Venue Map
                       </p>
-                      <p className="text-xs text-gray-400 mt-1 max-w-[220px]">
+                      <p className="text-xs text-slate-300 mt-1 max-w-[220px]">
                         Opens directly in Google Maps app for seamless driving and walking directions
                       </p>
-                      <span className="mt-4 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-semibold group-hover:bg-emerald-500 group-hover:text-white transition-all">
+                      <span className="mt-4 inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full liquid-glass-pill text-cyan-200 text-xs font-semibold group-hover:border-cyan-300/60 transition-all">
                         <Navigation size={12} />
                         Start GPS Navigation
                       </span>
@@ -343,64 +369,96 @@ export default function Home() {
         </div>
       </section>
 
+      {/* EVENT PILLARS */}
       <section className="py-16 px-4 relative z-10 scroll-snap-section">
         <div className="max-w-6xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-14">
             <h2 className="text-3xl sm:text-4xl font-bold mb-3">What Awaits You</h2>
-            <p className="text-gray-400">A day packed with talent, glamour, and celebration</p>
+            <p className="text-slate-300">A day packed with talent, glamour, and celebration</p>
           </motion.div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {EVENT_PILLARS.map((item, i) => (
-              <motion.div key={item.title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} className="p-6 rounded-2xl bg-gradient-to-br from-white/6 to-white/[0.02] border border-white/10 hover:border-blue-500/40 transition-all hover:-translate-y-1 group backdrop-blur-sm">
-                <div className="w-12 h-12 rounded-xl mb-4 bg-blue-500/15 border border-blue-500/30 text-blue-300 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <motion.div
+                key={item.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="p-6 rounded-3xl liquid-glass-card group"
+              >
+                <div className="w-12 h-12 rounded-2xl mb-4 liquid-icon-bubble text-cyan-300 flex items-center justify-center group-hover:scale-110 transition-transform">
                   <item.icon size={20} />
                 </div>
-                <h3 className="font-bold text-white mb-2 group-hover:text-blue-300 transition-colors">{item.title}</h3>
-                <p className="text-gray-400 text-sm leading-relaxed">{item.desc}</p>
+                <h3 className="font-bold text-white text-lg mb-2 group-hover:text-cyan-200 transition-colors">{item.title}</h3>
+                <p className="text-slate-300 text-sm leading-relaxed">{item.desc}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="py-18 px-4 relative z-10 scroll-snap-section">
+      {/* DAY FLOW */}
+      <section className="py-16 px-4 relative z-10 scroll-snap-section">
         <div className="max-w-6xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-8">
             <h2 className="text-3xl sm:text-4xl font-bold mb-2">Day Flow</h2>
-            <p className="text-gray-400">A quick look at the rhythm of Ignite 2.O.</p>
+            <p className="text-slate-300">A quick look at the rhythm of Ignite 2.O.</p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {scheduleConfigured && flow.length ? flow.map((item, i) => (
-              <motion.div key={`${item.time}-${item.title}`} initial={{ opacity: 0, x: i % 2 === 0 ? -20 : 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }} className="p-5 rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-sm">
+              <motion.div
+                key={`${item.time}-${item.title}`}
+                initial={{ opacity: 0, x: i % 2 === 0 ? -20 : 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.08 }}
+                className="p-5 rounded-2xl liquid-glass-card"
+              >
                 <div className="flex items-start gap-4">
-                  <div className="px-3 py-1 rounded-lg bg-olive-500/15 border border-olive-500/40 text-olive-300 text-sm font-bold">{item.time}</div>
+                  <div className="px-3 py-1 rounded-xl liquid-glass-pill text-cyan-200 text-sm font-bold shrink-0">
+                    {item.time}
+                  </div>
                   <div>
-                    <h3 className="font-semibold text-white mb-1">{item.title}</h3>
-                    <p className="text-sm text-gray-400">{item.desc}</p>
+                    <h3 className="font-semibold text-white text-base mb-1">{item.title}</h3>
+                    <p className="text-sm text-slate-300">{item.desc}</p>
                   </div>
                 </div>
               </motion.div>
-            )) : <p className="text-gray-300">{error ? 'Schedule unavailable.' : 'Schedule to be announced.'}</p>}
+            )) : <p className="text-slate-300">{error ? 'Schedule unavailable.' : 'Schedule to be announced.'}</p>}
           </div>
         </div>
       </section>
 
+      {/* FINAL CTA BANNER */}
       <section className="py-20 px-4 relative z-10 scroll-snap-section">
         <div className="max-w-4xl mx-auto">
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} className="relative rounded-3xl overflow-hidden border border-white/10">
-            <div className="absolute inset-0 bg-gradient-to-br from-[#3b82f6] to-[#718044]" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.16),transparent_42%),radial-gradient(circle_at_80%_70%,rgba(255,255,255,0.14),transparent_40%)]" />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            className="relative rounded-3xl overflow-hidden liquid-glass border-cyan-300/35 shadow-[0_25px_70px_rgba(6,182,212,0.22)]"
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-600/35 via-cyan-500/25 to-violet-600/35 pointer-events-none" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.2),transparent_45%),radial-gradient(circle_at_80%_75%,rgba(103,232,249,0.22),transparent_42%)] pointer-events-none" />
             <div className="relative p-10 sm:p-16 text-center">
-              <PartyPopper size={40} className="mx-auto mb-4 text-white/85" />
-              <h2 className="text-3xl sm:text-4xl font-black mb-4">Secure Your Spot</h2>
-              <p className="text-white/85 mb-8 text-lg">Limited seats available. Register before they run out.</p>
+              <div className="w-16 h-16 rounded-2xl liquid-icon-bubble mx-auto mb-5 flex items-center justify-center text-cyan-200">
+                <PartyPopper size={30} />
+              </div>
+              <h2 className="text-3xl sm:text-4xl font-black mb-4 text-white">Secure Your Spot</h2>
+              <p className="text-cyan-50/90 mb-8 text-lg">Limited seats available. Register before they run out.</p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link to="/register" className="px-8 py-4 bg-white text-blue-700 font-bold rounded-xl hover:bg-gray-100 transition-colors">
+                <Link
+                  to="/register"
+                  className="px-8 py-4 rounded-2xl liquid-btn-primary text-white font-bold text-base"
+                >
                   Register Now
                 </Link>
-                <Link to="/my-profile" className="px-8 py-4 border-2 border-white/50 text-white font-semibold rounded-xl hover:bg-white/10 transition-colors">
+                <Link
+                  to="/my-profile"
+                  className="px-8 py-4 rounded-2xl liquid-btn-glass text-white font-semibold text-base"
+                >
                   Already Registered?
                 </Link>
               </div>

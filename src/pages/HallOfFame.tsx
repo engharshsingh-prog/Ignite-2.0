@@ -43,14 +43,14 @@ const AWARD_ICONS: Record<string, LucideIcon> = {
 };
 
 const AWARD_COLORS: Record<string, string> = {
-  'Mr. IGNITE': 'from-olive-500 to-olive-300',
-  'Ms. IGNITE': 'from-olive-500 to-rose-300',
-  'Mr. Fresher': 'from-olive-500 to-olive-300',
-  'Ms. Fresher': 'from-olive-500 to-rose-300',
-  'Best Dancer': 'from-blue-500 to-violet-300',
-  'Best Singer': 'from-blue-500 to-blue-300',
-  'Most Talented': 'from-emerald-500 to-teal-300',
-  'Mr. Personality': 'from-orange-500 to-olive-300',
+  'Mr. IGNITE': 'from-cyan-400 via-sky-400 to-blue-500',
+  'Ms. IGNITE': 'from-violet-400 via-purple-400 to-cyan-300',
+  'Mr. Fresher': 'from-cyan-400 to-blue-500',
+  'Ms. Fresher': 'from-violet-400 to-cyan-300',
+  'Best Dancer': 'from-blue-400 to-violet-400',
+  'Best Singer': 'from-sky-400 to-indigo-400',
+  'Most Talented': 'from-teal-300 to-cyan-500',
+  'Mr. Personality': 'from-amber-300 to-cyan-400',
 };
 
 export default function HallOfFame() {
@@ -85,27 +85,38 @@ export default function HallOfFame() {
   const rest = normalizedWinners.filter((w) => !featuredAwards.has(w.award_title));
 
   return (
-    <div className="min-h-screen bg-[#111411] grid-bg text-white pt-20 pb-16">
+    <div className="min-h-screen text-white pt-24 pb-20">
       <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-olive-900/20 to-transparent" />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-48 bg-olive-500/10 rounded-full blur-3xl" />
-        <div className="relative max-w-7xl mx-auto px-4 py-16 text-center">
+        <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/10 via-blue-500/5 to-transparent pointer-events-none" />
+        <div className="absolute top-2 left-1/2 -translate-x-1/2 w-[28rem] h-48 bg-cyan-400/12 rounded-full blur-3xl pointer-events-none" />
+        <div className="relative max-w-7xl mx-auto px-4 py-14 text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <Trophy className="text-olive-400" size={32} />
-              <h1 className="text-5xl sm:text-6xl font-black bg-gradient-to-r from-olive-400 to-olive-200 bg-clip-text text-transparent">Hall of Fame</h1>
-              <Trophy className="text-olive-400" size={32} />
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full liquid-glass-pill text-xs font-semibold tracking-widest uppercase text-cyan-200 mb-5">
+              <Crown size={14} className="text-cyan-300" /> Champions & Icons
             </div>
-            <p className="text-gray-400 text-lg">The stars of Ignite 2.O</p>
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <span className="liquid-icon-bubble w-11 h-11 text-cyan-300 shrink-0">
+                <Trophy size={22} />
+              </span>
+              <h1 className="text-4xl sm:text-6xl font-black bg-gradient-to-r from-white via-cyan-200 to-violet-300 bg-clip-text text-transparent">
+                Hall of Fame
+              </h1>
+              <span className="liquid-icon-bubble w-11 h-11 text-cyan-300 shrink-0">
+                <Trophy size={22} />
+              </span>
+            </div>
+            <p className="text-slate-300/85 text-lg">The stars of Ignite 2.O</p>
           </motion.div>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4">
         {loading ? <LoadingSpinner text="Loading winners..." /> : normalizedWinners.length === 0 ? (
-          <div className="text-center py-20">
-            <Crown size={48} className="mx-auto text-gray-700 mb-4" />
-            <p className="text-gray-500">Winners will be announced soon. Stay tuned!</p>
+          <div className="liquid-glass-card rounded-3xl max-w-md mx-auto text-center py-14 px-8">
+            <div className="liquid-icon-bubble w-16 h-16 mx-auto mb-4 text-cyan-300/75">
+              <Crown size={30} />
+            </div>
+            <p className="text-slate-300">Winners will be announced soon. Stay tuned!</p>
           </div>
         ) : (
           <>
@@ -113,35 +124,40 @@ export default function HallOfFame() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
                 {topTwo.map((winner, i) => {
                   const FeaturedIcon = AWARD_ICONS[winner.award_title] || Trophy;
+                  const badgeGradient = AWARD_COLORS[winner.award_title] || 'from-cyan-400 to-blue-500';
                   return (
-                    <motion.div key={winner.id}
-                      initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.15 }}
-                      className="relative group">
-                      <div className={`absolute inset-0 bg-gradient-to-br ${AWARD_COLORS[winner.award_title] || 'from-blue-500 to-olive-500'} rounded-3xl opacity-20 group-hover:opacity-30 transition-opacity`} />
-                      <div className="relative bg-[#191e1b]/90 border border-[#303a32] rounded-3xl p-8 text-center overflow-hidden">
-                        <div className="absolute top-4 right-4">
-                          <Star className="text-olive-400" size={20} fill="currentColor" />
+                    <motion.div
+                      key={winner.id}
+                      initial={{ opacity: 0, y: 30 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.15 }}
+                      className="relative group"
+                    >
+                      <div className={`absolute -inset-0.5 bg-gradient-to-br ${badgeGradient} rounded-3xl opacity-20 group-hover:opacity-35 blur-md transition-opacity duration-300 pointer-events-none`} />
+                      <div className="relative liquid-glass-strong rounded-3xl p-8 text-center overflow-hidden transition-transform duration-300 group-hover:-translate-y-1">
+                        <div className="absolute top-4 right-4 liquid-icon-bubble w-9 h-9 text-cyan-300">
+                          <Star size={16} fill="currentColor" />
                         </div>
                         <div className="mb-4 flex justify-center">
-                          <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
-                            <FeaturedIcon size={34} className="text-olive-300" />
+                          <div className="liquid-icon-bubble w-16 h-16 rounded-2xl text-cyan-200 shadow-[0_0_24px_rgba(34,211,238,0.22)]">
+                            <FeaturedIcon size={32} />
                           </div>
                         </div>
-                        <div className={`inline-block px-4 py-1.5 rounded-full text-sm font-bold mb-4 bg-gradient-to-r ${AWARD_COLORS[winner.award_title] || 'from-blue-500 to-olive-500'} text-white`}>
+                        <div className={`inline-block px-4 py-1.5 rounded-full text-sm font-bold mb-5 bg-gradient-to-r ${badgeGradient} text-slate-950 shadow-lg shadow-cyan-500/20`}>
                           {winner.award_title}
                         </div>
                         <div className="flex justify-center mb-4">
                           <WinnerAvatar
                             src={winner.image_url}
                             name={winner.name}
-                            className="w-32 h-32 rounded-full object-cover border-4 border-olive-400/30 shadow-lg shadow-olive-500/10"
-                            fallbackClassName="w-32 h-32 rounded-full bg-gradient-to-br from-[#3b82f6] to-[#718044] flex items-center justify-center text-4xl font-black text-white border-4 border-olive-400/30"
+                            className="w-32 h-32 rounded-full object-cover border-4 border-cyan-300/35 shadow-[0_0_28px_rgba(34,211,238,0.22)]"
+                            fallbackClassName="w-32 h-32 rounded-full bg-gradient-to-br from-blue-500 via-cyan-500 to-violet-500 flex items-center justify-center text-4xl font-black text-white border-4 border-cyan-300/35 shadow-[0_0_28px_rgba(34,211,238,0.22)]"
                             textSize="text-4xl"
                           />
                         </div>
                         <h2 className="text-2xl font-black text-white mb-1">{winner.name}</h2>
-                        <p className="text-gray-400 text-sm mb-3">{winner.roll_no} &bull; {winner.branch}</p>
-                        {winner.description && <p className="text-gray-300 text-sm leading-relaxed">{winner.description}</p>}
+                        <p className="text-cyan-200/75 text-sm mb-3">{winner.roll_no} &bull; {winner.branch}</p>
+                        {winner.description && <p className="text-slate-300/90 text-sm leading-relaxed">{winner.description}</p>}
                       </div>
                     </motion.div>
                   );
@@ -151,36 +167,43 @@ export default function HallOfFame() {
 
             {rest.length > 0 && (
               <>
-                <h2 className="text-2xl font-bold text-center mb-8 text-gray-300">Other Award Winners</h2>
+                <h2 className="text-2xl font-bold text-center mb-8 bg-gradient-to-r from-white to-cyan-200 bg-clip-text text-transparent">
+                  Other Award Winners
+                </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   {rest.map((winner, i) => {
                     const CardIcon = AWARD_ICONS[winner.award_title] || Trophy;
+                    const badgeGradient = AWARD_COLORS[winner.award_title] || 'from-cyan-400 to-blue-500';
                     return (
-                      <motion.div key={winner.id}
-                        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 + i * 0.1 }}
-                        className="bg-[#191e1b]/90 border border-[#303a32] rounded-2xl p-6 hover:border-blue-500/40 transition-all hover:-translate-y-1">
+                      <motion.div
+                        key={winner.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.3 + i * 0.1 }}
+                        className="liquid-glass-card rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1.5"
+                      >
                         <div className="flex items-center gap-4 mb-4">
                           <WinnerAvatar
                             src={winner.image_url}
                             name={winner.name}
-                            className="w-16 h-16 rounded-full object-cover border-2 border-blue-500/30 shrink-0"
-                            fallbackClassName="w-16 h-16 rounded-full bg-gradient-to-br from-[#3b82f6] to-[#718044] flex items-center justify-center text-2xl font-black text-white border-2 border-blue-500/30 shrink-0"
+                            className="w-16 h-16 rounded-full object-cover border-2 border-cyan-400/40 shadow-[0_0_16px_rgba(34,211,238,0.18)] shrink-0"
+                            fallbackClassName="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 via-cyan-500 to-violet-500 flex items-center justify-center text-2xl font-black text-white border-2 border-cyan-400/40 shrink-0"
                             textSize="text-2xl"
                           />
                           <div>
                             <h3 className="font-bold text-white">{winner.name}</h3>
-                            <p className="text-gray-400 text-xs">{winner.roll_no} &bull; {winner.branch}</p>
+                            <p className="text-slate-300/75 text-xs">{winner.roll_no} &bull; {winner.branch}</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-2 mb-3">
-                          <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-white/5 border border-white/10">
-                            <CardIcon size={16} className="text-olive-300" />
+                          <span className="liquid-icon-bubble w-8 h-8 rounded-lg text-cyan-300 shrink-0">
+                            <CardIcon size={16} />
                           </span>
-                          <span className={`px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r ${AWARD_COLORS[winner.award_title] || 'from-blue-500 to-olive-500'} text-white`}>
+                          <span className={`px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r ${badgeGradient} text-slate-950 shadow-sm shadow-cyan-500/20`}>
                             {winner.award_title}
                           </span>
                         </div>
-                        {winner.description && <p className="text-gray-400 text-sm leading-relaxed">{winner.description}</p>}
+                        {winner.description && <p className="text-slate-300/80 text-sm leading-relaxed">{winner.description}</p>}
                       </motion.div>
                     );
                   })}
