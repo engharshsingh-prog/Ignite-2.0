@@ -86,21 +86,21 @@ export default function Gallery() {
   ];
 
   return (
-    <div className="min-h-screen text-white pt-24 pb-16">
+    <div className="min-h-screen text-slate-900 pt-24 pb-16">
       <div className="max-w-7xl mx-auto px-4">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">
-          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full liquid-glass-pill text-cyan-200 text-sm font-medium mb-4">
-            <Image size={14} className="text-cyan-300" /> Media Hub
+          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full liquid-glass-pill text-sky-800 text-sm font-medium mb-4">
+            <Image size={14} className="text-sky-600" /> Media Hub
           </span>
-          <h1 className="text-4xl sm:text-5xl font-black mb-3 bg-gradient-to-r from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent">
+          <h1 className="text-4xl sm:text-5xl font-black mb-3 bg-gradient-to-r from-slate-900 via-sky-700 to-cyan-600 bg-clip-text text-transparent">
             Gallery
           </h1>
-          <p className="text-slate-300">Relive the magic of Ignite 2.O</p>
+          <p className="text-slate-600">Relive the magic of Ignite 2.O</p>
         </motion.div>
 
         <div className="flex flex-wrap items-center justify-center gap-3 mb-10">
           <div className="inline-flex flex-wrap items-center justify-center gap-2 p-1.5 rounded-2xl liquid-glass">
-            <Filter size={15} className="text-cyan-300 ml-2 mr-1" />
+            <Filter size={15} className="text-sky-600 ml-2 mr-1" />
             {filters.map((f) => (
               <button
                 key={f.value}
@@ -108,7 +108,7 @@ export default function Gallery() {
                 className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
                   filter === f.value
                     ? 'liquid-btn-primary text-white'
-                    : 'text-slate-300 hover:text-white hover:bg-white/[0.08]'
+                    : 'text-slate-700 hover:text-slate-950 hover:bg-sky-500/10'
                 }`}
               >
                 {f.label}
@@ -121,10 +121,10 @@ export default function Gallery() {
           <LoadingSpinner text="Loading gallery..." />
         ) : media.length === 0 ? (
           <div className="text-center py-20 rounded-3xl liquid-glass max-w-lg mx-auto px-6">
-            <div className="w-16 h-16 rounded-2xl liquid-icon-bubble mx-auto mb-4 flex items-center justify-center text-cyan-300">
+            <div className="w-16 h-16 rounded-2xl liquid-icon-bubble mx-auto mb-4 flex items-center justify-center text-sky-600">
               <Image size={32} />
             </div>
-            <p className="text-slate-300">No media uploaded yet. Check back after the event!</p>
+            <p className="text-slate-600">No media uploaded yet. Check back after the event!</p>
           </div>
         ) : (
           <motion.div layout className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-5">
@@ -139,18 +139,18 @@ export default function Gallery() {
               >
                 <div className="relative overflow-hidden rounded-2xl">
                   {item.type === 'video' ? (
-                    <div className="relative aspect-video bg-[#071124]">
+                    <div className="relative aspect-video bg-slate-900">
                       <img
                         src={normalizeImageUrl(item.thumb_url || item.url)}
                         alt={item.caption || 'Video preview'}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
-                      <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full liquid-glass-strong text-cyan-100 text-xs font-semibold flex items-center gap-1.5">
+                      <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full liquid-glass-strong text-slate-900 text-xs font-semibold flex items-center gap-1.5">
                         Video
                       </div>
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-13 h-13 rounded-full liquid-icon-bubble flex items-center justify-center text-white shadow-lg group-hover:scale-115 transition-transform">
-                          <Play size={20} className="fill-white translate-x-0.5" />
+                        <div className="w-13 h-13 rounded-full liquid-icon-bubble flex items-center justify-center text-sky-700 shadow-lg group-hover:scale-115 transition-transform">
+                          <Play size={20} className="fill-sky-600 translate-x-0.5" />
                         </div>
                       </div>
                     </div>
@@ -162,14 +162,14 @@ export default function Gallery() {
                       loading="lazy"
                     />
                   )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#040814]/85 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
                     <div className="absolute bottom-0 left-0 right-0 p-4">
                       <p className="text-white text-sm font-medium">{item.caption}</p>
                       <span
                         className={`text-xs px-2.5 py-0.5 rounded-full mt-1.5 inline-block border ${
                           item.category === 'winner'
-                            ? 'bg-violet-500/30 border-violet-300/40 text-violet-200'
-                            : 'bg-cyan-500/25 border-cyan-300/40 text-cyan-200'
+                            ? 'bg-violet-500/35 border-violet-300/50 text-violet-100'
+                            : 'bg-cyan-500/30 border-cyan-300/50 text-cyan-100'
                         }`}
                       >
                         {item.category}
@@ -189,7 +189,7 @@ export default function Gallery() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-[#040814]/85 backdrop-blur-xl flex items-center justify-center p-4"
+            className="fixed inset-0 z-50 bg-slate-950/45 backdrop-blur-xl flex items-center justify-center p-4"
             onClick={() => setLightbox(null)}
           >
             <motion.div
@@ -204,7 +204,7 @@ export default function Gallery() {
                   const { isDrive, embedUrl } = getVideoEmbedInfo(lightbox.url);
                   if (isDrive) {
                     return (
-                      <div className="relative w-[88vw] max-w-4xl aspect-video rounded-2xl overflow-hidden bg-black shadow-2xl border border-cyan-300/25">
+                      <div className="relative w-[88vw] max-w-4xl aspect-video rounded-2xl overflow-hidden bg-slate-950 shadow-2xl border border-sky-300/30">
                         <iframe
                           src={embedUrl}
                           className="w-full h-full border-0"
@@ -222,7 +222,7 @@ export default function Gallery() {
                       controls
                       autoPlay
                       playsInline
-                      className="max-h-[80vh] w-full max-w-4xl rounded-2xl object-contain bg-black shadow-2xl"
+                      className="max-h-[80vh] w-full max-w-4xl rounded-2xl object-contain bg-slate-950 shadow-2xl"
                     />
                   );
                 })()
@@ -236,33 +236,33 @@ export default function Gallery() {
               <div className="absolute top-4 right-4 flex items-center gap-2 z-20">
                 <button
                   onClick={handleDownload}
-                  className="w-9 h-9 rounded-full liquid-icon-bubble flex items-center justify-center text-white"
+                  className="w-9 h-9 rounded-full liquid-icon-bubble flex items-center justify-center text-slate-900"
                   title="Download media"
                 >
                   <Download size={16} />
                 </button>
                 <button
                   onClick={handleShare}
-                  className="w-9 h-9 rounded-full liquid-icon-bubble flex items-center justify-center text-white"
+                  className="w-9 h-9 rounded-full liquid-icon-bubble flex items-center justify-center text-slate-900"
                   title="Share media"
                 >
                   <Share2 size={16} />
                 </button>
                 <button
                   onClick={() => setLightbox(null)}
-                  className="w-9 h-9 rounded-full liquid-icon-bubble flex items-center justify-center text-white"
+                  className="w-9 h-9 rounded-full liquid-icon-bubble flex items-center justify-center text-slate-900"
                   title="Close"
                 >
                   <X size={18} />
                 </button>
               </div>
               {actionMessage && (
-                <div className="absolute top-4 left-4 px-3 py-1.5 rounded-xl liquid-glass-strong text-cyan-200 text-xs z-20">
+                <div className="absolute top-4 left-4 px-3 py-1.5 rounded-xl liquid-glass-strong text-sky-800 text-xs z-20">
                   {actionMessage}
                 </div>
               )}
               {lightbox.caption && (
-                <div className="absolute bottom-2 left-2 right-2 p-4 bg-gradient-to-t from-[#040814]/90 to-transparent rounded-b-2xl pointer-events-none">
+                <div className="absolute bottom-2 left-2 right-2 p-4 bg-gradient-to-t from-slate-950/90 to-transparent rounded-b-2xl pointer-events-none">
                   <p className="text-white font-medium">{lightbox.caption}</p>
                 </div>
               )}

@@ -29,7 +29,7 @@ import SiteFooter from './components/SiteFooter';
 export default function App() {
   return (
     <BrowserRouter>
-      <div className="relative min-h-screen flex flex-col bg-[#040814] text-white">
+      <div className="relative min-h-screen flex flex-col bg-white text-slate-900">
         <LiquidBackdrop />
         <Navbar />
         <main className="relative z-10 flex-1">

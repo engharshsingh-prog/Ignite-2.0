@@ -757,8 +757,8 @@ export default function Register() {
 
   const borderClass = (field: string) => {
     const s = fieldStates[field];
-    if (s === 'valid') return '!border-emerald-400/80 focus:!border-emerald-300';
-    if (s === 'invalid') return '!border-red-400/80 focus:!border-red-300';
+    if (s === 'valid') return '!border-emerald-500/80 focus:!border-emerald-600';
+    if (s === 'invalid') return '!border-red-500/80 focus:!border-red-600';
     return '';
   };
 
@@ -780,82 +780,82 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
     const isRejected = activeParticipant.payment_status === 'rejected';
 
     return (
-      <div className="min-h-screen flex items-center justify-center px-4 pt-24 pb-16">
+      <div className="min-h-screen text-slate-900 flex items-center justify-center px-4 pt-24 pb-16">
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="max-w-md w-full text-center">
-          <div className="liquid-icon-bubble w-20 h-20 border-emerald-400/40 bg-emerald-500/15 mx-auto mb-6 shadow-[0_0_28px_rgba(52,211,153,0.22)]">
-            <CheckCircle size={40} className="text-emerald-300" />
+          <div className="liquid-icon-bubble w-20 h-20 border-emerald-500/40 bg-emerald-500/12 mx-auto mb-6 shadow-[0_8px_28px_rgba(16,185,129,0.18)]">
+            <CheckCircle size={40} className="text-emerald-600" />
           </div>
-          <h2 className="text-3xl font-display font-black bg-gradient-to-r from-white via-cyan-100 to-emerald-200 bg-clip-text text-transparent mb-2">
+          <h2 className="text-3xl font-display font-black bg-gradient-to-r from-slate-900 via-sky-700 to-emerald-700 bg-clip-text text-transparent mb-2">
             Registration Complete!
           </h2>
-          <p className="text-slate-300/85 mb-6">Your payment details have been submitted and recorded successfully.</p>
+          <p className="text-slate-600 mb-6">Your payment details have been submitted and recorded successfully.</p>
 
           <div className="liquid-glass-strong rounded-3xl p-6 text-left space-y-3 mb-5">
-            <div className="flex justify-between gap-3 border-b border-white/10 pb-2.5">
-              <span className="text-slate-400 text-sm">Registration ID</span>
-              <span className="text-emerald-300 font-mono font-bold text-sm">{activeParticipant.registration_id}</span>
+            <div className="flex justify-between gap-3 border-b border-slate-900/10 pb-2.5">
+              <span className="text-slate-500 text-sm">Registration ID</span>
+              <span className="text-emerald-700 font-mono font-bold text-sm">{activeParticipant.registration_id}</span>
             </div>
             <div className="flex justify-between gap-3">
-              <span className="text-slate-400 text-sm">Name</span>
-              <span className="text-white font-medium text-right">{activeParticipant.full_name}</span>
+              <span className="text-slate-500 text-sm">Name</span>
+              <span className="text-slate-900 font-semibold text-right">{activeParticipant.full_name}</span>
             </div>
             {(activeParticipant.account_holder_name || accountHolderName) && (
               <div className="flex justify-between gap-3">
-                <span className="text-slate-400 text-sm">Account Holder Name</span>
-                <span className="text-white font-medium text-right">{activeParticipant.account_holder_name || accountHolderName}</span>
+                <span className="text-slate-500 text-sm">Account Holder Name</span>
+                <span className="text-slate-900 font-medium text-right">{activeParticipant.account_holder_name || accountHolderName}</span>
               </div>
             )}
             <div className="flex justify-between gap-3">
-              <span className="text-slate-400 text-sm">Roll / Enrolment No</span>
-              <span className="text-white font-medium font-mono text-right">{activeParticipant.roll_number}</span>
+              <span className="text-slate-500 text-sm">Roll / Enrolment No</span>
+              <span className="text-slate-900 font-medium font-mono text-right">{activeParticipant.roll_number}</span>
             </div>
             <div className="flex justify-between gap-3">
-              <span className="text-slate-400 text-sm">Branch & Year</span>
-              <span className="text-white font-medium text-right text-xs sm:text-sm">{activeParticipant.branch} ({activeParticipant.year})</span>
+              <span className="text-slate-500 text-sm">Branch & Year</span>
+              <span className="text-slate-900 font-medium text-right text-xs sm:text-sm">{activeParticipant.branch} ({activeParticipant.year})</span>
             </div>
             <div className="flex justify-between gap-3">
-              <span className="text-slate-400 text-sm">Registration Amount</span>
-              <span className="text-emerald-300 font-bold text-sm">
+              <span className="text-slate-500 text-sm">Registration Amount</span>
+              <span className="text-emerald-700 font-bold text-sm">
                 INR {activeParticipant.payment_amount || (activeParticipant.year === '2nd Year' ? (settings.fee2ndYear ?? 699) : (settings.fee1stYear ?? 599))}
               </span>
             </div>
             {activeParticipant.payment_id && (
-              <div className="flex justify-between gap-3 border-t border-white/10 pt-2.5">
-                <span className="text-slate-400 text-sm">Payment ID</span>
-                <span className="text-cyan-200 font-mono text-xs text-right">{activeParticipant.payment_id}</span>
+              <div className="flex justify-between gap-3 border-t border-slate-900/10 pt-2.5">
+                <span className="text-slate-500 text-sm">Payment ID</span>
+                <span className="text-sky-700 font-mono text-xs text-right font-semibold">{activeParticipant.payment_id}</span>
               </div>
             )}
             <div className="flex justify-between gap-3 items-center">
-              <span className="text-slate-400 text-sm">Payment Status</span>
+              <span className="text-slate-500 text-sm">Payment Status</span>
               {isApproved ? (
-                <span className="text-xs px-2.5 py-0.5 rounded-full font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-400/35">
+                <span className="text-xs px-2.5 py-0.5 rounded-full font-semibold bg-emerald-500/12 text-emerald-700 border border-emerald-500/35">
                   Approved
                 </span>
               ) : isRejected ? (
-                <span className="text-xs px-2.5 py-0.5 rounded-full font-semibold bg-red-500/20 text-red-300 border border-red-400/35">
+                <span className="text-xs px-2.5 py-0.5 rounded-full font-semibold bg-red-500/12 text-red-700 border border-red-500/35">
                   Rejected
                 </span>
               ) : (
-                <span className="text-xs px-2.5 py-0.5 rounded-full font-semibold bg-amber-500/20 text-amber-200 border border-amber-400/35">
+                <span className="text-xs px-2.5 py-0.5 rounded-full font-semibold bg-amber-500/12 text-amber-800 border border-amber-500/35">
                   Pending Verification
                 </span>
               )}
             </div>
 
             {(activeParticipant.payment_screenshot_url || screenshotPreview) && (
-              <div className="border-t border-white/10 pt-3">
+              <div className="border-t border-slate-900/10 pt-3">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-slate-400 text-xs">Uploaded Payment Screenshot</span>
+                  <span className="text-slate-500 text-xs">Uploaded Payment Screenshot</span>
                   <a
                     href={activeParticipant.payment_screenshot_url || screenshotPreview || '#'}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs text-cyan-300 hover:underline"
+                    className="text-xs text-sky-700 font-medium hover:underline"
                   >
                     View Full Image
                   </a>
                 </div>
-                <div className="rounded-xl border border-white/15 overflow-hidden w-24 h-24 bg-black/40">
+                <div className="rounded-xl border border-slate-900/10 overflow-hidden w-24 h-24 bg-slate-100">
                   <img
                     src={activeParticipant.payment_screenshot_url || screenshotPreview || ''}
                     alt="Payment Screenshot Preview"
@@ -867,8 +867,8 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
           </div>
 
           {isRejected && activeParticipant.payment_rejected_reason && (
-            <div className="liquid-glass rounded-xl border-red-400/35 p-3.5 text-left text-xs text-red-200 mb-5">
-              <span className="font-semibold text-red-100">Rejection Reason: </span>
+            <div className="liquid-glass rounded-xl border-red-400/40 bg-red-50/80 p-3.5 text-left text-xs text-red-700 mb-5">
+              <span className="font-semibold text-red-800">Rejection Reason: </span>
               {activeParticipant.payment_rejected_reason}
             </div>
           )}
@@ -878,23 +878,23 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
             href={waLink}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2.5 w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-emerald-500/80 to-teal-500/80 hover:from-emerald-400/90 hover:to-teal-400/90 border border-emerald-300/35 backdrop-blur-md text-white font-bold text-sm sm:text-base shadow-[0_8px_28px_rgba(16,185,129,0.28)] transition-all text-center mb-3"
+            className="flex items-center justify-center gap-2.5 w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 border border-emerald-400/40 text-white font-bold text-sm sm:text-base shadow-[0_8px_24px_rgba(16,185,129,0.28)] transition-all text-center mb-3"
           >
             <MessageCircle size={18} />
             Send Payment Screenshot on WhatsApp
           </a>
 
           {/* WhatsApp Instruction Notice Box */}
-          <div className="liquid-glass rounded-2xl border-amber-400/30 p-3.5 text-left text-xs text-amber-100/90 mb-5 space-y-1.5">
-            <p className="font-semibold text-amber-200 flex items-center gap-1.5">
-              <AlertCircle size={14} className="flex-shrink-0 text-amber-300" />
+          <div className="liquid-glass rounded-2xl border-amber-500/35 bg-amber-50/75 p-3.5 text-left text-xs text-amber-900 mb-5 space-y-1.5">
+            <p className="font-semibold text-amber-800 flex items-center gap-1.5">
+              <AlertCircle size={14} className="flex-shrink-0 text-amber-600" />
               Manual Screenshot Attachment in WhatsApp:
             </p>
             <p>
               WhatsApp's click-to-chat opens with your details pre-filled, but <strong>cannot automatically attach images</strong>.
               Please manually attach and send your payment screenshot to <strong>Samarjeet Yadav (+91 99849 72334)</strong> in the WhatsApp chat.
             </p>
-            <p className="text-slate-300/75 text-[11px]">
+            <p className="text-amber-800/80 text-[11px]">
               Your screenshot is also uploaded on this portal and is waiting for administrator verification.
             </p>
           </div>
@@ -913,67 +913,67 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
   // VIEW 2: Pending Approval Confirmation Screen (Step 2 Strictly Locked)
   if (viewState === 'pending' && activeParticipant) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4 pt-24 pb-16">
+      <div className="min-h-screen text-slate-900 flex items-center justify-center px-4 pt-24 pb-16">
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="max-w-lg w-full text-center">
-          <div className="liquid-icon-bubble w-20 h-20 border-amber-400/40 bg-amber-500/15 mx-auto mb-5 shadow-[0_0_28px_rgba(251,191,36,0.2)]">
-            <Clock size={38} className="text-amber-300" />
+          <div className="liquid-icon-bubble w-20 h-20 border-amber-500/35 bg-amber-500/12 mx-auto mb-5 shadow-[0_8px_26px_rgba(245,158,11,0.18)]">
+            <Clock size={38} className="text-amber-600" />
           </div>
 
-          <div className="liquid-glass-pill inline-flex items-center gap-2 px-3.5 py-1 rounded-full border-amber-400/35 text-amber-200 text-xs font-semibold mb-3">
-            <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+          <div className="liquid-glass-pill inline-flex items-center gap-2 px-3.5 py-1 rounded-full border-amber-500/35 text-amber-800 text-xs font-semibold mb-3">
+            <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
             Pending Admin Verification
           </div>
 
-          <h2 className="text-3xl font-display font-black bg-gradient-to-r from-white via-cyan-100 to-blue-200 bg-clip-text text-transparent mb-2">
+          <h2 className="text-3xl font-display font-black bg-gradient-to-r from-slate-900 via-sky-700 to-blue-700 bg-clip-text text-transparent mb-2">
             Registration Submitted!
           </h2>
-          <p className="text-slate-300/85 text-sm sm:text-base mb-6 leading-relaxed">
+          <p className="text-slate-600 text-sm sm:text-base mb-6 leading-relaxed">
             Your registration has been submitted successfully. Please wait while our admin team verifies your details.
             You will receive an email once your registration is approved.
           </p>
 
           <div className="liquid-glass-strong rounded-3xl p-6 text-left space-y-3 mb-6">
-            <div className="flex items-center justify-between pb-3 border-b border-white/10">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-900/10">
               <div>
-                <p className="text-xs text-slate-400">Registration ID</p>
-                <p className="text-lg font-mono font-bold text-cyan-300">{activeParticipant.registration_id || 'Generating...'}</p>
+                <p className="text-xs text-slate-500">Registration ID</p>
+                <p className="text-lg font-mono font-bold text-sky-700">{activeParticipant.registration_id || 'Generating...'}</p>
               </div>
               <button
                 type="button"
                 onClick={copyRegistrationId}
-                className="liquid-btn-glass px-3 py-1.5 rounded-lg text-xs text-slate-200 inline-flex items-center gap-1.5"
+                className="liquid-btn-glass px-3 py-1.5 rounded-lg text-xs text-slate-700 inline-flex items-center gap-1.5 font-medium"
               >
                 <Copy size={13} /> {copiedId ? 'Copied' : 'Copy ID'}
               </button>
             </div>
 
             <div className="flex justify-between gap-3 text-sm">
-              <span className="text-slate-400">Participant Name:</span>
-              <span className="text-white font-medium text-right">{activeParticipant.full_name}</span>
+              <span className="text-slate-500">Participant Name:</span>
+              <span className="text-slate-900 font-semibold text-right">{activeParticipant.full_name}</span>
             </div>
             <div className="flex justify-between gap-3 text-sm">
-              <span className="text-slate-400">Roll / Enrolment No:</span>
-              <span className="text-white font-mono text-right">{activeParticipant.roll_number}</span>
+              <span className="text-slate-500">Roll / Enrolment No:</span>
+              <span className="text-slate-900 font-mono text-right">{activeParticipant.roll_number}</span>
             </div>
             <div className="flex justify-between gap-3 text-sm">
-              <span className="text-slate-400">Branch & Year:</span>
-              <span className="text-white text-right text-xs sm:text-sm">{activeParticipant.branch} ({activeParticipant.year})</span>
+              <span className="text-slate-500">Branch & Year:</span>
+              <span className="text-slate-900 text-right text-xs sm:text-sm">{activeParticipant.branch} ({activeParticipant.year})</span>
             </div>
             <div className="flex justify-between gap-3 text-sm">
-              <span className="text-slate-400">WhatsApp Number:</span>
-              <span className="text-white font-mono text-right">+91 {activeParticipant.whatsapp_number}</span>
+              <span className="text-slate-500">WhatsApp Number:</span>
+              <span className="text-slate-900 font-mono text-right">+91 {activeParticipant.whatsapp_number}</span>
             </div>
-            <div className="flex justify-between gap-3 text-sm border-t border-white/10 pt-2.5">
-              <span className="text-slate-400">Email:</span>
-              <span className="text-slate-200 text-xs sm:text-sm text-right break-all">{activeParticipant.email}</span>
+            <div className="flex justify-between gap-3 text-sm border-t border-slate-900/10 pt-2.5">
+              <span className="text-slate-500">Email:</span>
+              <span className="text-slate-800 text-xs sm:text-sm text-right break-all">{activeParticipant.email}</span>
             </div>
           </div>
 
-          <div className="liquid-glass rounded-2xl border-cyan-400/30 p-4 text-left mb-6">
+          <div className="liquid-glass rounded-2xl border-sky-400/35 p-4 text-left mb-6">
             <div className="flex items-start gap-3">
-              <ShieldAlert size={18} className="text-cyan-300 flex-shrink-0 mt-0.5" />
-              <div className="text-xs text-slate-200/90 space-y-1">
-                <p className="font-semibold text-cyan-200">Important Note on Step 2 (Payment):</p>
+              <ShieldAlert size={18} className="text-sky-600 flex-shrink-0 mt-0.5" />
+              <div className="text-xs text-slate-700 space-y-1">
+                <p className="font-semibold text-sky-800">Important Note on Step 2 (Payment):</p>
                 <p>
                   Step 2 and the payment page are strictly locked until an authorized administrator verifies your group membership and details.
                 </p>
@@ -989,7 +989,7 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
               type="button"
               onClick={handleRefreshLiveStatus}
               disabled={loading}
-              className="liquid-btn-glass flex-1 py-3 rounded-xl text-slate-100 font-semibold inline-flex items-center justify-center gap-2 text-sm disabled:opacity-50"
+              className="liquid-btn-glass flex-1 py-3 rounded-xl text-slate-900 font-semibold inline-flex items-center justify-center gap-2 text-sm disabled:opacity-50"
             >
               <RefreshCw size={15} className={loading ? 'animate-spin' : ''} /> Check Live Approval Status
             </button>
@@ -999,13 +999,13 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
                 setViewState('form');
                 setStep(1);
               }}
-              className="liquid-btn-glass py-3 px-4 rounded-xl text-slate-300 hover:text-white text-sm"
+              className="liquid-btn-glass py-3 px-4 rounded-xl text-slate-600 hover:text-slate-900 text-sm font-medium"
             >
               New Form
             </button>
           </div>
 
-          {error && <p className="text-xs text-red-300 mt-3">{error}</p>}
+          {error && <p className="text-xs text-red-600 mt-3 font-medium">{error}</p>}
         </motion.div>
       </div>
     );
@@ -1014,24 +1014,24 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
   // VIEW 3: Rejection Notice Screen
   if (viewState === 'rejected' && activeParticipant) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4 pt-24 pb-16">
+      <div className="min-h-screen text-slate-900 flex items-center justify-center px-4 pt-24 pb-16">
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="max-w-md w-full text-center">
-          <div className="liquid-icon-bubble w-20 h-20 border-red-400/40 bg-red-500/15 mx-auto mb-5 shadow-[0_0_28px_rgba(248,113,113,0.2)]">
-            <XCircle size={38} className="text-red-300" />
+          <div className="liquid-icon-bubble w-20 h-20 border-red-500/35 bg-red-500/12 mx-auto mb-5 shadow-[0_8px_26px_rgba(239,68,68,0.18)]">
+            <XCircle size={38} className="text-red-600" />
           </div>
 
-          <div className="liquid-glass-pill inline-flex items-center gap-2 px-3.5 py-1 rounded-full border-red-400/35 text-red-200 text-xs font-semibold mb-3">
+          <div className="liquid-glass-pill inline-flex items-center gap-2 px-3.5 py-1 rounded-full border-red-500/35 text-red-700 text-xs font-semibold mb-3">
             Registration Not Approved
           </div>
 
-          <h2 className="text-3xl font-display font-black text-white mb-2">Request Rejected</h2>
-          <p className="text-slate-300/85 text-sm mb-6">
+          <h2 className="text-3xl font-display font-black text-slate-900 mb-2">Request Rejected</h2>
+          <p className="text-slate-600 text-sm mb-6">
             Your Step 1 registration request for Ignite 2.O could not be approved at this time.
           </p>
 
-          <div className="liquid-glass-card rounded-2xl border-red-400/30 p-5 text-left mb-6">
-            <p className="text-xs text-slate-400 mb-1">Rejection Reason:</p>
-            <p className="text-sm text-red-200 font-medium">
+          <div className="liquid-glass-card rounded-2xl border-red-400/35 p-5 text-left mb-6">
+            <p className="text-xs text-slate-500 mb-1">Rejection Reason:</p>
+            <p className="text-sm text-red-700 font-medium">
               {activeParticipant.rejection_reason || error || 'Details could not be verified by admin.'}
             </p>
           </div>
@@ -1054,17 +1054,17 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
 
   // VIEW 4 & 5: Main Interactive Registration Flow (Step 1 Form & Approved Step 2 Payment)
   return (
-    <div className="min-h-screen text-white pt-24 pb-20 px-4">
+    <div className="min-h-screen text-slate-900 pt-24 pb-20 px-4">
       <div className="max-w-xl mx-auto">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <div className="text-center mb-8">
-            <span className="liquid-glass-pill inline-block px-4 py-1.5 rounded-full text-cyan-200 text-xs font-semibold uppercase tracking-wider mb-4">
+            <span className="liquid-glass-pill inline-block px-4 py-1.5 rounded-full text-sky-800 text-xs font-semibold uppercase tracking-wider mb-4">
               Ignite 2.O
             </span>
-            <h1 className="text-4xl font-display font-black mb-2 bg-gradient-to-r from-white via-cyan-100 to-violet-300 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-display font-black mb-2 bg-gradient-to-r from-slate-900 via-sky-700 to-violet-700 bg-clip-text text-transparent">
               {step === 1 ? 'Step 1: Registration' : 'Step 2: Payment'}
             </h1>
-            <p className="text-slate-300/85 text-sm">
+            <p className="text-slate-600 text-sm">
               {step === 1
                 ? 'Fill details and submit for admin approval'
                 : 'Registration approved! Complete payment to finalize'}
@@ -1074,12 +1074,12 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
           {/* Stepper Indicator */}
           <div className="flex items-center gap-3 mb-6">
             <div className="flex-1">
-              <div className="h-2 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 shadow-[0_0_12px_rgba(34,211,238,0.45)]" />
-              <p className="text-[11px] text-cyan-200 mt-1.5 text-center font-semibold">Step 1: Details & Verification</p>
+              <div className="h-2 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 shadow-[0_2px_10px_rgba(14,165,233,0.35)]" />
+              <p className="text-[11px] text-sky-800 mt-1.5 text-center font-semibold">Step 1: Details & Verification</p>
             </div>
             <div className="flex-1">
-              <div className={`h-2 rounded-full transition-colors ${step >= 2 ? 'bg-gradient-to-r from-blue-500 to-violet-400 shadow-[0_0_12px_rgba(139,92,246,0.45)]' : 'bg-white/10'}`} />
-              <p className={`text-[11px] mt-1.5 text-center font-semibold ${step >= 2 ? 'text-violet-200' : 'text-slate-400'}`}>
+              <div className={`h-2 rounded-full transition-colors ${step >= 2 ? 'bg-gradient-to-r from-blue-600 to-violet-600 shadow-[0_2px_10px_rgba(124,58,237,0.35)]' : 'bg-slate-900/10'}`} />
+              <p className={`text-[11px] mt-1.5 text-center font-semibold ${step >= 2 ? 'text-violet-700' : 'text-slate-500'}`}>
                 Step 2: Approved Payment
               </p>
             </div>
@@ -1087,26 +1087,26 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
 
           {/* Step 2 Approved Banner */}
           {step === 2 && activeParticipant && (
-            <div className="liquid-glass rounded-2xl border-emerald-400/35 p-4 mb-6 flex items-start gap-3">
-              <ShieldCheck size={20} className="text-emerald-300 flex-shrink-0 mt-0.5" />
+            <div className="liquid-glass rounded-2xl border-emerald-500/35 bg-emerald-50/75 p-4 mb-6 flex items-start gap-3">
+              <ShieldCheck size={20} className="text-emerald-600 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="text-sm font-bold text-emerald-200">Registration Approved by Admin</p>
-                <p className="text-xs text-slate-200/90 mt-0.5">
-                  Welcome, <span className="text-white font-medium">{activeParticipant.full_name}</span> ({activeParticipant.registration_id}). Complete payment to confirm your seat.
+                <p className="text-sm font-bold text-emerald-800">Registration Approved by Admin</p>
+                <p className="text-xs text-slate-700 mt-0.5">
+                  Welcome, <span className="text-slate-900 font-semibold">{activeParticipant.full_name}</span> ({activeParticipant.registration_id}). Complete payment to confirm your seat.
                 </p>
               </div>
             </div>
           )}
 
           {error && (
-            <div className="liquid-glass rounded-2xl border-red-400/40 flex items-start gap-3 p-4 text-red-200 mb-6">
-              <AlertCircle size={18} className="flex-shrink-0 mt-0.5 text-red-300" />
+            <div className="liquid-glass rounded-2xl border-red-400/45 bg-red-50/85 flex items-start gap-3 p-4 text-red-700 mb-6">
+              <AlertCircle size={18} className="flex-shrink-0 mt-0.5 text-red-600" />
               <div className="text-sm flex-1">
-                <p>{error}</p>
+                <p className="font-medium">{error}</p>
                 {error.toLowerCase().includes('already registered') && (
                   <a
                     href="/my-profile"
-                    className="inline-block mt-1.5 text-xs text-cyan-300 font-semibold underline hover:text-cyan-200"
+                    className="inline-block mt-1.5 text-xs text-sky-700 font-semibold underline hover:text-sky-800"
                   >
                     View your registration & entry pass in My Profile →
                   </a>
@@ -1120,9 +1120,9 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
             <form onSubmit={handleSubmitStep1} className="liquid-glass-strong rounded-3xl p-6 sm:p-8 space-y-5">
               {/* Email Address with OTP */}
               <div>
-                <label htmlFor="reg-email" className="block text-sm font-medium text-slate-200 mb-1.5">Email Address *</label>
+                <label htmlFor="reg-email" className="block text-sm font-medium text-slate-700 mb-1.5">Email Address *</label>
                 <div className="relative">
-                  <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-cyan-300/70" />
+                  <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sky-600" />
                   <input
                     id="reg-email"
                     name="email"
@@ -1132,8 +1132,8 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
                     onChange={handleChange}
                     readOnly={otpVerified}
                     placeholder="yourname@gmail.com"
-                    className={`liquid-input w-full rounded-xl pl-10 pr-20 py-3 text-white placeholder-slate-400/60 ${
-                      otpVerified ? 'opacity-80 cursor-not-allowed !border-emerald-400/60' : borderClass('email')
+                    className={`liquid-input w-full rounded-xl pl-10 pr-20 py-3 text-slate-900 placeholder-slate-400 ${
+                      otpVerified ? 'opacity-85 cursor-not-allowed !border-emerald-500/70' : borderClass('email')
                     }`}
                   />
                   {otpVerified && (
@@ -1150,13 +1150,13 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
                           sessionStorage.removeItem('ignite_otp_session');
                         } catch (_) {}
                       }}
-                      className="liquid-glass-pill absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-cyan-200 hover:text-white underline font-medium px-2.5 py-1 rounded-lg"
+                      className="liquid-glass-pill absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-sky-700 hover:text-slate-900 underline font-medium px-2.5 py-1 rounded-lg"
                     >
                       Change
                     </button>
                   )}
                 </div>
-                <p className="text-xs text-slate-400 mt-1.5">
+                <p className="text-xs text-slate-500 mt-1.5">
                   Only gmail.com addresses are accepted. Verification OTP will be sent here.
                 </p>
 
@@ -1166,7 +1166,7 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
                     type="button"
                     onClick={handleSendOtp}
                     disabled={otpLoading || otpCooldown > 0 || validateField('email', form.email) !== 'valid'}
-                    className="liquid-btn-glass sm:w-40 px-4 py-2.5 rounded-xl border-cyan-400/35 text-cyan-200 text-sm disabled:opacity-50"
+                    className="liquid-btn-glass sm:w-40 px-4 py-2.5 rounded-xl border-sky-400/40 text-sky-800 text-sm font-medium disabled:opacity-50"
                   >
                     {otpLoading
                       ? 'Sending...'
@@ -1192,16 +1192,16 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
                       }}
                       maxLength={6}
                       placeholder="Enter 6-digit OTP"
-                      className="liquid-input flex-1 rounded-xl px-3.5 py-2 text-white placeholder-slate-400/60"
+                      className="liquid-input flex-1 rounded-xl px-3.5 py-2 text-slate-900 placeholder-slate-400"
                     />
                     <button
                       type="button"
                       onClick={handleVerifyOtp}
                       disabled={otpLoading || !otpSent || otpVerified}
-                      className={`liquid-btn-glass px-4 py-2 rounded-xl text-sm disabled:opacity-50 ${
+                      className={`liquid-btn-glass px-4 py-2 rounded-xl text-sm font-medium disabled:opacity-50 ${
                         otpVerified
-                          ? 'border-emerald-400/45 bg-emerald-500/20 text-emerald-200'
-                          : 'border-cyan-400/35 text-cyan-200'
+                          ? 'border-emerald-500/45 bg-emerald-500/15 text-emerald-800'
+                          : 'border-sky-400/40 text-sky-800'
                       }`}
                     >
                       {otpLoading ? '...' : otpVerified ? 'Verified' : 'Verify'}
@@ -1209,7 +1209,7 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
                   </div>
                 </div>
                 {otpMessage && (!error || (!error.toLowerCase().includes('otp') && !error.toLowerCase().includes('verification'))) && (
-                  <p className={`text-xs mt-1.5 ${otpVerified ? 'text-emerald-300' : 'text-amber-300'}`}>
+                  <p className={`text-xs mt-1.5 font-medium ${otpVerified ? 'text-emerald-700' : 'text-amber-700'}`}>
                     {otpMessage}
                   </p>
                 )}
@@ -1217,9 +1217,9 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
 
               {/* Full Name */}
               <div>
-                <label htmlFor="reg-fullname" className="block text-sm font-medium text-slate-200 mb-1.5">Full Name *</label>
+                <label htmlFor="reg-fullname" className="block text-sm font-medium text-slate-700 mb-1.5">Full Name *</label>
                 <div className="relative">
-                  <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-cyan-300/70" />
+                  <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sky-600" />
                   <input
                     id="reg-fullname"
                     name="full_name"
@@ -1227,16 +1227,16 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
                     value={form.full_name}
                     onChange={handleChange}
                     placeholder="Your complete full name"
-                    className={`liquid-input w-full rounded-xl pl-10 pr-4 py-3 text-white placeholder-slate-400/60 ${borderClass('full_name')}`}
+                    className={`liquid-input w-full rounded-xl pl-10 pr-4 py-3 text-slate-900 placeholder-slate-400 ${borderClass('full_name')}`}
                   />
                 </div>
               </div>
 
               {/* Roll / Enrolment Number */}
               <div>
-                <label htmlFor="reg-rollno" className="block text-sm font-medium text-slate-200 mb-1.5">Roll Number / Enrolment Number *</label>
+                <label htmlFor="reg-rollno" className="block text-sm font-medium text-slate-700 mb-1.5">Roll Number / Enrolment Number *</label>
                 <div className="relative">
-                  <Hash size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-cyan-300/70" />
+                  <Hash size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sky-600" />
                   <input
                     id="reg-rollno"
                     name="roll_number"
@@ -1244,19 +1244,19 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
                     onChange={handleChange}
                     placeholder="e.g. 2614670010009 (up to 15 chars)"
                     maxLength={15}
-                    className={`liquid-input w-full rounded-xl pl-10 pr-4 py-3 text-white placeholder-slate-400/60 font-mono ${borderClass('roll_number')}`}
+                    className={`liquid-input w-full rounded-xl pl-10 pr-4 py-3 text-slate-900 placeholder-slate-400 font-mono ${borderClass('roll_number')}`}
                   />
                 </div>
               </div>
 
               {/* WhatsApp Number (Present in Our Group) */}
               <div>
-                <label htmlFor="reg-whatsapp" className="block text-sm font-medium text-slate-200 mb-1.5">
+                <label htmlFor="reg-whatsapp" className="block text-sm font-medium text-slate-700 mb-1.5">
                   WhatsApp Number / Phone Number (Present in Our Group) *
                 </label>
                 <div className="relative flex">
-                  <div className="liquid-glass inline-flex items-center gap-1.5 px-3.5 rounded-l-xl border-r-0 text-cyan-200 text-sm select-none">
-                    <Phone size={14} className="text-emerald-300" />
+                  <div className="liquid-glass inline-flex items-center gap-1.5 px-3.5 rounded-l-xl border-r-0 text-sky-800 font-medium text-sm select-none">
+                    <Phone size={14} className="text-emerald-600" />
                     <span>+91</span>
                   </div>
                   <input
@@ -1269,29 +1269,29 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
                     placeholder="10-digit WhatsApp phone number"
                     maxLength={10}
                     inputMode="numeric"
-                    className={`liquid-input flex-1 rounded-r-xl rounded-l-none px-4 py-3 text-white placeholder-slate-400/60 font-mono ${borderClass('whatsapp_number')}`}
+                    className={`liquid-input flex-1 rounded-r-xl rounded-l-none px-4 py-3 text-slate-900 placeholder-slate-400 font-mono ${borderClass('whatsapp_number')}`}
                   />
                 </div>
-                <p className="text-xs text-slate-400 mt-1.5">
+                <p className="text-xs text-slate-500 mt-1.5">
                   Ensure this phone number is present in the official Ignite WhatsApp group for verification.
                 </p>
               </div>
 
               {/* Branch */}
               <div>
-                <label htmlFor="reg-branch" className="block text-sm font-medium text-slate-200 mb-1.5">Branch *</label>
+                <label htmlFor="reg-branch" className="block text-sm font-medium text-slate-700 mb-1.5">Branch *</label>
                 <div className="relative">
-                  <BookOpen size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-cyan-300/70" />
+                  <BookOpen size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sky-600" />
                   <select
                     id="reg-branch"
                     name="branch"
                     value={form.branch}
                     onChange={handleChange}
-                    className={`liquid-input w-full rounded-xl pl-10 pr-4 py-3 text-white appearance-none ${borderClass('branch')}`}
+                    className={`liquid-input w-full rounded-xl pl-10 pr-4 py-3 text-slate-900 appearance-none ${borderClass('branch')}`}
                   >
-                    <option value="" className="bg-[#081022] text-slate-400">Select branch</option>
+                    <option value="" className="bg-white text-slate-400">Select branch</option>
                     {BRANCHES.map(b => (
-                      <option key={b} value={b} className="bg-[#081022] text-white">
+                      <option key={b} value={b} className="bg-white text-slate-900">
                         {b}
                       </option>
                     ))}
@@ -1301,49 +1301,49 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
 
               {/* Year */}
               <div>
-                <label htmlFor="reg-year" className="block text-sm font-medium text-slate-200 mb-1.5">Year *</label>
+                <label htmlFor="reg-year" className="block text-sm font-medium text-slate-700 mb-1.5">Year *</label>
                 <div className="relative">
-                  <BookOpen size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-cyan-300/70" />
+                  <BookOpen size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sky-600" />
                   <select
                     id="reg-year"
                     name="year"
                     value={form.year}
                     onChange={handleChange}
-                    className={`liquid-input w-full rounded-xl pl-10 pr-4 py-3 text-white appearance-none ${borderClass('year')}`}
+                    className={`liquid-input w-full rounded-xl pl-10 pr-4 py-3 text-slate-900 appearance-none ${borderClass('year')}`}
                   >
-                    <option value="" className="bg-[#081022] text-slate-400">Select year</option>
-                    <option value="1st Year" disabled={settings.registration1stYearEnabled === false} className="bg-[#081022] text-white">
+                    <option value="" className="bg-white text-slate-400">Select year</option>
+                    <option value="1st Year" disabled={settings.registration1stYearEnabled === false} className="bg-white text-slate-900">
                       1st Year (INR {settings.fee1stYear ?? 599}) {settings.registration1stYearEnabled === false ? '🔒 [Registrations Closed]' : ''}
                     </option>
-                    <option value="2nd Year" disabled={settings.registration2ndYearEnabled === false} className="bg-[#081022] text-white">
+                    <option value="2nd Year" disabled={settings.registration2ndYearEnabled === false} className="bg-white text-slate-900">
                       2nd Year (INR {settings.fee2ndYear ?? 699}) {settings.registration2ndYearEnabled === false ? '🔒 [Registrations Closed]' : ''}
                     </option>
                   </select>
                 </div>
 
                 {form.year === '2nd Year' && settings.registration2ndYearEnabled === false && (
-                  <div className="liquid-glass mt-2.5 p-3 rounded-xl border-amber-400/35 text-amber-200 text-xs flex items-center gap-2">
-                    <AlertCircle size={15} className="flex-shrink-0 text-amber-300" />
+                  <div className="liquid-glass mt-2.5 p-3 rounded-xl border-amber-500/35 bg-amber-50/80 text-amber-800 text-xs flex items-center gap-2">
+                    <AlertCircle size={15} className="flex-shrink-0 text-amber-600" />
                     <span>2nd Year registrations are currently closed by Super Admin.</span>
                   </div>
                 )}
                 {form.year === '1st Year' && settings.registration1stYearEnabled === false && (
-                  <div className="liquid-glass mt-2.5 p-3 rounded-xl border-amber-400/35 text-amber-200 text-xs flex items-center gap-2">
-                    <AlertCircle size={15} className="flex-shrink-0 text-amber-300" />
+                  <div className="liquid-glass mt-2.5 p-3 rounded-xl border-amber-500/35 bg-amber-50/80 text-amber-800 text-xs flex items-center gap-2">
+                    <AlertCircle size={15} className="flex-shrink-0 text-amber-600" />
                     <span>1st Year registrations are currently closed by Super Admin.</span>
                   </div>
                 )}
 
                 {form.year && !((form.year === '2nd Year' && settings.registration2ndYearEnabled === false) || (form.year === '1st Year' && settings.registration1stYearEnabled === false)) && (
-                  <p className="text-xs text-cyan-200 mt-1.5 font-medium">
-                    Applicable Registration Fee: <span className="text-emerald-300 font-bold">INR {form.year === '2nd Year' ? (settings.fee2ndYear ?? 699) : (settings.fee1stYear ?? 599)}</span>
+                  <p className="text-xs text-sky-800 mt-1.5 font-medium">
+                    Applicable Registration Fee: <span className="text-emerald-700 font-bold">INR {form.year === '2nd Year' ? (settings.fee2ndYear ?? 699) : (settings.fee1stYear ?? 599)}</span>
                   </p>
                 )}
               </div>
 
               {/* Skills */}
               <div>
-                <label className="block text-sm font-medium text-slate-200 mb-2">
+                <label className="block text-sm font-medium text-slate-700 mb-2">
                   Showcase Your Skill (Optional, select multiple)
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -1352,21 +1352,21 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
                       key={skill}
                       type="button"
                       onClick={() => toggleSkill(skill)}
-                      className={`px-3.5 py-2.5 rounded-xl border text-sm transition-all text-left backdrop-blur-md ${
+                      className={`px-3.5 py-2.5 rounded-xl border text-sm transition-all text-left backdrop-blur-md font-medium ${
                         skillSelected(skill)
-                          ? 'border-cyan-400/60 bg-cyan-400/20 text-cyan-100 shadow-[0_0_18px_rgba(34,211,238,0.18)]'
-                          : 'border-white/10 bg-white/[0.04] text-slate-300 hover:border-cyan-300/30 hover:bg-white/[0.08]'
+                          ? 'border-sky-500/60 bg-sky-500/12 text-sky-900 shadow-[0_4px_14px_rgba(14,165,233,0.14)]'
+                          : 'border-slate-900/10 bg-white/60 text-slate-700 hover:border-sky-400/50 hover:bg-white/90'
                       }`}
                     >
                       <span className="inline-flex items-center gap-2">
-                        <Sparkles size={14} className={skillSelected(skill) ? 'text-cyan-300' : 'text-slate-400'} />
+                        <Sparkles size={14} className={skillSelected(skill) ? 'text-sky-600' : 'text-slate-400'} />
                         {skill}
                       </span>
                     </button>
                   ))}
                 </div>
                 {form.skills.length > 0 && (
-                  <p className="text-emerald-300 text-xs mt-2">Selected: {form.skills.join(', ')}</p>
+                  <p className="text-emerald-700 text-xs mt-2 font-medium">Selected: {form.skills.join(', ')}</p>
                 )}
               </div>
 
@@ -1393,7 +1393,7 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
                 <button
                   type="button"
                   onClick={() => setShowStatusModal(true)}
-                  className="text-xs text-cyan-300 hover:text-cyan-200 underline inline-flex items-center gap-1.5"
+                  className="text-xs text-sky-700 hover:text-sky-800 underline inline-flex items-center gap-1.5 font-medium"
                 >
                   <Search size={13} /> Already submitted Step 1? Check Approval Status / Continue to Payment
                 </button>
@@ -1407,15 +1407,15 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
               <div className="liquid-glass-strong rounded-3xl p-6">
                 <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
                   <div className="flex items-center gap-2.5">
-                    <span className="liquid-icon-bubble w-9 h-9 text-cyan-300">
+                    <span className="liquid-icon-bubble w-9 h-9 text-sky-600">
                       <QrCode size={17} />
                     </span>
-                    <h3 className="font-semibold text-white">Pay Registration Fee</h3>
+                    <h3 className="font-semibold text-slate-900">Pay Registration Fee</h3>
                   </div>
                   <span className={`liquid-glass-pill text-xs px-3 py-1 rounded-full font-semibold flex items-center gap-1.5 ${
                     paymentYear === '2nd Year'
-                      ? 'border-amber-400/40 text-amber-200'
-                      : 'border-cyan-400/40 text-cyan-200'
+                      ? 'border-amber-500/40 text-amber-800'
+                      : 'border-sky-400/40 text-sky-800'
                   }`}>
                     <Lock size={12} /> {paymentYear} Payment Locked
                   </span>
@@ -1424,43 +1424,43 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
                 {/* Locked Academic Year & Fee Card */}
                 <div className={`liquid-glass p-4 rounded-2xl mb-5 flex items-center justify-between ${
                   paymentYear === '2nd Year'
-                    ? 'border-amber-400/35 text-amber-100'
-                    : 'border-cyan-400/35 text-cyan-100'
+                    ? 'border-amber-500/35 text-amber-900'
+                    : 'border-sky-400/35 text-sky-900'
                 }`}>
                   <div className="flex items-center gap-3">
                     <div className={`liquid-icon-bubble w-10 h-10 rounded-xl ${
                       paymentYear === '2nd Year'
-                        ? 'border-amber-400/40 bg-amber-500/15 text-amber-300'
-                        : 'border-cyan-400/40 bg-cyan-500/15 text-cyan-300'
+                        ? 'border-amber-500/35 bg-amber-500/12 text-amber-600'
+                        : 'border-sky-500/35 bg-sky-500/12 text-sky-600'
                     }`}>
                       <Lock size={17} />
                     </div>
                     <div>
-                      <p className="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">
+                      <p className="text-[11px] uppercase tracking-wider text-slate-500 font-semibold">
                         Registered Academic Year (Locked)
                       </p>
-                      <p className="text-base font-black text-white">{paymentYear}</p>
+                      <p className="text-base font-black text-slate-900">{paymentYear}</p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">
+                    <p className="text-[11px] uppercase tracking-wider text-slate-500 font-semibold">
                       Applicable Fee
                     </p>
-                    <p className="text-lg font-black text-emerald-300">INR {activeFee}</p>
+                    <p className="text-lg font-black text-emerald-700">INR {activeFee}</p>
                   </div>
                 </div>
 
                 {/* QR Code Display or Clear Error if Not Configured */}
                 {!activeQrUrl || qrImageError ? (
-                  <div className="liquid-glass rounded-2xl border-red-400/35 p-4 text-red-200 text-center my-4">
-                    <AlertCircle size={24} className="mx-auto mb-2 text-red-300" />
+                  <div className="liquid-glass rounded-2xl border-red-400/40 bg-red-50/75 p-4 text-red-700 text-center my-4">
+                    <AlertCircle size={24} className="mx-auto mb-2 text-red-600" />
                     <p className="text-sm font-semibold">No QR Code Configured for {paymentYear}</p>
-                    <p className="text-xs text-slate-300/80 mt-1">
+                    <p className="text-xs text-slate-600 mt-1">
                       The payment QR code for {paymentYear} participants has not been configured yet. Please pay directly via UPI ID below or contact support.
                     </p>
                   </div>
                 ) : (
-                  <div className="bg-white rounded-2xl p-3 w-fit mx-auto mb-4 shadow-[0_12px_36px_rgba(34,211,238,0.18)]">
+                  <div className="bg-white rounded-2xl p-3 w-fit mx-auto mb-4 shadow-[0_12px_32px_rgba(14,165,233,0.14)] border border-slate-900/10">
                     <img
                       key={`${paymentYear}-${activeQrUrl}`}
                       src={activeQrUrl}
@@ -1471,17 +1471,17 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
                   </div>
                 )}
 
-                <p className="text-xs text-slate-300/85 mt-1 break-all text-center">
-                  Payee: <span className="text-white font-medium">{activeUpiName}</span> | UPI ID: <span className="font-mono text-cyan-200 font-medium">{activeUpiId}</span>
+                <p className="text-xs text-slate-600 mt-1 break-all text-center">
+                  Payee: <span className="text-slate-900 font-semibold">{activeUpiName}</span> | UPI ID: <span className="font-mono text-sky-700 font-semibold">{activeUpiId}</span>
                 </p>
               </div>
 
               <div className="liquid-glass-strong rounded-3xl p-6 space-y-5">
                 {/* Account Holder Name */}
                 <div>
-                  <label htmlFor="reg-account-holder" className="block text-sm font-medium text-slate-200 mb-1.5">Account Holder Name *</label>
+                  <label htmlFor="reg-account-holder" className="block text-sm font-medium text-slate-700 mb-1.5">Account Holder Name *</label>
                   <div className="relative">
-                    <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-cyan-300/70" />
+                    <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sky-600" />
                     <input
                       id="reg-account-holder"
                       name="account_holder_name"
@@ -1493,31 +1493,31 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
                         setError('');
                       }}
                       placeholder="Name of account holder who made the payment"
-                      className={`liquid-input w-full rounded-xl pl-10 pr-4 py-3 text-white placeholder-slate-400/60 ${
+                      className={`liquid-input w-full rounded-xl pl-10 pr-4 py-3 text-slate-900 placeholder-slate-400 ${
                         accountHolderNameState === 'valid'
-                          ? '!border-emerald-400/80 focus:!border-emerald-300'
+                          ? '!border-emerald-500/80 focus:!border-emerald-600'
                           : accountHolderNameState === 'invalid'
-                          ? '!border-red-400/80 focus:!border-red-300'
+                          ? '!border-red-500/80 focus:!border-red-600'
                           : ''
                       }`}
                     />
                   </div>
-                  <p className="text-xs text-slate-400 mt-1.5">
+                  <p className="text-xs text-slate-500 mt-1.5">
                     Enter the exact account holder name corresponding to the bank / UPI account used for payment.
                   </p>
                 </div>
 
                 {/* Upload Payment Screenshot */}
                 <div>
-                  <label htmlFor="reg-payment-screenshot" className="block text-sm font-medium text-slate-200 mb-1.5">
+                  <label htmlFor="reg-payment-screenshot" className="block text-sm font-medium text-slate-700 mb-1.5">
                     Upload Payment Screenshot *
                   </label>
                   <div className="relative">
                     {!screenshotPreview ? (
-                      <label htmlFor="reg-payment-screenshot" className={`liquid-glass flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-white/[0.08] transition-colors ${screenshotError ? '!border-red-400/60 bg-red-500/10' : 'border-cyan-300/25'}`}>
-                        <Upload size={30} className={`mb-2 ${screenshotError ? 'text-red-300' : 'text-cyan-300/80'}`} />
-                        <p className="text-sm font-semibold text-white">Click to upload payment screenshot</p>
-                        <p className="text-xs text-slate-400 mt-1">PNG, JPG, JPEG, or WEBP (Max 10MB)</p>
+                      <label htmlFor="reg-payment-screenshot" className={`liquid-glass flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-white/80 transition-colors ${screenshotError ? '!border-red-400/60 bg-red-50/75' : 'border-sky-400/40'}`}>
+                        <Upload size={30} className={`mb-2 ${screenshotError ? 'text-red-600' : 'text-sky-600'}`} />
+                        <p className="text-sm font-semibold text-slate-900">Click to upload payment screenshot</p>
+                        <p className="text-xs text-slate-500 mt-1">PNG, JPG, JPEG, or WEBP (Max 10MB)</p>
                         <input
                           id="reg-payment-screenshot"
                           name="payment_screenshot"
@@ -1533,19 +1533,19 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
                         <img
                           src={screenshotPreview}
                           alt="Payment screenshot preview"
-                          className="w-24 h-24 sm:w-28 sm:h-28 object-cover rounded-xl border border-white/25 shadow-md flex-shrink-0"
+                          className="w-24 h-24 sm:w-28 sm:h-28 object-cover rounded-xl border border-slate-900/15 shadow-md flex-shrink-0"
                         />
                         <div className="flex-1 text-center sm:text-left min-w-0">
                           <div className="flex items-center gap-2 justify-center sm:justify-start">
-                            <CheckCircle size={16} className="text-emerald-300" />
-                            <span className="text-sm font-semibold text-emerald-200">Screenshot Selected</span>
+                            <CheckCircle size={16} className="text-emerald-600" />
+                            <span className="text-sm font-semibold text-emerald-700">Screenshot Selected</span>
                           </div>
-                          <p className="text-xs text-slate-200 truncate mt-1">{screenshotFile?.name || 'payment-screenshot'}</p>
+                          <p className="text-xs text-slate-700 truncate mt-1">{screenshotFile?.name || 'payment-screenshot'}</p>
                           {screenshotFile?.size && (
-                            <p className="text-[11px] text-slate-400">{(screenshotFile.size / 1024).toFixed(1)} KB</p>
+                            <p className="text-[11px] text-slate-500">{(screenshotFile.size / 1024).toFixed(1)} KB</p>
                           )}
                           <div className="flex items-center gap-2 mt-3 justify-center sm:justify-start">
-                            <label htmlFor="reg-payment-screenshot-replace" className="liquid-btn-glass px-3 py-1.5 rounded-lg border-cyan-400/35 text-cyan-200 text-xs font-medium cursor-pointer">
+                            <label htmlFor="reg-payment-screenshot-replace" className="liquid-btn-glass px-3 py-1.5 rounded-lg border-sky-400/40 text-sky-800 text-xs font-medium cursor-pointer">
                               Replace Screenshot
                               <input
                                 id="reg-payment-screenshot-replace"
@@ -1560,7 +1560,7 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
                             <button
                               type="button"
                               onClick={handleRemoveScreenshot}
-                              className="px-3 py-1.5 rounded-lg bg-red-500/15 hover:bg-red-500/25 text-red-200 text-xs font-medium border border-red-400/35 transition-colors inline-flex items-center gap-1"
+                              className="px-3 py-1.5 rounded-lg bg-red-500/12 hover:bg-red-500/20 text-red-700 text-xs font-medium border border-red-400/35 transition-colors inline-flex items-center gap-1"
                             >
                               <Trash2 size={12} /> Remove
                             </button>
@@ -1570,16 +1570,16 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
                     )}
                   </div>
                   {screenshotError && (
-                    <p className="text-xs text-red-300 mt-1.5 flex items-center gap-1">
+                    <p className="text-xs text-red-600 mt-1.5 flex items-center gap-1 font-medium">
                       <AlertCircle size={12} /> {screenshotError}
                     </p>
                   )}
                 </div>
 
                 <div>
-                  <label htmlFor="reg-payment-id" className="block text-sm font-medium text-slate-200 mb-1.5">Registration Payment ID *</label>
+                  <label htmlFor="reg-payment-id" className="block text-sm font-medium text-slate-700 mb-1.5">Registration Payment ID *</label>
                   <div className="relative">
-                    <CreditCard size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-cyan-300/70" />
+                    <CreditCard size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sky-600" />
                     <input
                       id="reg-payment-id"
                       name="payment_id"
@@ -1590,16 +1590,16 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
                         setError('');
                       }}
                       placeholder="Enter UPI Transaction / UTR / Reference ID"
-                      className={`liquid-input w-full rounded-xl pl-10 pr-4 py-3 text-white placeholder-slate-400/60 font-mono ${
+                      className={`liquid-input w-full rounded-xl pl-10 pr-4 py-3 text-slate-900 placeholder-slate-400 font-mono ${
                         paymentIdState === 'valid'
-                          ? '!border-emerald-400/80 focus:!border-emerald-300'
+                          ? '!border-emerald-500/80 focus:!border-emerald-600'
                           : paymentIdState === 'invalid'
-                          ? '!border-red-400/80 focus:!border-red-300'
+                          ? '!border-red-500/80 focus:!border-red-600'
                           : ''
                       }`}
                     />
                   </div>
-                  <p className="text-xs text-slate-400 mt-1.5">
+                  <p className="text-xs text-slate-500 mt-1.5">
                     Copy and paste the 12-digit UPI reference ID or transaction reference from your payment app.
                   </p>
                 </div>
@@ -1615,62 +1615,62 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
             </form>
           )}
 
-          <p className="text-center text-slate-400 text-xs mt-6">
-            Already registered and paid? <a href="/my-profile" className="text-cyan-300 hover:underline">View your profile</a>
+          <p className="text-center text-slate-600 text-xs mt-6">
+            Already registered and paid? <a href="/my-profile" className="text-sky-700 font-semibold hover:underline">View your profile</a>
           </p>
         </motion.div>
       </div>
 
       {/* STATUS LOOKUP MODAL */}
       {showStatusModal && (
-        <div className="fixed inset-0 bg-[#020612]/75 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-slate-950/35 backdrop-blur-md z-50 flex items-center justify-center p-4">
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="liquid-glass-strong w-full max-w-md rounded-3xl overflow-hidden shadow-2xl">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
-              <h3 className="font-bold text-white text-base flex items-center gap-2">
-                <Search size={16} className="text-cyan-300" /> Check Registration Approval Status
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-900/10">
+              <h3 className="font-bold text-slate-900 text-base flex items-center gap-2">
+                <Search size={16} className="text-sky-600" /> Check Registration Approval Status
               </h3>
               <button
                 onClick={() => setShowStatusModal(false)}
-                className="liquid-icon-bubble w-8 h-8 rounded-lg text-slate-200 hover:text-white"
+                className="liquid-icon-bubble w-8 h-8 rounded-lg text-slate-700 hover:text-slate-900"
               >
                 <X size={16} />
               </button>
             </div>
 
             <form onSubmit={handleLookupSubmit} className="p-6 space-y-4">
-              <p className="text-xs text-slate-300/85">
+              <p className="text-xs text-slate-600">
                 Enter your Roll Number and registered Gmail address to check if your registration has been approved:
               </p>
 
               <div>
-                <label className="block text-xs text-slate-200 mb-1.5">Roll / Enrolment Number</label>
+                <label className="block text-xs font-medium text-slate-700 mb-1.5">Roll / Enrolment Number</label>
                 <input
                   value={lookupRoll}
                   onChange={e => setLookupRoll(e.target.value)}
                   placeholder="e.g. 2614670010009"
                   maxLength={15}
-                  className="liquid-input w-full rounded-xl px-3.5 py-2.5 text-white font-mono text-sm"
+                  className="liquid-input w-full rounded-xl px-3.5 py-2.5 text-slate-900 placeholder-slate-400 font-mono text-sm"
                 />
               </div>
 
               <div>
-                <label className="block text-xs text-slate-200 mb-1.5">Registered Gmail Address</label>
+                <label className="block text-xs font-medium text-slate-700 mb-1.5">Registered Gmail Address</label>
                 <input
                   type="email"
                   value={lookupEmail}
                   onChange={e => setLookupEmail(e.target.value)}
                   placeholder="yourname@gmail.com"
-                  className="liquid-input w-full rounded-xl px-3.5 py-2.5 text-white text-sm"
+                  className="liquid-input w-full rounded-xl px-3.5 py-2.5 text-slate-900 placeholder-slate-400 text-sm"
                 />
               </div>
 
-              {lookupError && <p className="text-xs text-red-300">{lookupError}</p>}
+              {lookupError && <p className="text-xs text-red-600 font-medium">{lookupError}</p>}
 
               <div className="flex justify-end gap-2.5 pt-2">
                 <button
                   type="button"
                   onClick={() => setShowStatusModal(false)}
-                  className="liquid-btn-glass px-4 py-2 rounded-xl text-slate-200 text-sm"
+                  className="liquid-btn-glass px-4 py-2 rounded-xl text-slate-700 text-sm font-medium"
                 >
                   Cancel
                 </button>

@@ -30,7 +30,7 @@ export default function Countdown({ targetDateIso }: { targetDateIso?: string })
     return () => clearInterval(id);
   }, [eventDate]);
 
-  if (!eventDate) return <p className="text-cyan-100/80 text-lg">Event date and time: To be announced</p>;
+  if (!eventDate) return <p className="text-slate-600 text-lg font-medium">Event date and time: To be announced</p>;
 
   if (timeLeft.ended) {
     return (
@@ -55,19 +55,19 @@ export default function Countdown({ targetDateIso }: { targetDateIso?: string })
         <div key={u.label} className="flex items-center gap-2.5 sm:gap-5">
           <div className="text-center">
             <div className="relative group">
-              <div className="w-16 h-16 sm:w-22 sm:h-22 rounded-2xl liquid-glass-card flex items-center justify-center border-cyan-300/30">
-                <div className="absolute inset-x-2 top-0 h-px bg-gradient-to-r from-transparent via-white/55 to-transparent pointer-events-none" />
-                <span className="relative z-10 font-mono font-black text-2xl sm:text-4xl bg-gradient-to-b from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent tabular-nums drop-shadow-sm">
+              <div className="w-16 h-16 sm:w-22 sm:h-22 rounded-2xl liquid-glass-card flex items-center justify-center border-sky-200/80">
+                <div className="absolute inset-x-2 top-0 h-px bg-gradient-to-r from-transparent via-white to-transparent pointer-events-none" />
+                <span className="relative z-10 font-mono font-black text-2xl sm:text-4xl bg-gradient-to-b from-slate-900 via-sky-700 to-cyan-600 bg-clip-text text-transparent tabular-nums">
                   {pad(u.value)}
                 </span>
               </div>
             </div>
-            <p className="text-[11px] sm:text-xs text-cyan-200/85 mt-2 font-semibold tracking-[0.2em] uppercase">
+            <p className="text-[11px] sm:text-xs text-slate-600 mt-2 font-semibold tracking-[0.2em] uppercase">
               {u.label}
             </p>
           </div>
           {i < 3 && (
-            <span className="text-cyan-300/80 font-bold text-2xl sm:text-3xl -mt-6 animate-pulse">
+            <span className="text-sky-600/80 font-bold text-2xl sm:text-3xl -mt-6 animate-pulse">
               :
             </span>
           )}

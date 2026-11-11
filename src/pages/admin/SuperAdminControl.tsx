@@ -823,25 +823,25 @@ export default function SuperAdminControl() {
   const pendingCount = pendingRequests.length;
 
   return (
-    <div className="min-h-screen text-white pt-20 pb-20">
+    <div className="min-h-screen text-slate-900 pt-20 pb-20">
       {/* HEADER SECTION */}
-      <header className="border-b border-white/15 bg-white/[0.05] backdrop-blur-2xl sticky top-16 z-30 shadow-[0_8px_32px_rgba(3,7,18,0.45)]">
+      <header className="border-b border-slate-900/10 bg-white/80 backdrop-blur-2xl sticky top-16 z-30 shadow-[0_8px_32px_rgba(15,23,42,0.06)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-cyan-400/25 to-blue-600/30 border border-cyan-400/50 ring-2 ring-cyan-400/25 flex items-center justify-center text-cyan-300 shadow-lg shadow-cyan-500/20 backdrop-blur-md">
+            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-sky-400/20 to-blue-600/20 border border-sky-500/35 ring-2 ring-sky-400/20 flex items-center justify-center text-sky-700 shadow-lg shadow-sky-500/15 backdrop-blur-md">
               <Crown size={22} />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white">Super Admin Control</h1>
-                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-cyan-500/15 border border-cyan-400/40 text-cyan-200 backdrop-blur-md">
+                <h1 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900">Super Admin Control</h1>
+                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-sky-500/12 border border-sky-500/35 text-sky-800 backdrop-blur-md">
                   MASTER ACCESS
                 </span>
               </div>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className="text-xs text-slate-600 mt-0.5">
                 {currentUser?.email ? (
                   <>
-                    Logged in as <span className="text-cyan-300 font-medium">{currentUser.email}</span>
+                    Logged in as <span className="text-sky-700 font-medium">{currentUser.email}</span>
                   </>
                 ) : (
                   'Master Governance & System Administration'
@@ -854,7 +854,7 @@ export default function SuperAdminControl() {
             <Link
               to="/admin"
               aria-label="Back to Standard Admin Dashboard"
-              className="liquid-btn-glass px-3.5 py-2 min-h-[44px] text-xs inline-flex items-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-cyan-400"
+              className="liquid-btn-glass px-3.5 py-2 min-h-[44px] text-xs inline-flex items-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-sky-500"
             >
               <ArrowLeft size={14} />
               Standard Dashboard
@@ -862,7 +862,7 @@ export default function SuperAdminControl() {
             <button
               onClick={handleSignOut}
               aria-label="Sign out of Super Admin"
-              className="px-3.5 py-2 min-h-[44px] rounded-xl text-xs font-semibold bg-red-500/15 border border-red-400/30 text-red-300 hover:bg-red-500/25 transition-colors inline-flex items-center gap-1.5 backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-red-400"
+              className="px-3.5 py-2 min-h-[44px] rounded-xl text-xs font-semibold bg-red-500/12 border border-red-400/35 text-red-700 hover:bg-red-500/20 transition-colors inline-flex items-center gap-1.5 backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-red-400"
             >
               <LogOut size={14} />
               Sign Out
@@ -878,15 +878,15 @@ export default function SuperAdminControl() {
             role="status"
             className={`p-4 rounded-2xl mb-6 text-sm flex items-center justify-between border backdrop-blur-md ${
               actionMessage.type === 'success'
-                ? 'bg-emerald-500/15 border-emerald-400/35 text-emerald-200'
-                : 'bg-red-500/15 border-red-400/35 text-red-200'
+                ? 'bg-emerald-500/12 border-emerald-500/35 text-emerald-800'
+                : 'bg-red-500/12 border-red-400/35 text-red-800'
             }`}
           >
             <span className="font-medium">{actionMessage.text}</span>
             <button
               onClick={() => setActionMessage(null)}
               aria-label="Dismiss message"
-              className="p-1 rounded hover:bg-white/10 transition-colors ml-4 text-xs"
+              className="p-1 rounded hover:bg-slate-900/10 transition-colors ml-4 text-xs"
             >
               <X size={16} />
             </button>
@@ -894,13 +894,13 @@ export default function SuperAdminControl() {
         )}
 
         {/* SECTION TABS NAVIGATION */}
-        <div className="flex items-center gap-2 border-b border-white/10 pb-3 mb-6 overflow-x-auto no-scrollbar">
+        <div className="flex items-center gap-2 border-b border-slate-900/10 pb-3 mb-6 overflow-x-auto no-scrollbar">
           <button
             onClick={() => setActiveTab('overview')}
-            className={`px-4 py-2.5 min-h-[44px] text-xs sm:text-sm flex items-center gap-2 whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-cyan-400 ${
+            className={`px-4 py-2.5 min-h-[44px] text-xs sm:text-sm flex items-center gap-2 whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-sky-500 ${
               activeTab === 'overview'
                 ? 'liquid-btn-primary'
-                : 'liquid-btn-glass text-slate-300 hover:text-white'
+                : 'liquid-btn-glass text-slate-700 hover:text-slate-900'
             }`}
           >
             <Layers size={16} />
@@ -909,16 +909,16 @@ export default function SuperAdminControl() {
 
           <button
             onClick={() => setActiveTab('requests')}
-            className={`px-4 py-2.5 min-h-[44px] text-xs sm:text-sm flex items-center gap-2 whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-cyan-400 ${
+            className={`px-4 py-2.5 min-h-[44px] text-xs sm:text-sm flex items-center gap-2 whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-sky-500 ${
               activeTab === 'requests'
                 ? 'liquid-btn-primary'
-                : 'liquid-btn-glass text-slate-300 hover:text-white'
+                : 'liquid-btn-glass text-slate-700 hover:text-slate-900'
             }`}
           >
             <Clock size={16} />
             Admin Requests
             {pendingCount > 0 && (
-              <span className="px-2 py-0.5 rounded-full text-xs font-black bg-amber-400 text-black animate-pulse">
+              <span className="px-2 py-0.5 rounded-full text-xs font-black bg-amber-400 text-slate-950 animate-pulse">
                 {pendingCount > 9 ? '9+' : pendingCount}
               </span>
             )}
@@ -926,16 +926,16 @@ export default function SuperAdminControl() {
 
           <button
             onClick={() => setActiveTab('admins')}
-            className={`px-4 py-2.5 min-h-[44px] text-xs sm:text-sm flex items-center gap-2 whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-cyan-400 ${
+            className={`px-4 py-2.5 min-h-[44px] text-xs sm:text-sm flex items-center gap-2 whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-sky-500 ${
               activeTab === 'admins'
                 ? 'liquid-btn-primary'
-                : 'liquid-btn-glass text-slate-300 hover:text-white'
+                : 'liquid-btn-glass text-slate-700 hover:text-slate-900'
             }`}
           >
             <Shield size={16} />
             Admins
             {admins.length > 0 && (
-              <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-white/15 text-slate-200">
+              <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-slate-900/10 text-slate-800">
                 {admins.length}
               </span>
             )}
@@ -943,10 +943,10 @@ export default function SuperAdminControl() {
 
           <button
             onClick={() => setActiveTab('locks')}
-            className={`px-4 py-2.5 min-h-[44px] text-xs sm:text-sm flex items-center gap-2 whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-cyan-400 ${
+            className={`px-4 py-2.5 min-h-[44px] text-xs sm:text-sm flex items-center gap-2 whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-sky-500 ${
               activeTab === 'locks'
                 ? 'liquid-btn-primary'
-                : 'liquid-btn-glass text-slate-300 hover:text-white'
+                : 'liquid-btn-glass text-slate-700 hover:text-slate-900'
             }`}
           >
             <Lock size={16} />
@@ -955,10 +955,10 @@ export default function SuperAdminControl() {
 
           <button
             onClick={() => setActiveTab('activity')}
-            className={`px-4 py-2.5 min-h-[44px] text-xs sm:text-sm flex items-center gap-2 whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-cyan-400 ${
+            className={`px-4 py-2.5 min-h-[44px] text-xs sm:text-sm flex items-center gap-2 whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-sky-500 ${
               activeTab === 'activity'
                 ? 'liquid-btn-primary'
-                : 'liquid-btn-glass text-slate-300 hover:text-white'
+                : 'liquid-btn-glass text-slate-700 hover:text-slate-900'
             }`}
           >
             <History size={16} />
@@ -974,28 +974,28 @@ export default function SuperAdminControl() {
             {/* Top Stat Cards */}
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="liquid-glass-card p-5 rounded-2xl flex flex-col justify-between">
-                <div className="flex items-center justify-between text-slate-400 text-xs font-medium">
+                <div className="flex items-center justify-between text-slate-600 text-xs font-medium">
                   <span>Total Participants</span>
-                  <Users size={16} className="text-blue-400" />
+                  <Users size={16} className="text-blue-600" />
                 </div>
                 <div className="mt-3">
-                  <div className="text-2xl sm:text-3xl font-black text-white">
+                  <div className="text-2xl sm:text-3xl font-black text-slate-900">
                     {summaryLoading ? '—' : summary?.participants ?? 0}
                   </div>
-                  <p className="text-[11px] text-slate-400 mt-1">Registrations recorded</p>
+                  <p className="text-[11px] text-slate-500 mt-1">Registrations recorded</p>
                 </div>
               </div>
 
               <div className="liquid-glass-card p-5 rounded-2xl flex flex-col justify-between">
-                <div className="flex items-center justify-between text-slate-400 text-xs font-medium">
+                <div className="flex items-center justify-between text-slate-600 text-xs font-medium">
                   <span>Checked In</span>
-                  <UserCheck size={16} className="text-cyan-400" />
+                  <UserCheck size={16} className="text-sky-600" />
                 </div>
                 <div className="mt-3">
-                  <div className="text-2xl sm:text-3xl font-black text-cyan-300">
+                  <div className="text-2xl sm:text-3xl font-black text-sky-700">
                     {summaryLoading ? '—' : summary?.checkedIn ?? 0}
                   </div>
-                  <p className="text-[11px] text-slate-400 mt-1">
+                  <p className="text-[11px] text-slate-500 mt-1">
                     {summary?.participants
                       ? `${Math.round(((summary.checkedIn || 0) / summary.participants) * 100)}% attendance rate`
                       : 'Verified at entry'}
@@ -1004,28 +1004,28 @@ export default function SuperAdminControl() {
               </div>
 
               <div className="liquid-glass-card p-5 rounded-2xl flex flex-col justify-between">
-                <div className="flex items-center justify-between text-slate-400 text-xs font-medium">
+                <div className="flex items-center justify-between text-slate-600 text-xs font-medium">
                   <span>Pending Requests</span>
-                  <Clock size={16} className="text-amber-400" />
+                  <Clock size={16} className="text-amber-600" />
                 </div>
                 <div className="mt-3">
-                  <div className="text-2xl sm:text-3xl font-black text-amber-300">
+                  <div className="text-2xl sm:text-3xl font-black text-amber-700">
                     {summaryLoading ? '—' : summary?.pendingApprovals ?? pendingCount}
                   </div>
-                  <p className="text-[11px] text-slate-400 mt-1">Require Super Admin approval</p>
+                  <p className="text-[11px] text-slate-500 mt-1">Require Super Admin approval</p>
                 </div>
               </div>
 
               <div className="liquid-glass-card p-5 rounded-2xl flex flex-col justify-between">
-                <div className="flex items-center justify-between text-slate-400 text-xs font-medium">
+                <div className="flex items-center justify-between text-slate-600 text-xs font-medium">
                   <span>Media Pending</span>
-                  <Image size={16} className="text-violet-400" />
+                  <Image size={16} className="text-violet-600" />
                 </div>
                 <div className="mt-3">
-                  <div className="text-2xl sm:text-3xl font-black text-white">
+                  <div className="text-2xl sm:text-3xl font-black text-slate-900">
                     {summaryLoading ? '—' : summary?.pendingMedia ?? 0}
                   </div>
-                  <p className="text-[11px] text-slate-400 mt-1">
+                  <p className="text-[11px] text-slate-500 mt-1">
                     Out of {summary?.media ?? 0} uploaded items
                   </p>
                 </div>
@@ -1036,38 +1036,38 @@ export default function SuperAdminControl() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="liquid-glass-card p-4 rounded-2xl flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-slate-400">Payments Verified</p>
-                  <p className="text-xl font-bold text-emerald-300 mt-1">{summary?.paymentsVerified ?? 0}</p>
+                  <p className="text-xs text-slate-600">Payments Verified</p>
+                  <p className="text-xl font-bold text-emerald-700 mt-1">{summary?.paymentsVerified ?? 0}</p>
                 </div>
-                <ShieldCheck size={24} className="text-emerald-400/70" />
+                <ShieldCheck size={24} className="text-emerald-600/75" />
               </div>
 
               <div className="liquid-glass-card p-4 rounded-2xl flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-slate-400">Active Admin Sessions</p>
-                  <p className="text-xl font-bold text-cyan-300 mt-1">{summary?.activeSessions ?? 0}</p>
+                  <p className="text-xs text-slate-600">Active Admin Sessions</p>
+                  <p className="text-xl font-bold text-sky-700 mt-1">{summary?.activeSessions ?? 0}</p>
                 </div>
-                <Shield size={24} className="text-cyan-400/70" />
+                <Shield size={24} className="text-sky-600/75" />
               </div>
 
               <div className="liquid-glass-card p-4 rounded-2xl flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-slate-400">Provisioned Admins</p>
-                  <p className="text-xl font-bold text-white mt-1">{summary?.admins ?? admins.length}</p>
+                  <p className="text-xs text-slate-600">Provisioned Admins</p>
+                  <p className="text-xl font-bold text-slate-900 mt-1">{summary?.admins ?? admins.length}</p>
                 </div>
-                <Users size={24} className="text-slate-400/70" />
+                <Users size={24} className="text-slate-500/80" />
               </div>
             </div>
 
             {/* Master Gates & Public Controls Card */}
             <div className="liquid-glass-strong rounded-3xl p-6">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4 pb-4 border-b border-white/10">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4 pb-4 border-b border-slate-900/10">
                 <div>
-                  <h2 className="text-base font-bold text-white flex items-center gap-2">
-                    <Shield className="text-cyan-400" size={18} />
+                  <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                    <Shield className="text-sky-600" size={18} />
                     Public Gateway & Submission Controls
                   </h2>
-                  <p className="text-xs text-slate-400 mt-1">
+                  <p className="text-xs text-slate-600 mt-1">
                     Manage real-time access to public registration year gateways and community upload portals. Only Super Admins have authority to toggle these gates.
                   </p>
                 </div>
@@ -1080,27 +1080,27 @@ export default function SuperAdminControl() {
                     <div
                       className={`p-3 rounded-xl border mt-0.5 shrink-0 ${
                         (yearGateways?.enabled_2nd_year ?? true)
-                          ? 'bg-amber-500/15 border-amber-400/35 text-amber-300'
-                          : 'bg-rose-500/15 border-rose-400/35 text-rose-300'
+                          ? 'bg-amber-500/12 border-amber-500/35 text-amber-700'
+                          : 'bg-rose-500/12 border-rose-500/35 text-rose-700'
                       }`}
                     >
                       <Crown size={22} />
                     </div>
                     <div>
                       <div className="flex flex-wrap items-center gap-2.5">
-                        <h3 className="text-sm sm:text-base font-bold text-white">2nd Year Registration Gateway (₹699)</h3>
+                        <h3 className="text-sm sm:text-base font-bold text-slate-900">2nd Year Registration Gateway (₹699)</h3>
                         <span
                           className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold ${
                             yearGatewaysLoading
-                              ? 'bg-white/10 text-slate-400'
+                              ? 'bg-slate-900/10 text-slate-600'
                               : (yearGateways?.enabled_2nd_year ?? true)
-                                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/40'
-                                : 'bg-rose-500/20 text-rose-300 border border-rose-400/40'
+                                ? 'bg-emerald-500/15 text-emerald-800 border border-emerald-500/35'
+                                : 'bg-rose-500/15 text-rose-800 border border-rose-500/35'
                           }`}
                         >
                           <span
                             className={`w-1.5 h-1.5 rounded-full ${
-                              (yearGateways?.enabled_2nd_year ?? true) ? 'bg-emerald-400 animate-pulse' : 'bg-rose-400'
+                              (yearGateways?.enabled_2nd_year ?? true) ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'
                             }`}
                           />
                           {yearGatewaysLoading
@@ -1110,12 +1110,12 @@ export default function SuperAdminControl() {
                               : 'PAUSED (Registrations Closed)'}
                         </span>
                       </div>
-                      <p className="text-xs text-slate-300 mt-1 max-w-xl leading-relaxed">
-                        Controls whether students can select <strong className="text-amber-300">2nd Year (₹699)</strong> and register with the 2nd Year QR code on <code className="text-xs text-cyan-200 bg-white/10 px-1.5 py-0.5 rounded">/register</code>.
+                      <p className="text-xs text-slate-600 mt-1 max-w-xl leading-relaxed">
+                        Controls whether students can select <strong className="text-amber-700">2nd Year (₹699)</strong> and register with the 2nd Year QR code on <code className="text-xs text-sky-800 bg-sky-500/10 px-1.5 py-0.5 rounded">/register</code>.
                         When paused, the 2nd Year option is locked and marked closed, preventing both form submission and API bypass.
                       </p>
                       {yearGateways?.updated_at && (
-                        <p className="text-[11px] text-slate-400 mt-1.5 flex items-center gap-1">
+                        <p className="text-[11px] text-slate-500 mt-1.5 flex items-center gap-1">
                           <Clock size={12} />
                           Last changed: {new Date(yearGateways.updated_at).toLocaleString()}
                           {yearGateways.updated_by ? ` by ${yearGateways.updated_by}` : ''}
@@ -1137,10 +1137,10 @@ export default function SuperAdminControl() {
                     <button
                       onClick={() => handleToggleYearGateway('2nd Year', !(yearGateways?.enabled_2nd_year ?? true))}
                       disabled={yearGatewaysLoading || gatewayToggleLoading === '2nd Year'}
-                      className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all backdrop-blur-md ${
+                      className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all backdrop-blur-md shadow-sm ${
                         (yearGateways?.enabled_2nd_year ?? true)
-                          ? 'bg-rose-500/80 hover:bg-rose-500 border border-rose-300/30 text-white'
-                          : 'bg-emerald-500/80 hover:bg-emerald-500 border border-emerald-300/30 text-white'
+                          ? 'bg-rose-600 hover:bg-rose-500 border border-rose-500/40 text-white'
+                          : 'bg-emerald-600 hover:bg-emerald-500 border border-emerald-500/40 text-white'
                       } disabled:opacity-50`}
                     >
                       {gatewayToggleLoading === '2nd Year' ? (
@@ -1164,27 +1164,27 @@ export default function SuperAdminControl() {
                     <div
                       className={`p-3 rounded-xl border mt-0.5 shrink-0 ${
                         (yearGateways?.enabled_1st_year ?? true)
-                          ? 'bg-cyan-500/15 border-cyan-400/35 text-cyan-300'
-                          : 'bg-rose-500/15 border-rose-400/35 text-rose-300'
+                          ? 'bg-sky-500/12 border-sky-500/35 text-sky-700'
+                          : 'bg-rose-500/12 border-rose-500/35 text-rose-700'
                       }`}
                     >
                       <Users size={22} />
                     </div>
                     <div>
                       <div className="flex flex-wrap items-center gap-2.5">
-                        <h3 className="text-sm sm:text-base font-bold text-white">1st Year Registration Gateway (₹599)</h3>
+                        <h3 className="text-sm sm:text-base font-bold text-slate-900">1st Year Registration Gateway (₹599)</h3>
                         <span
                           className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold ${
                             yearGatewaysLoading
-                              ? 'bg-white/10 text-slate-400'
+                              ? 'bg-slate-900/10 text-slate-600'
                               : (yearGateways?.enabled_1st_year ?? true)
-                                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/40'
-                                : 'bg-rose-500/20 text-rose-300 border border-rose-400/40'
+                                ? 'bg-emerald-500/15 text-emerald-800 border border-emerald-500/35'
+                                : 'bg-rose-500/15 text-rose-800 border border-rose-500/35'
                           }`}
                         >
                           <span
                             className={`w-1.5 h-1.5 rounded-full ${
-                              (yearGateways?.enabled_1st_year ?? true) ? 'bg-emerald-400 animate-pulse' : 'bg-rose-400'
+                              (yearGateways?.enabled_1st_year ?? true) ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'
                             }`}
                           />
                           {yearGatewaysLoading
@@ -1194,11 +1194,11 @@ export default function SuperAdminControl() {
                               : 'PAUSED (Registrations Closed)'}
                         </span>
                       </div>
-                      <p className="text-xs text-slate-300 mt-1 max-w-xl leading-relaxed">
-                        Controls whether students can select <strong className="text-cyan-300">1st Year (₹599)</strong> and register with the 1st Year QR code on <code className="text-xs text-cyan-200 bg-white/10 px-1.5 py-0.5 rounded">/register</code>.
+                      <p className="text-xs text-slate-600 mt-1 max-w-xl leading-relaxed">
+                        Controls whether students can select <strong className="text-sky-700">1st Year (₹599)</strong> and register with the 1st Year QR code on <code className="text-xs text-sky-800 bg-sky-500/10 px-1.5 py-0.5 rounded">/register</code>.
                       </p>
                       {yearGateways?.updated_at && (
-                        <p className="text-[11px] text-slate-400 mt-1.5 flex items-center gap-1">
+                        <p className="text-[11px] text-slate-500 mt-1.5 flex items-center gap-1">
                           <Clock size={12} />
                           Last changed: {new Date(yearGateways.updated_at).toLocaleString()}
                         </p>
@@ -1210,10 +1210,10 @@ export default function SuperAdminControl() {
                     <button
                       onClick={() => handleToggleYearGateway('1st Year', !(yearGateways?.enabled_1st_year ?? true))}
                       disabled={yearGatewaysLoading || gatewayToggleLoading === '1st Year'}
-                      className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all backdrop-blur-md ${
+                      className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all backdrop-blur-md shadow-sm ${
                         (yearGateways?.enabled_1st_year ?? true)
-                          ? 'bg-rose-500/80 hover:bg-rose-500 border border-rose-300/30 text-white'
-                          : 'bg-emerald-500/80 hover:bg-emerald-500 border border-emerald-300/30 text-white'
+                          ? 'bg-rose-600 hover:bg-rose-500 border border-rose-500/40 text-white'
+                          : 'bg-emerald-600 hover:bg-emerald-500 border border-emerald-500/40 text-white'
                       } disabled:opacity-50`}
                     >
                       {gatewayToggleLoading === '1st Year' ? (
@@ -1237,27 +1237,27 @@ export default function SuperAdminControl() {
                     <div
                       className={`p-3 rounded-xl border mt-0.5 shrink-0 ${
                         mediaControl?.enabled
-                          ? 'bg-emerald-500/15 border-emerald-400/35 text-emerald-300'
-                          : 'bg-rose-500/15 border-rose-400/35 text-rose-300'
+                          ? 'bg-emerald-500/12 border-emerald-500/35 text-emerald-700'
+                          : 'bg-rose-500/12 border-rose-500/35 text-rose-700'
                       }`}
                     >
                       <UploadCloud size={22} />
                     </div>
                     <div>
                       <div className="flex flex-wrap items-center gap-2.5">
-                        <h3 className="text-sm sm:text-base font-bold text-white">Public Media Upload Portal</h3>
+                        <h3 className="text-sm sm:text-base font-bold text-slate-900">Public Media Upload Portal</h3>
                         <span
                           className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold ${
                             mediaControlLoading
-                              ? 'bg-white/10 text-slate-400'
+                              ? 'bg-slate-900/10 text-slate-600'
                               : mediaControl?.enabled
-                                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/40'
-                                : 'bg-rose-500/20 text-rose-300 border border-rose-400/40'
+                                ? 'bg-emerald-500/15 text-emerald-800 border border-emerald-500/35'
+                                : 'bg-rose-500/15 text-rose-800 border border-rose-500/35'
                           }`}
                         >
                           <span
                             className={`w-1.5 h-1.5 rounded-full ${
-                              mediaControl?.enabled ? 'bg-emerald-400 animate-pulse' : 'bg-rose-400'
+                              mediaControl?.enabled ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'
                             }`}
                           />
                           {mediaControlLoading
@@ -1267,12 +1267,12 @@ export default function SuperAdminControl() {
                               : 'CLOSED (Submissions Paused)'}
                         </span>
                       </div>
-                      <p className="text-xs text-slate-300 mt-1 max-w-xl leading-relaxed">
-                        Controls access to the public community upload page (<code className="text-xs text-cyan-200 bg-white/10 px-1.5 py-0.5 rounded">/upload-media</code>).
+                      <p className="text-xs text-slate-600 mt-1 max-w-xl leading-relaxed">
+                        Controls access to the public community upload page (<code className="text-xs text-sky-800 bg-sky-500/10 px-1.5 py-0.5 rounded">/upload-media</code>).
                         When turned OFF, public visitors cannot submit photos or videos. Admins can still upload media anytime via the admin panel.
                       </p>
                       {mediaControl?.updated_at && (
-                        <p className="text-[11px] text-slate-400 mt-1.5 flex items-center gap-1">
+                        <p className="text-[11px] text-slate-500 mt-1.5 flex items-center gap-1">
                           <Clock size={12} />
                           Last changed: {new Date(mediaControl.updated_at).toLocaleString()}
                         </p>
@@ -1293,10 +1293,10 @@ export default function SuperAdminControl() {
                     <button
                       onClick={() => handleToggleMediaControl(!mediaControl?.enabled)}
                       disabled={mediaControlLoading || mediaToggleLoading}
-                      className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all backdrop-blur-md ${
+                      className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all backdrop-blur-md shadow-sm ${
                         mediaControl?.enabled
-                          ? 'bg-rose-500/80 hover:bg-rose-500 border border-rose-300/30 text-white'
-                          : 'bg-emerald-500/80 hover:bg-emerald-500 border border-emerald-300/30 text-white'
+                          ? 'bg-rose-600 hover:bg-rose-500 border border-rose-500/40 text-white'
+                          : 'bg-emerald-600 hover:bg-emerald-500 border border-emerald-500/40 text-white'
                       } disabled:opacity-50`}
                     >
                       {mediaToggleLoading ? (
@@ -1320,11 +1320,11 @@ export default function SuperAdminControl() {
             <div className="liquid-glass-strong rounded-3xl p-6">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h2 className="text-base font-bold text-white flex items-center gap-2">
-                    <ExternalLink size={18} className="text-cyan-400" />
+                  <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                    <ExternalLink size={18} className="text-sky-600" />
                     Full Data Views & Governance Tools
                   </h2>
-                  <p className="text-xs text-slate-400 mt-1">
+                  <p className="text-xs text-slate-600 mt-1">
                     Super admins have complete master privileges across all Ignite 2.O data surfaces.
                   </p>
                 </div>
@@ -1333,80 +1333,80 @@ export default function SuperAdminControl() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 <Link
                   to="/admin"
-                  className="liquid-glass-card p-4 rounded-2xl hover:border-cyan-400/50 transition-all flex items-center justify-between group"
+                  className="liquid-glass-card p-4 rounded-2xl hover:border-sky-500/45 transition-all flex items-center justify-between group"
                 >
                   <div>
-                    <p className="text-sm font-semibold text-white group-hover:text-cyan-300 transition-colors">
+                    <p className="text-sm font-semibold text-slate-900 group-hover:text-sky-700 transition-colors">
                       Participants & Check-ins
                     </p>
-                    <p className="text-xs text-slate-400 mt-0.5">Filter, search, QR check-in & verification</p>
+                    <p className="text-xs text-slate-600 mt-0.5">Filter, search, QR check-in & verification</p>
                   </div>
-                  <ExternalLink size={16} className="text-slate-400 group-hover:text-cyan-300 transition-colors" />
+                  <ExternalLink size={16} className="text-slate-500 group-hover:text-sky-600 transition-colors" />
                 </Link>
 
                 <Link
                   to="/gallery"
-                  className="liquid-glass-card p-4 rounded-2xl hover:border-cyan-400/50 transition-all flex items-center justify-between group"
+                  className="liquid-glass-card p-4 rounded-2xl hover:border-sky-500/45 transition-all flex items-center justify-between group"
                 >
                   <div>
-                    <p className="text-sm font-semibold text-white group-hover:text-cyan-300 transition-colors">
+                    <p className="text-sm font-semibold text-slate-900 group-hover:text-sky-700 transition-colors">
                       Media Gallery Management
                     </p>
-                    <p className="text-xs text-slate-400 mt-0.5">Review and curate user media uploads</p>
+                    <p className="text-xs text-slate-600 mt-0.5">Review and curate user media uploads</p>
                   </div>
-                  <ExternalLink size={16} className="text-slate-400 group-hover:text-cyan-300 transition-colors" />
+                  <ExternalLink size={16} className="text-slate-500 group-hover:text-sky-600 transition-colors" />
                 </Link>
 
                 <Link
                   to="/admin/event-settings"
-                  className="liquid-glass-card p-4 rounded-2xl hover:border-cyan-400/50 transition-all flex items-center justify-between group"
+                  className="liquid-glass-card p-4 rounded-2xl hover:border-sky-500/45 transition-all flex items-center justify-between group"
                 >
                   <div>
-                    <p className="text-sm font-semibold text-white group-hover:text-cyan-300 transition-colors">
+                    <p className="text-sm font-semibold text-slate-900 group-hover:text-sky-700 transition-colors">
                       Event Configuration
                     </p>
-                    <p className="text-xs text-slate-400 mt-0.5">Registration toggles, schedule & rules</p>
+                    <p className="text-xs text-slate-600 mt-0.5">Registration toggles, schedule & rules</p>
                   </div>
-                  <ExternalLink size={16} className="text-slate-400 group-hover:text-cyan-300 transition-colors" />
+                  <ExternalLink size={16} className="text-slate-500 group-hover:text-sky-600 transition-colors" />
                 </Link>
 
                 <Link
                   to="/admin/winners"
-                  className="liquid-glass-card p-4 rounded-2xl hover:border-cyan-400/50 transition-all flex items-center justify-between group"
+                  className="liquid-glass-card p-4 rounded-2xl hover:border-sky-500/45 transition-all flex items-center justify-between group"
                 >
                   <div>
-                    <p className="text-sm font-semibold text-white group-hover:text-cyan-300 transition-colors">
+                    <p className="text-sm font-semibold text-slate-900 group-hover:text-sky-700 transition-colors">
                       Hall of Fame & Winners
                     </p>
-                    <p className="text-xs text-slate-400 mt-0.5">Record event podiums and awards</p>
+                    <p className="text-xs text-slate-600 mt-0.5">Record event podiums and awards</p>
                   </div>
-                  <ExternalLink size={16} className="text-slate-400 group-hover:text-cyan-300 transition-colors" />
+                  <ExternalLink size={16} className="text-slate-500 group-hover:text-sky-600 transition-colors" />
                 </Link>
 
                 <Link
                   to="/admin/management-team"
-                  className="liquid-glass-card p-4 rounded-2xl hover:border-cyan-400/50 transition-all flex items-center justify-between group"
+                  className="liquid-glass-card p-4 rounded-2xl hover:border-sky-500/45 transition-all flex items-center justify-between group"
                 >
                   <div>
-                    <p className="text-sm font-semibold text-white group-hover:text-cyan-300 transition-colors">
+                    <p className="text-sm font-semibold text-slate-900 group-hover:text-sky-700 transition-colors">
                       Management Team Roster
                     </p>
-                    <p className="text-xs text-slate-400 mt-0.5">Organizers, coordinators, faculty</p>
+                    <p className="text-xs text-slate-600 mt-0.5">Organizers, coordinators, faculty</p>
                   </div>
-                  <ExternalLink size={16} className="text-slate-400 group-hover:text-cyan-300 transition-colors" />
+                  <ExternalLink size={16} className="text-slate-500 group-hover:text-sky-600 transition-colors" />
                 </Link>
 
                 <Link
                   to="/admin/bulk-passes"
-                  className="liquid-glass-card p-4 rounded-2xl hover:border-cyan-400/50 transition-all flex items-center justify-between group"
+                  className="liquid-glass-card p-4 rounded-2xl hover:border-sky-500/45 transition-all flex items-center justify-between group"
                 >
                   <div>
-                    <p className="text-sm font-semibold text-white group-hover:text-cyan-300 transition-colors">
+                    <p className="text-sm font-semibold text-slate-900 group-hover:text-sky-700 transition-colors">
                       Bulk Pass Generation
                     </p>
-                    <p className="text-xs text-slate-400 mt-0.5">Export printable attendee badges</p>
+                    <p className="text-xs text-slate-600 mt-0.5">Export printable attendee badges</p>
                   </div>
-                  <ExternalLink size={16} className="text-slate-400 group-hover:text-cyan-300 transition-colors" />
+                  <ExternalLink size={16} className="text-slate-500 group-hover:text-sky-600 transition-colors" />
                 </Link>
               </div>
             </div>
@@ -1422,10 +1422,10 @@ export default function SuperAdminControl() {
             <div className="liquid-glass-strong rounded-3xl p-6">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
                 <div className="flex items-center gap-2">
-                  <Clock size={20} className="text-amber-400" />
-                  <h2 className="text-lg font-bold text-white">Pending Admin Access Requests</h2>
+                  <Clock size={20} className="text-amber-600" />
+                  <h2 className="text-lg font-bold text-slate-900">Pending Admin Access Requests</h2>
                   {pendingCount > 0 && (
-                    <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-400/20 text-amber-300 border border-amber-400/40">
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500/15 text-amber-800 border border-amber-500/35">
                       {pendingCount} Pending
                     </span>
                   )}
@@ -1435,7 +1435,7 @@ export default function SuperAdminControl() {
                   onClick={fetchRequests}
                   disabled={requestsLoading}
                   aria-label="Refresh access requests"
-                  className="liquid-btn-glass px-3.5 py-2 min-h-[44px] text-xs flex items-center gap-1.5 self-start sm:self-auto focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                  className="liquid-btn-glass px-3.5 py-2 min-h-[44px] text-xs flex items-center gap-1.5 self-start sm:self-auto focus:outline-none focus:ring-2 focus:ring-sky-500"
                 >
                   <RefreshCw size={13} className={requestsLoading ? 'animate-spin' : ''} />
                   Refresh List
@@ -1443,17 +1443,17 @@ export default function SuperAdminControl() {
               </div>
 
               {pendingRequests.length === 0 ? (
-                <div className="text-center py-12 text-slate-400 border border-dashed border-white/15 rounded-2xl bg-white/[0.02]">
-                  <CheckCircle2 size={36} className="mx-auto mb-2 text-emerald-400" />
-                  <p className="font-semibold text-sm text-slate-200">No pending access requests</p>
-                  <p className="text-xs text-slate-400 mt-1">
+                <div className="text-center py-12 text-slate-600 border border-dashed border-slate-900/15 rounded-2xl bg-slate-900/[0.02]">
+                  <CheckCircle2 size={36} className="mx-auto mb-2 text-emerald-600" />
+                  <p className="font-semibold text-sm text-slate-900">No pending access requests</p>
+                  <p className="text-xs text-slate-600 mt-1">
                     When a new admin attempts to sign in or register, their authorization request will appear here.
                   </p>
                 </div>
               ) : (
-                <div className="overflow-x-auto rounded-2xl border border-white/15 bg-white/[0.02]">
+                <div className="overflow-x-auto rounded-2xl border border-slate-900/10 bg-white/55">
                   <table className="w-full text-left text-sm">
-                    <thead className="bg-white/[0.05] text-slate-300 text-xs font-semibold uppercase tracking-wider border-b border-white/10">
+                    <thead className="bg-slate-900/[0.04] text-slate-700 text-xs font-semibold uppercase tracking-wider border-b border-slate-900/10">
                       <tr>
                         <th className="py-3 px-4">Admin Email</th>
                         <th className="py-3 px-4">Requested Time</th>
@@ -1461,24 +1461,24 @@ export default function SuperAdminControl() {
                         <th className="py-3 px-4 text-right">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-white/10">
+                    <tbody className="divide-y divide-slate-900/10">
                       {pendingRequests.map((req) => (
-                        <tr key={req.id} className="hover:bg-white/[0.04] transition-colors">
+                        <tr key={req.id} className="hover:bg-slate-900/[0.03] transition-colors">
                           <td className="py-3.5 px-4">
-                            <div className="font-semibold text-white">{req.email}</div>
-                            <span className="inline-block mt-1 px-2 py-0.5 rounded text-[11px] font-bold bg-amber-400/15 text-amber-300 border border-amber-400/30">
+                            <div className="font-semibold text-slate-900">{req.email}</div>
+                            <span className="inline-block mt-1 px-2 py-0.5 rounded text-[11px] font-bold bg-amber-500/12 text-amber-800 border border-amber-500/30">
                               Awaiting Approval
                             </span>
                           </td>
-                          <td className="py-3.5 px-4 text-slate-300 text-xs">
+                          <td className="py-3.5 px-4 text-slate-700 text-xs">
                             <div>{formatDate(req.requested_at)}</div>
-                            <span className="text-[11px] text-slate-400">
+                            <span className="text-[11px] text-slate-500">
                               Expires: {formatDate(req.expires_at)}
                             </span>
                           </td>
-                          <td className="py-3.5 px-4 text-slate-400 text-xs">
-                            <div className="font-mono">{req.ip || 'Unknown IP'}</div>
-                            <div className="truncate max-w-[200px] text-[11px] text-slate-400" title={req.user_agent}>
+                          <td className="py-3.5 px-4 text-slate-600 text-xs">
+                            <div className="font-mono text-slate-800">{req.ip || 'Unknown IP'}</div>
+                            <div className="truncate max-w-[200px] text-[11px] text-slate-500" title={req.user_agent}>
                               {req.user_agent || 'Standard Web Client'}
                             </div>
                           </td>
@@ -1488,7 +1488,7 @@ export default function SuperAdminControl() {
                                 onClick={() => handleResolveRequest(req.id, 'approve')}
                                 disabled={resolvingId === req.id}
                                 aria-label={`Approve request for ${req.email}`}
-                                className="px-3 py-1.5 min-h-[38px] rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-400/35 hover:bg-emerald-500/30 text-xs font-bold inline-flex items-center gap-1.5 transition-colors disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                                className="px-3 py-1.5 min-h-[38px] rounded-xl bg-emerald-500/12 text-emerald-700 border border-emerald-500/35 hover:bg-emerald-500/20 text-xs font-bold inline-flex items-center gap-1.5 transition-colors disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                               >
                                 <CheckCircle2 size={14} />
                                 Approve
@@ -1505,7 +1505,7 @@ export default function SuperAdminControl() {
                                 }
                                 disabled={resolvingId === req.id}
                                 aria-label={`Reject request for ${req.email}`}
-                                className="px-3 py-1.5 min-h-[38px] rounded-xl bg-red-500/20 text-red-300 border border-red-400/35 hover:bg-red-500/30 text-xs font-bold inline-flex items-center gap-1.5 transition-colors disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-red-400"
+                                className="px-3 py-1.5 min-h-[38px] rounded-xl bg-red-500/12 text-red-700 border border-red-400/35 hover:bg-red-500/20 text-xs font-bold inline-flex items-center gap-1.5 transition-colors disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-red-400"
                               >
                                 <XCircle size={14} />
                                 Reject
@@ -1523,15 +1523,15 @@ export default function SuperAdminControl() {
             {/* Recent Authorization History Box */}
             <div className="liquid-glass-strong rounded-3xl p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-base font-bold text-white flex items-center gap-2">
-                  <History size={18} className="text-slate-400" />
+                <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                  <History size={18} className="text-slate-600" />
                   Recent Authorization History
                 </h3>
                 {recentRequests.length > 0 && (
                   <button
                     onClick={handleClearAllHistory}
                     aria-label="Clear all authorization history"
-                    className="px-3 py-1.5 min-h-[38px] rounded-xl bg-red-500/15 border border-red-400/30 hover:bg-red-500/25 text-red-300 text-xs font-semibold flex items-center gap-1.5 transition-colors focus:outline-none focus:ring-2 focus:ring-red-400"
+                    className="px-3 py-1.5 min-h-[38px] rounded-xl bg-red-500/12 border border-red-400/35 hover:bg-red-500/20 text-red-700 text-xs font-semibold flex items-center gap-1.5 transition-colors focus:outline-none focus:ring-2 focus:ring-red-400"
                   >
                     <Trash2 size={13} />
                     Clear History
@@ -1540,11 +1540,11 @@ export default function SuperAdminControl() {
               </div>
 
               {recentRequests.length === 0 ? (
-                <div className="text-center py-6 text-slate-400 text-xs">No authorization history recorded yet.</div>
+                <div className="text-center py-6 text-slate-500 text-xs">No authorization history recorded yet.</div>
               ) : (
-                <div className="overflow-x-auto rounded-2xl border border-white/15 bg-white/[0.02]">
+                <div className="overflow-x-auto rounded-2xl border border-slate-900/10 bg-white/55">
                   <table className="w-full text-left text-xs">
-                    <thead className="bg-white/[0.05] text-slate-300 font-semibold border-b border-white/10">
+                    <thead className="bg-slate-900/[0.04] text-slate-700 font-semibold border-b border-slate-900/10">
                       <tr>
                         <th className="py-2.5 px-4">Email</th>
                         <th className="py-2.5 px-4">Outcome</th>
@@ -1553,30 +1553,30 @@ export default function SuperAdminControl() {
                         <th className="py-2.5 px-4 text-right">Action</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-white/10">
+                    <tbody className="divide-y divide-slate-900/10">
                       {recentRequests.map((req) => (
-                        <tr key={req.id} className="hover:bg-white/[0.04] transition-colors">
-                          <td className="py-2.5 px-4 font-medium text-slate-200">{req.email}</td>
+                        <tr key={req.id} className="hover:bg-slate-900/[0.03] transition-colors">
+                          <td className="py-2.5 px-4 font-medium text-slate-900">{req.email}</td>
                           <td className="py-2.5 px-4">
                             <span
                               className={`px-2 py-0.5 rounded text-[11px] font-bold ${
                                 req.status === 'approved'
-                                  ? 'bg-emerald-500/20 text-emerald-300'
+                                  ? 'bg-emerald-500/12 text-emerald-700 border border-emerald-500/30'
                                   : req.status === 'rejected'
-                                  ? 'bg-red-500/20 text-red-300'
-                                  : 'bg-white/10 text-slate-400'
+                                  ? 'bg-red-500/12 text-red-700 border border-red-400/30'
+                                  : 'bg-slate-900/10 text-slate-600'
                               }`}
                             >
                               {req.status}
                             </span>
                           </td>
-                          <td className="py-2.5 px-4 text-slate-400">{req.resolved_by || 'system'}</td>
-                          <td className="py-2.5 px-4 text-slate-400">{formatDate(req.resolved_at || req.requested_at)}</td>
+                          <td className="py-2.5 px-4 text-slate-600">{req.resolved_by || 'system'}</td>
+                          <td className="py-2.5 px-4 text-slate-600">{formatDate(req.resolved_at || req.requested_at)}</td>
                           <td className="py-2.5 px-4 text-right">
                             <button
                               onClick={() => handleDeleteHistoryRecord(req.id)}
                               aria-label={`Remove history record for ${req.email}`}
-                              className="text-slate-400 hover:text-red-400 p-1.5 rounded transition-colors inline-flex items-center"
+                              className="text-slate-500 hover:text-red-600 p-1.5 rounded transition-colors inline-flex items-center"
                               title="Delete record"
                             >
                               <Trash2 size={13} />
@@ -1600,11 +1600,11 @@ export default function SuperAdminControl() {
             <div className="liquid-glass-strong rounded-3xl p-6">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-5">
                 <div>
-                  <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                    <Shield size={20} className="text-cyan-400" />
+                  <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <Shield size={20} className="text-sky-600" />
                     Admin Accounts & Governance
                   </h2>
-                  <p className="text-xs text-slate-400 mt-0.5">
+                  <p className="text-xs text-slate-600 mt-0.5">
                     Manage provisioned admin users, revoke access, change roles, or reset credentials.
                   </p>
                 </div>
@@ -1613,7 +1613,7 @@ export default function SuperAdminControl() {
                   <button
                     onClick={() => setShowAddAdminModal(true)}
                     aria-label="Add new admin"
-                    className="liquid-btn-primary px-3.5 py-2 min-h-[44px] text-xs inline-flex items-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                    className="liquid-btn-primary px-3.5 py-2 min-h-[44px] text-xs inline-flex items-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-sky-500"
                   >
                     <UserPlus size={15} />
                     Add Admin
@@ -1622,7 +1622,7 @@ export default function SuperAdminControl() {
                     onClick={fetchAdmins}
                     disabled={adminsLoading}
                     aria-label="Refresh admin accounts list"
-                    className="liquid-btn-glass px-3.5 py-2 min-h-[44px] text-xs flex items-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                    className="liquid-btn-glass px-3.5 py-2 min-h-[44px] text-xs flex items-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-sky-500"
                   >
                     <RefreshCw size={13} className={adminsLoading ? 'animate-spin' : ''} />
                     Refresh
@@ -1633,7 +1633,7 @@ export default function SuperAdminControl() {
               {/* Search bar */}
               <div className="mb-4">
                 <div className="relative">
-                  <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
                   <input
                     id="search-admins"
                     name="search_admins"
@@ -1648,9 +1648,9 @@ export default function SuperAdminControl() {
               </div>
 
               {/* Admins Table */}
-              <div className="overflow-x-auto rounded-2xl border border-white/15 bg-white/[0.02]">
+              <div className="overflow-x-auto rounded-2xl border border-slate-900/10 bg-white/55">
                 <table className="w-full text-left text-sm">
-                  <thead className="bg-white/[0.05] text-slate-300 text-xs font-semibold uppercase tracking-wider border-b border-white/10">
+                  <thead className="bg-slate-900/[0.04] text-slate-700 text-xs font-semibold uppercase tracking-wider border-b border-slate-900/10">
                     <tr>
                       <th className="py-3 px-4">Admin Email</th>
                       <th className="py-3 px-4">Role</th>
@@ -1659,10 +1659,10 @@ export default function SuperAdminControl() {
                       <th className="py-3 px-4 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/10">
+                  <tbody className="divide-y divide-slate-900/10">
                     {filteredAdmins.length === 0 ? (
                       <tr>
-                        <td colSpan={5} className="py-8 text-center text-slate-400 text-sm">
+                        <td colSpan={5} className="py-8 text-center text-slate-500 text-sm">
                           No admin accounts match your search.
                         </td>
                       </tr>
@@ -1672,29 +1672,29 @@ export default function SuperAdminControl() {
                         const isSuper = admin.is_super_admin || admin.role === 'super_admin';
 
                         return (
-                          <tr key={admin.id} className="hover:bg-white/[0.04] transition-colors">
+                          <tr key={admin.id} className="hover:bg-slate-900/[0.03] transition-colors">
                             <td className="py-3.5 px-4">
-                              <div className="font-semibold text-white flex items-center gap-2">
+                              <div className="font-semibold text-slate-900 flex items-center gap-2">
                                 {admin.email}
                                 {isCurrent && (
-                                  <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-500/20 text-blue-300 border border-blue-400/35">
+                                  <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-500/12 text-blue-700 border border-blue-500/35">
                                     YOU
                                   </span>
                                 )}
                               </div>
-                              <div className="text-[11px] text-slate-400 mt-0.5">
+                              <div className="text-[11px] text-slate-500 mt-0.5">
                                 Added by {admin.added_by || 'system'} • {formatDate(admin.created_at)}
                               </div>
                             </td>
 
                             <td className="py-3.5 px-4">
                               {isSuper ? (
-                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-cyan-500/20 text-cyan-200 border border-cyan-400/35">
+                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-sky-500/12 text-sky-800 border border-sky-500/35">
                                   <Crown size={12} />
                                   Super Admin
                                 </span>
                               ) : (
-                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-500/20 text-blue-300 border border-blue-400/35">
+                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-500/12 text-blue-700 border border-blue-500/35">
                                   <Shield size={12} />
                                   Admin
                                 </span>
@@ -1703,24 +1703,24 @@ export default function SuperAdminControl() {
 
                             <td className="py-3.5 px-4">
                               {admin.status === 'active' ? (
-                                <span className="inline-block px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/35">
+                                <span className="inline-block px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-500/12 text-emerald-700 border border-emerald-500/35">
                                   Active
                                 </span>
                               ) : (
-                                <span className="inline-block px-2 py-0.5 rounded text-[11px] font-bold bg-red-500/20 text-red-300 border border-red-400/35">
+                                <span className="inline-block px-2 py-0.5 rounded text-[11px] font-bold bg-red-500/12 text-red-700 border border-red-400/35">
                                   Revoked / Suspended
                                 </span>
                               )}
                             </td>
 
-                            <td className="py-3.5 px-4 text-xs text-slate-400">
+                            <td className="py-3.5 px-4 text-xs text-slate-600">
                               {formatDate(admin.last_login_at)}
                             </td>
 
                             <td className="py-3.5 px-4 text-right">
                               <div className="flex items-center justify-end gap-1.5">
                                 {isSuper ? (
-                                  <span className="text-xs text-slate-400 italic pr-2">Protected</span>
+                                  <span className="text-xs text-slate-500 italic pr-2">Protected</span>
                                 ) : (
                                   <>
                                     {/* Revoke / Reactivate access */}
@@ -1728,7 +1728,7 @@ export default function SuperAdminControl() {
                                       <button
                                         onClick={() => handleRevokeAdminAccess(admin)}
                                         aria-label={`Revoke access for ${admin.email}`}
-                                        className="px-2.5 py-1.5 rounded-lg bg-red-500/15 border border-red-400/30 text-red-300 hover:bg-red-500/25 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-red-400"
+                                        className="px-2.5 py-1.5 rounded-lg bg-red-500/12 border border-red-400/35 text-red-700 hover:bg-red-500/20 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-red-400"
                                         title="Revoke admin access immediately"
                                       >
                                         Revoke
@@ -1737,7 +1737,7 @@ export default function SuperAdminControl() {
                                       <button
                                         onClick={() => handleReactivateAdminAccess(admin)}
                                         aria-label={`Restore access for ${admin.email}`}
-                                        className="px-2.5 py-1.5 rounded-lg bg-emerald-500/15 border border-emerald-400/30 text-emerald-300 hover:bg-emerald-500/25 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                                        className="px-2.5 py-1.5 rounded-lg bg-emerald-500/12 border border-emerald-500/35 text-emerald-700 hover:bg-emerald-500/20 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500"
                                         title="Restore admin access"
                                       >
                                         Activate
@@ -1751,7 +1751,7 @@ export default function SuperAdminControl() {
                                         setNewResetPassword('');
                                       }}
                                       aria-label={`Reset password for ${admin.email}`}
-                                      className="p-1.5 rounded-lg bg-white/[0.06] border border-white/15 hover:bg-white/15 text-slate-300 hover:text-white transition-colors"
+                                      className="p-1.5 rounded-lg bg-slate-900/[0.04] border border-slate-900/15 hover:bg-slate-900/10 text-slate-700 hover:text-slate-900 transition-colors"
                                       title="Reset Password"
                                     >
                                       <KeyRound size={14} />
@@ -1761,7 +1761,7 @@ export default function SuperAdminControl() {
                                     <button
                                       onClick={() => handleRemoveAdminId(admin)}
                                       aria-label={`Remove admin ID ${admin.email}`}
-                                      className="p-1.5 rounded-lg bg-red-500/15 border border-red-400/30 hover:bg-red-500/25 text-red-300 transition-colors"
+                                      className="p-1.5 rounded-lg bg-red-500/12 border border-red-400/35 hover:bg-red-500/20 text-red-700 transition-colors"
                                       title="Delete Admin Account"
                                     >
                                       <Trash2 size={14} />
@@ -1789,41 +1789,41 @@ export default function SuperAdminControl() {
             {/* Top Stat Cards */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <div className="liquid-glass-card p-5 rounded-2xl flex flex-col justify-between">
-                <div className="flex items-center justify-between text-slate-400 text-xs font-medium">
+                <div className="flex items-center justify-between text-slate-600 text-xs font-medium">
                   <span>Total Registrations</span>
-                  <Users size={16} className="text-blue-400" />
+                  <Users size={16} className="text-blue-600" />
                 </div>
-                <div className="mt-2 text-2xl font-black text-white">
+                <div className="mt-2 text-2xl font-black text-slate-900">
                   {locksLoading ? '—' : lockStats.total}
                 </div>
               </div>
 
               <div className="liquid-glass-card p-5 rounded-2xl flex flex-col justify-between">
-                <div className="flex items-center justify-between text-slate-400 text-xs font-medium">
+                <div className="flex items-center justify-between text-slate-600 text-xs font-medium">
                   <span>1st Year (₹599)</span>
-                  <span className="w-2.5 h-2.5 rounded-full bg-cyan-400" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-sky-500" />
                 </div>
-                <div className="mt-2 text-2xl font-black text-cyan-300">
+                <div className="mt-2 text-2xl font-black text-sky-700">
                   {locksLoading ? '—' : lockStats.firstYearCount}
                 </div>
               </div>
 
               <div className="liquid-glass-card p-5 rounded-2xl flex flex-col justify-between">
-                <div className="flex items-center justify-between text-slate-400 text-xs font-medium">
+                <div className="flex items-center justify-between text-slate-600 text-xs font-medium">
                   <span>2nd Year (₹699)</span>
-                  <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
                 </div>
-                <div className="mt-2 text-2xl font-black text-amber-300">
+                <div className="mt-2 text-2xl font-black text-amber-700">
                   {locksLoading ? '—' : lockStats.secondYearCount}
                 </div>
               </div>
 
               <div className="liquid-glass-card p-5 rounded-2xl flex flex-col justify-between">
-                <div className="flex items-center justify-between text-slate-400 text-xs font-medium">
+                <div className="flex items-center justify-between text-slate-600 text-xs font-medium">
                   <span>Unlocked Records</span>
-                  <Unlock size={16} className="text-emerald-400" />
+                  <Unlock size={16} className="text-emerald-600" />
                 </div>
-                <div className="mt-2 text-2xl font-black text-emerald-300">
+                <div className="mt-2 text-2xl font-black text-emerald-700">
                   {locksLoading ? '—' : lockStats.unlockedCount}
                 </div>
               </div>
@@ -1832,23 +1832,23 @@ export default function SuperAdminControl() {
             {/* Quick Year Registration Gateways Control */}
             <div className="liquid-glass-strong p-4 sm:p-5 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-cyan-500/15 border border-cyan-400/30 text-cyan-300">
+                <div className="p-2.5 rounded-xl bg-sky-500/12 border border-sky-500/35 text-sky-700">
                   <Shield size={20} />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                  <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
                     Public Registration Gateways
-                    <span className="text-[11px] font-normal text-slate-400">(Super Admin Only)</span>
+                    <span className="text-[11px] font-normal text-slate-500">(Super Admin Only)</span>
                   </h3>
                   <div className="flex flex-wrap items-center gap-3 mt-1 text-xs">
-                    <span className="flex items-center gap-1.5 text-slate-300">
-                      <span className={`w-2 h-2 rounded-full ${(yearGateways?.enabled_1st_year ?? true) ? 'bg-cyan-400' : 'bg-rose-400'}`} />
-                      1st Year (₹599): <strong className={(yearGateways?.enabled_1st_year ?? true) ? 'text-cyan-300' : 'text-rose-400'}>{(yearGateways?.enabled_1st_year ?? true) ? 'OPEN' : 'PAUSED'}</strong>
+                    <span className="flex items-center gap-1.5 text-slate-700">
+                      <span className={`w-2 h-2 rounded-full ${(yearGateways?.enabled_1st_year ?? true) ? 'bg-sky-500' : 'bg-rose-500'}`} />
+                      1st Year (₹599): <strong className={(yearGateways?.enabled_1st_year ?? true) ? 'text-sky-700' : 'text-rose-700'}>{(yearGateways?.enabled_1st_year ?? true) ? 'OPEN' : 'PAUSED'}</strong>
                     </span>
-                    <span className="text-slate-600">•</span>
-                    <span className="flex items-center gap-1.5 text-slate-300">
-                      <span className={`w-2 h-2 rounded-full ${(yearGateways?.enabled_2nd_year ?? true) ? 'bg-amber-400' : 'bg-rose-400'}`} />
-                      2nd Year (₹699): <strong className={(yearGateways?.enabled_2nd_year ?? true) ? 'text-amber-300' : 'text-rose-400'}>{(yearGateways?.enabled_2nd_year ?? true) ? 'OPEN' : 'PAUSED'}</strong>
+                    <span className="text-slate-400">•</span>
+                    <span className="flex items-center gap-1.5 text-slate-700">
+                      <span className={`w-2 h-2 rounded-full ${(yearGateways?.enabled_2nd_year ?? true) ? 'bg-amber-500' : 'bg-rose-500'}`} />
+                      2nd Year (₹699): <strong className={(yearGateways?.enabled_2nd_year ?? true) ? 'text-amber-700' : 'text-rose-700'}>{(yearGateways?.enabled_2nd_year ?? true) ? 'OPEN' : 'PAUSED'}</strong>
                     </span>
                   </div>
                 </div>
@@ -1858,10 +1858,10 @@ export default function SuperAdminControl() {
                 <button
                   onClick={() => handleToggleYearGateway('1st Year', !(yearGateways?.enabled_1st_year ?? true))}
                   disabled={yearGatewaysLoading || gatewayToggleLoading === '1st Year'}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all backdrop-blur-md ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all backdrop-blur-md shadow-sm ${
                     (yearGateways?.enabled_1st_year ?? true)
-                      ? 'bg-rose-500/80 hover:bg-rose-500 border border-rose-300/30 text-white'
-                      : 'bg-blue-500/80 hover:bg-blue-500 border border-blue-300/30 text-white'
+                      ? 'bg-rose-600 hover:bg-rose-500 border border-rose-500/40 text-white'
+                      : 'bg-blue-600 hover:bg-blue-500 border border-blue-500/40 text-white'
                   } disabled:opacity-50`}
                 >
                   {gatewayToggleLoading === '1st Year' ? (
@@ -1880,10 +1880,10 @@ export default function SuperAdminControl() {
                 <button
                   onClick={() => handleToggleYearGateway('2nd Year', !(yearGateways?.enabled_2nd_year ?? true))}
                   disabled={yearGatewaysLoading || gatewayToggleLoading === '2nd Year'}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all backdrop-blur-md ${
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all backdrop-blur-md shadow-sm ${
                     (yearGateways?.enabled_2nd_year ?? true)
-                      ? 'bg-rose-500/80 hover:bg-rose-500 border border-rose-300/30 text-white'
-                      : 'bg-amber-500/80 hover:bg-amber-500 border border-amber-300/30 text-black'
+                      ? 'bg-rose-600 hover:bg-rose-500 border border-rose-500/40 text-white'
+                      : 'bg-amber-500 hover:bg-amber-400 border border-amber-400/50 text-slate-950'
                   } disabled:opacity-50`}
                 >
                   {gatewayToggleLoading === '2nd Year' ? (
@@ -1905,11 +1905,11 @@ export default function SuperAdminControl() {
             <div className="liquid-glass-strong rounded-3xl p-6">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-5">
                 <div>
-                  <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                    <Lock size={20} className="text-cyan-400" />
+                  <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <Lock size={20} className="text-sky-600" />
                     Year-Wise Registration Lock Management
                   </h2>
-                  <p className="text-xs text-slate-400 mt-0.5">
+                  <p className="text-xs text-slate-600 mt-0.5">
                     Independently view, unlock, or lock student registrations for 1st Year (₹599) and 2nd Year (₹699).
                   </p>
                 </div>
@@ -1921,7 +1921,7 @@ export default function SuperAdminControl() {
                   }}
                   disabled={locksLoading || auditLoading}
                   aria-label="Refresh registration locks"
-                  className="liquid-btn-glass px-3.5 py-2 min-h-[44px] text-xs flex items-center gap-1.5 self-start md:self-auto focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                  className="liquid-btn-glass px-3.5 py-2 min-h-[44px] text-xs flex items-center gap-1.5 self-start md:self-auto focus:outline-none focus:ring-2 focus:ring-sky-500"
                 >
                   <RefreshCw size={13} className={locksLoading || auditLoading ? 'animate-spin' : ''} />
                   Refresh
@@ -1931,7 +1931,7 @@ export default function SuperAdminControl() {
               {/* Filters */}
               <div className="flex flex-col sm:flex-row gap-3 mb-5">
                 <div className="relative flex-1">
-                  <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
                   <input
                     id="search-locks"
                     name="search_locks"
@@ -1945,16 +1945,16 @@ export default function SuperAdminControl() {
                 </div>
 
                 <div className="flex items-center gap-2 flex-wrap">
-                  <Filter size={16} className="text-slate-400 hidden sm:inline-block" />
+                  <Filter size={16} className="text-slate-500 hidden sm:inline-block" />
                   <select
                     value={locksYearFilter}
                     onChange={(e) => setLocksYearFilter(e.target.value as any)}
                     aria-label="Filter locks by academic year"
                     className="liquid-input px-3 py-2 text-xs font-medium"
                   >
-                    <option value="all" className="bg-[#081022] text-white">All Academic Years</option>
-                    <option value="1st Year" className="bg-[#081022] text-white">1st Year (₹599)</option>
-                    <option value="2nd Year" className="bg-[#081022] text-white">2nd Year (₹699)</option>
+                    <option value="all" className="bg-white text-slate-900">All Academic Years</option>
+                    <option value="1st Year" className="bg-white text-slate-900">1st Year (₹599)</option>
+                    <option value="2nd Year" className="bg-white text-slate-900">2nd Year (₹699)</option>
                   </select>
 
                   <select
@@ -1963,17 +1963,17 @@ export default function SuperAdminControl() {
                     aria-label="Filter locks by lock status"
                     className="liquid-input px-3 py-2 text-xs font-medium"
                   >
-                    <option value="all" className="bg-[#081022] text-white">All Lock Statuses</option>
-                    <option value="locked" className="bg-[#081022] text-white">Locked Only</option>
-                    <option value="unlocked" className="bg-[#081022] text-white">Unlocked Only</option>
+                    <option value="all" className="bg-white text-slate-900">All Lock Statuses</option>
+                    <option value="locked" className="bg-white text-slate-900">Locked Only</option>
+                    <option value="unlocked" className="bg-white text-slate-900">Unlocked Only</option>
                   </select>
                 </div>
               </div>
 
               {/* Table */}
-              <div className="overflow-x-auto rounded-2xl border border-white/15 bg-white/[0.02]">
+              <div className="overflow-x-auto rounded-2xl border border-slate-900/10 bg-white/55">
                 <table className="w-full text-left text-sm">
-                  <thead className="bg-white/[0.05] text-slate-300 text-xs font-semibold uppercase tracking-wider border-b border-white/10">
+                  <thead className="bg-slate-900/[0.04] text-slate-700 text-xs font-semibold uppercase tracking-wider border-b border-slate-900/10">
                     <tr>
                       <th className="py-3 px-4">Student</th>
                       <th className="py-3 px-4">Academic Year</th>
@@ -1983,34 +1983,34 @@ export default function SuperAdminControl() {
                       <th className="py-3 px-4 text-right">Super Admin Action</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/10">
+                  <tbody className="divide-y divide-slate-900/10">
                     {filteredLocks.length === 0 ? (
                       <tr>
-                        <td colSpan={6} className="py-10 text-center text-slate-400 text-sm">
+                        <td colSpan={6} className="py-10 text-center text-slate-500 text-sm">
                           {locksLoading ? 'Loading registration locks...' : 'No registrations found matching the criteria.'}
                         </td>
                       </tr>
                     ) : (
                       filteredLocks.map((item) => (
-                        <tr key={`${item.email}-${item.year}-${item.participant_id}`} className="hover:bg-white/[0.04] transition-colors">
+                        <tr key={`${item.email}-${item.year}-${item.participant_id}`} className="hover:bg-slate-900/[0.03] transition-colors">
                           <td className="py-3 px-4">
-                            <div className="font-semibold text-white text-xs">{item.full_name}</div>
-                            <div className="text-[11px] text-slate-400 font-mono mt-0.5">{item.email}</div>
-                            <div className="text-[11px] text-slate-400 mt-0.5">
-                              Roll: <span className="text-slate-200 font-mono">{item.roll_number || 'N/A'}</span> • {item.branch}
+                            <div className="font-semibold text-slate-900 text-xs">{item.full_name}</div>
+                            <div className="text-[11px] text-slate-500 font-mono mt-0.5">{item.email}</div>
+                            <div className="text-[11px] text-slate-500 mt-0.5">
+                              Roll: <span className="text-slate-800 font-mono">{item.roll_number || 'N/A'}</span> • {item.branch}
                             </div>
                           </td>
                           <td className="py-3 px-4 whitespace-nowrap">
                             <span
                               className={`inline-block px-2 py-0.5 rounded text-[11px] font-bold border ${
                                 item.year === '1st Year'
-                                  ? 'bg-cyan-500/15 text-cyan-300 border-cyan-400/30'
-                                  : 'bg-amber-500/15 text-amber-300 border-amber-400/30'
+                                  ? 'bg-sky-500/12 text-sky-800 border-sky-500/35'
+                                  : 'bg-amber-500/12 text-amber-800 border-amber-500/35'
                               }`}
                             >
                               {item.year}
                             </span>
-                            <div className="text-[10px] text-slate-400 font-mono mt-1">
+                            <div className="text-[10px] text-slate-500 font-mono mt-1">
                               {item.registration_id}
                             </div>
                           </td>
@@ -2018,10 +2018,10 @@ export default function SuperAdminControl() {
                             <span
                               className={`inline-block px-2 py-0.5 rounded text-[11px] font-bold border ${
                                 item.approval_status === 'approved'
-                                  ? 'bg-emerald-500/15 text-emerald-300 border-emerald-400/30'
+                                  ? 'bg-emerald-500/12 text-emerald-700 border-emerald-500/35'
                                   : item.approval_status === 'rejected'
-                                  ? 'bg-red-500/15 text-red-300 border-red-400/30'
-                                  : 'bg-yellow-500/15 text-yellow-300 border-yellow-400/30'
+                                  ? 'bg-red-500/12 text-red-700 border-red-400/35'
+                                  : 'bg-amber-500/12 text-amber-800 border-amber-500/35'
                               }`}
                             >
                               {item.approval_status === 'approved'
@@ -2030,21 +2030,21 @@ export default function SuperAdminControl() {
                                 ? 'Rejected'
                                 : 'Pending Approval'}
                             </span>
-                            <div className="text-[10px] text-slate-400 mt-1">
+                            <div className="text-[10px] text-slate-500 mt-1">
                               {formatDate(item.registered_at)}
                             </div>
                           </td>
                           <td className="py-3 px-4 whitespace-nowrap">
-                            <div className="text-xs font-semibold text-white">
+                            <div className="text-xs font-semibold text-slate-900">
                               ₹{item.payment_amount}
                             </div>
                             <span
                               className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold mt-1 border ${
                                 item.payment_verified || item.payment_status === 'completed'
-                                  ? 'bg-emerald-500/15 text-emerald-300 border-emerald-400/30'
+                                  ? 'bg-emerald-500/12 text-emerald-700 border-emerald-500/35'
                                   : item.payment_id
-                                  ? 'bg-blue-500/15 text-blue-300 border-blue-400/30'
-                                  : 'bg-white/10 text-slate-400 border-white/15'
+                                  ? 'bg-blue-500/12 text-blue-700 border-blue-500/35'
+                                  : 'bg-slate-900/10 text-slate-600 border-slate-900/15'
                               }`}
                             >
                               {item.payment_verified || item.payment_status === 'completed'
@@ -2057,24 +2057,24 @@ export default function SuperAdminControl() {
                           <td className="py-3 px-4 whitespace-nowrap">
                             {item.is_locked ? (
                               <div>
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-bold bg-amber-500/15 text-amber-300 border border-amber-400/30">
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-bold bg-amber-500/12 text-amber-800 border border-amber-500/35">
                                   <Lock size={12} />
                                   Locked
                                 </span>
                                 {item.locked_at && (
-                                  <div className="text-[10px] text-slate-400 mt-0.5" title={item.lock_reason || undefined}>
+                                  <div className="text-[10px] text-slate-500 mt-0.5" title={item.lock_reason || undefined}>
                                     Locked {formatDate(item.locked_at)}
                                   </div>
                                 )}
                               </div>
                             ) : (
                               <div>
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-400/30">
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-500/12 text-emerald-700 border border-emerald-500/35">
                                   <Unlock size={12} />
                                   Unlocked
                                 </span>
                                 {item.unlocked_by && (
-                                  <div className="text-[10px] text-emerald-300/80 mt-0.5" title={item.unlock_reason || undefined}>
+                                  <div className="text-[10px] text-emerald-700 mt-0.5" title={item.unlock_reason || undefined}>
                                     By {item.unlocked_by.split('@')[0]}
                                   </div>
                                 )}
@@ -2091,7 +2091,7 @@ export default function SuperAdminControl() {
                                   })
                                 }
                                 aria-label={`Unlock ${item.year} registration for ${item.email}`}
-                                className="px-3 py-1.5 rounded-lg bg-emerald-500/15 border border-emerald-400/35 text-emerald-300 hover:bg-emerald-500/25 text-xs font-semibold inline-flex items-center gap-1.5 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                                className="px-3 py-1.5 rounded-lg bg-emerald-500/12 border border-emerald-500/35 text-emerald-700 hover:bg-emerald-500/20 text-xs font-semibold inline-flex items-center gap-1.5 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500"
                               >
                                 <Unlock size={13} />
                                 Unlock Year
@@ -2105,7 +2105,7 @@ export default function SuperAdminControl() {
                                   })
                                 }
                                 aria-label={`Re-lock ${item.year} registration for ${item.email}`}
-                                className="px-3 py-1.5 rounded-lg bg-amber-500/15 border border-amber-400/35 text-amber-300 hover:bg-amber-500/25 text-xs font-semibold inline-flex items-center gap-1.5 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400"
+                                className="px-3 py-1.5 rounded-lg bg-amber-500/12 border border-amber-500/35 text-amber-800 hover:bg-amber-500/20 text-xs font-semibold inline-flex items-center gap-1.5 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500"
                               >
                                 <Lock size={13} />
                                 Re-Lock Year
@@ -2124,19 +2124,19 @@ export default function SuperAdminControl() {
             <div className="liquid-glass-strong rounded-3xl p-6">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h3 className="text-base font-bold text-white flex items-center gap-2">
-                    <History size={18} className="text-cyan-400" />
+                  <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                    <History size={18} className="text-sky-600" />
                     Registration Lock Audit Log
                   </h3>
-                  <p className="text-xs text-slate-400 mt-0.5">
+                  <p className="text-xs text-slate-600 mt-0.5">
                     Immutable history of Super Admin unlock and lock actions, reasons, and timestamps.
                   </p>
                 </div>
               </div>
 
-              <div className="overflow-x-auto rounded-2xl border border-white/15 bg-white/[0.02]">
+              <div className="overflow-x-auto rounded-2xl border border-slate-900/10 bg-white/55">
                 <table className="w-full text-left text-sm">
-                  <thead className="bg-white/[0.05] text-slate-300 text-xs font-semibold uppercase tracking-wider border-b border-white/10">
+                  <thead className="bg-slate-900/[0.04] text-slate-700 text-xs font-semibold uppercase tracking-wider border-b border-slate-900/10">
                     <tr>
                       <th className="py-3 px-4">When</th>
                       <th className="py-3 px-4">Super Admin</th>
@@ -2146,10 +2146,10 @@ export default function SuperAdminControl() {
                       <th className="py-3 px-4">Reason / Notes</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/10">
+                  <tbody className="divide-y divide-slate-900/10">
                     {lockAuditLogs.length === 0 ? (
                       <tr>
-                        <td colSpan={6} className="py-8 text-center text-slate-400 text-xs">
+                        <td colSpan={6} className="py-8 text-center text-slate-500 text-xs">
                           {auditLoading ? 'Loading audit history...' : 'No lock or unlock events recorded yet.'}
                         </td>
                       </tr>
@@ -2157,35 +2157,35 @@ export default function SuperAdminControl() {
                       lockAuditLogs.map((log) => {
                         const isUnlock = log.action === 'unlock_registration';
                         return (
-                          <tr key={log.id} className="hover:bg-white/[0.04] transition-colors">
-                            <td className="py-3 px-4 text-xs text-slate-400 whitespace-nowrap">
+                          <tr key={log.id} className="hover:bg-slate-900/[0.03] transition-colors">
+                            <td className="py-3 px-4 text-xs text-slate-500 whitespace-nowrap">
                               {formatDate(log.created_at)}
                             </td>
-                            <td className="py-3 px-4 text-xs text-white font-medium whitespace-nowrap">
+                            <td className="py-3 px-4 text-xs text-slate-900 font-medium whitespace-nowrap">
                               {log.actor_email}
                             </td>
                             <td className="py-3 px-4 whitespace-nowrap">
                               <span
                                 className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-bold border ${
                                   isUnlock
-                                    ? 'bg-emerald-500/15 text-emerald-300 border-emerald-400/30'
-                                    : 'bg-amber-500/15 text-amber-300 border-amber-400/30'
+                                    ? 'bg-emerald-500/12 text-emerald-700 border-emerald-500/35'
+                                    : 'bg-amber-500/12 text-amber-800 border-amber-500/35'
                                 }`}
                               >
                                 {isUnlock ? <Unlock size={11} /> : <Lock size={11} />}
                                 {isUnlock ? 'UNLOCKED' : 'LOCKED'}
                               </span>
                             </td>
-                            <td className="py-3 px-4 text-xs font-mono text-slate-300 whitespace-nowrap">
+                            <td className="py-3 px-4 text-xs font-mono text-slate-700 whitespace-nowrap">
                               {log.details?.email || 'N/A'}
                             </td>
                             <td className="py-3 px-4 whitespace-nowrap">
-                              <span className="text-xs font-bold text-cyan-300">
+                              <span className="text-xs font-bold text-sky-700">
                                 {log.details?.year || 'N/A'}
                               </span>
                             </td>
-                            <td className="py-3 px-4 text-xs text-slate-300 max-w-xs">
-                              <span className="italic text-slate-400">
+                            <td className="py-3 px-4 text-xs text-slate-600 max-w-xs">
+                              <span className="italic text-slate-500">
                                 {log.details?.reason || 'No reason provided'}
                               </span>
                             </td>
@@ -2208,11 +2208,11 @@ export default function SuperAdminControl() {
             <div className="liquid-glass-strong rounded-3xl p-6">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-5">
                 <div>
-                  <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                    <History size={20} className="text-cyan-400" />
+                  <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <History size={20} className="text-sky-600" />
                     Audit & Activity Log
                   </h2>
-                  <p className="text-xs text-slate-400 mt-0.5">
+                  <p className="text-xs text-slate-600 mt-0.5">
                     Comprehensive log of all administrative actions, approvals, revokes, and updates.
                   </p>
                 </div>
@@ -2221,7 +2221,7 @@ export default function SuperAdminControl() {
                   onClick={fetchActivityLogs}
                   disabled={logsLoading}
                   aria-label="Refresh activity logs"
-                  className="liquid-btn-glass px-3.5 py-2 min-h-[44px] text-xs flex items-center gap-1.5 self-start md:self-auto focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                  className="liquid-btn-glass px-3.5 py-2 min-h-[44px] text-xs flex items-center gap-1.5 self-start md:self-auto focus:outline-none focus:ring-2 focus:ring-sky-500"
                 >
                   <RefreshCw size={13} className={logsLoading ? 'animate-spin' : ''} />
                   Refresh
@@ -2231,7 +2231,7 @@ export default function SuperAdminControl() {
               {/* Filters */}
               <div className="flex flex-col sm:flex-row gap-3 mb-5">
                 <div className="relative flex-1">
-                  <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
                   <input
                     id="search-logs"
                     name="search_logs"
@@ -2245,26 +2245,26 @@ export default function SuperAdminControl() {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <Filter size={16} className="text-slate-400" />
+                  <Filter size={16} className="text-slate-500" />
                   <select
                     value={logActionFilter}
                     onChange={(e) => setLogActionFilter(e.target.value)}
                     aria-label="Filter activity logs by category"
                     className="liquid-input px-3 py-2 text-xs font-medium"
                   >
-                    <option value="all" className="bg-[#081022] text-white">All Actions</option>
-                    <option value="approvals" className="bg-[#081022] text-white">Login Approvals & Requests</option>
-                    <option value="admins" className="bg-[#081022] text-white">Admin Management</option>
-                    <option value="participants" className="bg-[#081022] text-white">Participant Actions</option>
-                    <option value="media" className="bg-[#081022] text-white">Media Actions</option>
+                    <option value="all" className="bg-white text-slate-900">All Actions</option>
+                    <option value="approvals" className="bg-white text-slate-900">Login Approvals & Requests</option>
+                    <option value="admins" className="bg-white text-slate-900">Admin Management</option>
+                    <option value="participants" className="bg-white text-slate-900">Participant Actions</option>
+                    <option value="media" className="bg-white text-slate-900">Media Actions</option>
                   </select>
                 </div>
               </div>
 
               {/* Log Table */}
-              <div className="overflow-x-auto rounded-2xl border border-white/15 bg-white/[0.02]">
+              <div className="overflow-x-auto rounded-2xl border border-slate-900/10 bg-white/55">
                 <table className="w-full text-left text-sm">
-                  <thead className="bg-white/[0.05] text-slate-300 text-xs font-semibold uppercase tracking-wider border-b border-white/10">
+                  <thead className="bg-slate-900/[0.04] text-slate-700 text-xs font-semibold uppercase tracking-wider border-b border-slate-900/10">
                     <tr>
                       <th className="py-3 px-4">When</th>
                       <th className="py-3 px-4">Who (Actor)</th>
@@ -2272,10 +2272,10 @@ export default function SuperAdminControl() {
                       <th className="py-3 px-4">Details</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/10">
+                  <tbody className="divide-y divide-slate-900/10">
                     {filteredLogs.length === 0 ? (
                       <tr>
-                        <td colSpan={4} className="py-10 text-center text-slate-400 text-sm">
+                        <td colSpan={4} className="py-10 text-center text-slate-500 text-sm">
                           {logsLoading ? 'Loading activity logs...' : 'No activity logs matching the criteria.'}
                         </td>
                       </tr>
@@ -2289,20 +2289,20 @@ export default function SuperAdminControl() {
                         }
 
                         return (
-                          <tr key={log.id} className="hover:bg-white/[0.04] transition-colors">
-                            <td className="py-3 px-4 text-xs text-slate-400 whitespace-nowrap">
+                          <tr key={log.id} className="hover:bg-slate-900/[0.03] transition-colors">
+                            <td className="py-3 px-4 text-xs text-slate-500 whitespace-nowrap">
                               {formatDate(log.created_at)}
                             </td>
                             <td className="py-3 px-4">
-                              <span className="font-semibold text-white text-xs">{log.actor_email || 'System'}</span>
+                              <span className="font-semibold text-slate-900 text-xs">{log.actor_email || 'System'}</span>
                             </td>
                             <td className="py-3 px-4">
-                              <span className="inline-block px-2 py-0.5 rounded text-[11px] font-bold bg-cyan-500/15 text-cyan-300 border border-cyan-400/30">
+                              <span className="inline-block px-2 py-0.5 rounded text-[11px] font-bold bg-sky-500/12 text-sky-800 border border-sky-500/35">
                                 {log.action}
                               </span>
                             </td>
-                            <td className="py-3 px-4 text-xs text-slate-300 max-w-md">
-                              <div className="truncate font-mono text-[11px] text-slate-400" title={detailsStr}>
+                            <td className="py-3 px-4 text-xs text-slate-600 max-w-md">
+                              <div className="truncate font-mono text-[11px] text-slate-500" title={detailsStr}>
                                 {detailsStr || `${log.entity_type} #${log.entity_id}`}
                               </div>
                             </td>
@@ -2326,31 +2326,31 @@ export default function SuperAdminControl() {
           role="dialog"
           aria-modal="true"
           aria-labelledby="add-admin-title"
-          className="fixed inset-0 z-50 bg-[#030712]/75 backdrop-blur-md flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 bg-slate-950/35 backdrop-blur-md flex items-center justify-center p-4"
         >
           <div className="liquid-glass-strong rounded-3xl max-w-md w-full p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 id="add-admin-title" className="text-base font-bold text-white flex items-center gap-2">
-                <UserPlus size={18} className="text-cyan-400" />
+              <h3 id="add-admin-title" className="text-base font-bold text-slate-900 flex items-center gap-2">
+                <UserPlus size={18} className="text-sky-600" />
                 Provision New Admin
               </h3>
               <button
                 onClick={() => setShowAddAdminModal(false)}
-                className="liquid-icon-bubble !w-8 !h-8 text-slate-300 hover:text-white"
+                className="liquid-icon-bubble !w-8 !h-8 text-slate-600 hover:text-slate-900"
               >
                 <X size={16} />
               </button>
             </div>
 
             {addAdminError && (
-              <div className="mb-4 p-3 rounded-xl bg-red-500/15 border border-red-400/30 text-xs text-red-200">
+              <div className="mb-4 p-3 rounded-xl bg-red-500/12 border border-red-400/35 text-xs text-red-700">
                 {addAdminError}
               </div>
             )}
 
             <form onSubmit={handleAddAdminSubmit} className="space-y-4">
               <div>
-                <label htmlFor="provision-admin-email" className="block text-xs font-semibold text-slate-300 mb-1">Gmail Address</label>
+                <label htmlFor="provision-admin-email" className="block text-xs font-semibold text-slate-700 mb-1">Gmail Address</label>
                 <input
                   id="provision-admin-email"
                   name="email"
@@ -2365,7 +2365,7 @@ export default function SuperAdminControl() {
               </div>
 
               <div>
-                <label htmlFor="provision-admin-password" className="block text-xs font-semibold text-slate-300 mb-1">Password</label>
+                <label htmlFor="provision-admin-password" className="block text-xs font-semibold text-slate-700 mb-1">Password</label>
                 <div className="relative">
                   <input
                     id="provision-admin-password"
@@ -2383,7 +2383,7 @@ export default function SuperAdminControl() {
                     type="button"
                     aria-label={showNewAdminPw ? "Hide password" : "Show password"}
                     onClick={() => setShowNewAdminPw(!showNewAdminPw)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-900"
                   >
                     {showNewAdminPw ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
@@ -2419,29 +2419,29 @@ export default function SuperAdminControl() {
           role="dialog"
           aria-modal="true"
           aria-labelledby="reset-pw-title"
-          className="fixed inset-0 z-50 bg-[#030712]/75 backdrop-blur-md flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 bg-slate-950/35 backdrop-blur-md flex items-center justify-center p-4"
         >
           <div className="liquid-glass-strong rounded-3xl max-w-md w-full p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 id="reset-pw-title" className="text-base font-bold text-white flex items-center gap-2">
-                <KeyRound size={18} className="text-amber-400" />
+              <h3 id="reset-pw-title" className="text-base font-bold text-slate-900 flex items-center gap-2">
+                <KeyRound size={18} className="text-amber-600" />
                 Reset Password
               </h3>
               <button
                 onClick={() => setPasswordResetTarget(null)}
-                className="liquid-icon-bubble !w-8 !h-8 text-slate-300 hover:text-white"
+                className="liquid-icon-bubble !w-8 !h-8 text-slate-600 hover:text-slate-900"
               >
                 <X size={16} />
               </button>
             </div>
 
-            <p className="text-xs text-slate-300 mb-4">
-              Reset password for <span className="font-semibold text-white">{passwordResetTarget.email}</span>. All active sessions for this admin will be revoked immediately.
+            <p className="text-xs text-slate-600 mb-4">
+              Reset password for <span className="font-semibold text-slate-900">{passwordResetTarget.email}</span>. All active sessions for this admin will be revoked immediately.
             </p>
 
             <form onSubmit={handleResetPasswordSubmit} className="space-y-4">
               <div>
-                <label htmlFor="reset-admin-password" className="block text-xs font-semibold text-slate-300 mb-1">New Password</label>
+                <label htmlFor="reset-admin-password" className="block text-xs font-semibold text-slate-700 mb-1">New Password</label>
                 <div className="relative">
                   <input
                     id="reset-admin-password"
@@ -2459,7 +2459,7 @@ export default function SuperAdminControl() {
                     type="button"
                     aria-label={showResetPw ? "Hide password" : "Show password"}
                     onClick={() => setShowResetPw(!showResetPw)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-900"
                   >
                     {showResetPw ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
@@ -2477,7 +2477,7 @@ export default function SuperAdminControl() {
                 <button
                   type="submit"
                   disabled={resetLoading}
-                  className="px-4 py-2 min-h-[44px] rounded-xl text-xs font-bold bg-amber-500 text-black hover:bg-amber-400 disabled:opacity-50"
+                  className="px-4 py-2 min-h-[44px] rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 disabled:opacity-50"
                 >
                   {resetLoading ? 'Resetting...' : 'Update Password'}
                 </button>
@@ -2495,26 +2495,26 @@ export default function SuperAdminControl() {
           role="dialog"
           aria-modal="true"
           aria-labelledby="lock-toggle-modal-title"
-          className="fixed inset-0 z-50 bg-[#030712]/75 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in"
+          className="fixed inset-0 z-50 bg-slate-950/35 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in"
         >
           <div className="liquid-glass-strong rounded-3xl max-w-lg w-full p-6">
-            <div className="flex items-center justify-between mb-4 border-b border-white/10 pb-3">
+            <div className="flex items-center justify-between mb-4 border-b border-slate-900/10 pb-3">
               <div className="flex items-center gap-3">
                 <div
                   className={`w-10 h-10 rounded-xl flex items-center justify-center ${
                     toggleTarget.action === 'unlock'
-                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/35'
-                      : 'bg-amber-500/20 text-amber-300 border border-amber-400/35'
+                      ? 'bg-emerald-500/15 text-emerald-700 border border-emerald-500/35'
+                      : 'bg-amber-500/15 text-amber-700 border border-amber-500/35'
                   }`}
                 >
                   {toggleTarget.action === 'unlock' ? <Unlock size={20} /> : <Lock size={20} />}
                 </div>
                 <div>
-                  <h3 id="lock-toggle-modal-title" className="text-base font-bold text-white">
+                  <h3 id="lock-toggle-modal-title" className="text-base font-bold text-slate-900">
                     {toggleTarget.action === 'unlock' ? 'Unlock Registration' : 'Re-Lock Registration'}
                   </h3>
-                  <p className="text-xs text-slate-400">
-                    Academic Year: <span className="text-cyan-300 font-semibold">{toggleTarget.item.year}</span>
+                  <p className="text-xs text-slate-600">
+                    Academic Year: <span className="text-sky-700 font-semibold">{toggleTarget.item.year}</span>
                   </p>
                 </div>
               </div>
@@ -2525,37 +2525,37 @@ export default function SuperAdminControl() {
                 }}
                 disabled={toggleLoading}
                 aria-label="Close dialog"
-                className="liquid-icon-bubble !w-8 !h-8 text-slate-300 hover:text-white"
+                className="liquid-icon-bubble !w-8 !h-8 text-slate-600 hover:text-slate-900"
               >
                 <X size={16} />
               </button>
             </div>
 
             <div className="space-y-3 mb-5">
-              <div className="p-3.5 rounded-2xl bg-white/[0.04] border border-white/15 text-xs space-y-2">
+              <div className="p-3.5 rounded-2xl bg-slate-900/[0.04] border border-slate-900/10 text-xs space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-slate-400">Student Name:</span>
-                  <span className="text-white font-medium">{toggleTarget.item.full_name}</span>
+                  <span className="text-slate-600">Student Name:</span>
+                  <span className="text-slate-900 font-medium">{toggleTarget.item.full_name}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-slate-400">Email:</span>
-                  <span className="text-white font-mono">{toggleTarget.item.email}</span>
+                  <span className="text-slate-600">Email:</span>
+                  <span className="text-slate-900 font-mono">{toggleTarget.item.email}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-slate-400">Roll Number:</span>
-                  <span className="text-white font-mono">{toggleTarget.item.roll_number || 'N/A'}</span>
+                  <span className="text-slate-600">Roll Number:</span>
+                  <span className="text-slate-900 font-mono">{toggleTarget.item.roll_number || 'N/A'}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-slate-400">Academic Year:</span>
-                  <span className="text-cyan-300 font-semibold">{toggleTarget.item.year}</span>
+                  <span className="text-slate-600">Academic Year:</span>
+                  <span className="text-sky-700 font-semibold">{toggleTarget.item.year}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-slate-400">Registration ID:</span>
-                  <span className="text-white font-mono">{toggleTarget.item.registration_id}</span>
+                  <span className="text-slate-600">Registration ID:</span>
+                  <span className="text-slate-900 font-mono">{toggleTarget.item.registration_id}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-slate-400">Current Lock Status:</span>
-                  <span className={`font-semibold ${toggleTarget.item.is_locked ? 'text-amber-300' : 'text-emerald-300'}`}>
+                  <span className="text-slate-600">Current Lock Status:</span>
+                  <span className={`font-semibold ${toggleTarget.item.is_locked ? 'text-amber-700' : 'text-emerald-700'}`}>
                     {toggleTarget.item.is_locked ? 'Locked' : 'Unlocked'}
                   </span>
                 </div>
@@ -2564,8 +2564,8 @@ export default function SuperAdminControl() {
               <div
                 className={`p-3.5 rounded-2xl text-xs border ${
                   toggleTarget.action === 'unlock'
-                    ? 'bg-emerald-500/15 border-emerald-400/25 text-emerald-200'
-                    : 'bg-amber-500/15 border-amber-400/25 text-amber-200'
+                    ? 'bg-emerald-500/12 border-emerald-500/35 text-emerald-900'
+                    : 'bg-amber-500/12 border-amber-500/35 text-amber-950'
                 }`}
               >
                 {toggleTarget.action === 'unlock' ? (
@@ -2582,7 +2582,7 @@ export default function SuperAdminControl() {
               </div>
 
               <div>
-                <label htmlFor="lock-reason" className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label htmlFor="lock-reason" className="block text-xs font-semibold text-slate-700 mb-1.5">
                   Reason for {toggleTarget.action === 'unlock' ? 'Unlocking' : 'Locking'} (Optional, recorded in audit log)
                 </label>
                 <textarea
@@ -2618,8 +2618,8 @@ export default function SuperAdminControl() {
                 disabled={toggleLoading}
                 className={`px-4 py-2 min-h-[44px] rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 focus:outline-none focus:ring-2 ${
                   toggleTarget.action === 'unlock'
-                    ? 'bg-emerald-500 text-black hover:bg-emerald-400 focus:ring-emerald-400'
-                    : 'bg-amber-500 text-black hover:bg-amber-400 focus:ring-amber-400'
+                    ? 'bg-emerald-600 text-white hover:bg-emerald-500 focus:ring-emerald-400'
+                    : 'bg-amber-500 text-slate-950 hover:bg-amber-400 focus:ring-amber-400'
                 } disabled:opacity-50`}
               >
                 {toggleLoading ? (
@@ -2652,25 +2652,25 @@ export default function SuperAdminControl() {
           role="alertdialog"
           aria-modal="true"
           aria-labelledby="confirm-dialog-title"
-          className="fixed inset-0 z-50 bg-[#030712]/75 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in"
+          className="fixed inset-0 z-50 bg-slate-950/35 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in"
         >
           <div className="liquid-glass-strong rounded-3xl max-w-md w-full p-6">
             <div className="flex items-center gap-3 mb-3">
               <div
                 className={`w-10 h-10 rounded-xl flex items-center justify-center ${
                   confirmDialog.confirmVariant === 'danger'
-                    ? 'bg-red-500/20 text-red-300 border border-red-400/35'
-                    : 'bg-amber-500/20 text-amber-300 border border-amber-400/35'
+                    ? 'bg-red-500/15 text-red-700 border border-red-400/35'
+                    : 'bg-amber-500/15 text-amber-700 border border-amber-500/35'
                 }`}
               >
                 <AlertTriangle size={20} />
               </div>
-              <h3 id="confirm-dialog-title" className="text-base font-bold text-white">
+              <h3 id="confirm-dialog-title" className="text-base font-bold text-slate-900">
                 {confirmDialog.title}
               </h3>
             </div>
 
-            <p className="text-xs text-slate-300 whitespace-pre-line leading-relaxed mb-6">
+            <p className="text-xs text-slate-600 whitespace-pre-line leading-relaxed mb-6">
               {confirmDialog.message}
             </p>
 
@@ -2703,8 +2703,8 @@ export default function SuperAdminControl() {
                 }}
                 className={`px-4 py-2 min-h-[44px] rounded-xl text-xs font-bold transition-colors focus:outline-none focus:ring-2 ${
                   confirmDialog.confirmVariant === 'danger'
-                    ? 'bg-red-500/90 text-white hover:bg-red-500 focus:ring-red-400'
-                    : 'bg-amber-500 text-black hover:bg-amber-400 focus:ring-amber-400'
+                    ? 'bg-red-600 text-white hover:bg-red-500 focus:ring-red-400'
+                    : 'bg-amber-500 text-slate-950 hover:bg-amber-400 focus:ring-amber-400'
                 }`}
               >
                 {confirmWorking ? 'Processing...' : confirmDialog.confirmLabel}

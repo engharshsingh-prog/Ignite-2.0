@@ -130,14 +130,14 @@ export default function SiteFooter() {
     }));
 
     const particleCount = width < 640 ? 16 : 28;
-    const hues = ['34, 211, 238', '56, 189, 248', '139, 92, 246', '165, 243, 252'];
+    const hues = ['14, 165, 233', '6, 182, 212', '99, 102, 241', '2, 132, 199'];
     const particles: GlowParticle[] = Array.from({ length: particleCount }, (_, idx) => ({
       x: Math.random() * Math.max(width, 320),
       y: 80 + Math.random() * Math.max(height - 80, 160),
       r: 1.1 + Math.random() * 2.2,
       vx: (Math.random() - 0.5) * 0.28,
       vy: -0.08 - Math.random() * 0.22,
-      alpha: 0.22 + Math.random() * 0.35,
+      alpha: 0.28 + Math.random() * 0.35,
       hue: hues[idx % hues.length],
       phase: Math.random() * Math.PI * 2,
     }));
@@ -165,8 +165,8 @@ export default function SiteFooter() {
       if (pointerRef.current.active) {
         const { x, y } = pointerRef.current;
         const grad = ctx.createRadialGradient(x, y, 4, x, y, 165);
-        grad.addColorStop(0, 'rgba(103, 232, 249, 0.15)');
-        grad.addColorStop(0.45, 'rgba(56, 189, 248, 0.07)');
+        grad.addColorStop(0, 'rgba(14, 165, 233, 0.2)');
+        grad.addColorStop(0.45, 'rgba(6, 182, 212, 0.1)');
         grad.addColorStop(1, 'rgba(34, 211, 238, 0)');
         ctx.fillStyle = grad;
         ctx.beginPath();
@@ -208,18 +208,18 @@ export default function SiteFooter() {
         }
 
         // Glass bubble rim
-        ctx.strokeStyle = `rgba(165, 243, 252, ${b.alpha})`;
+        ctx.strokeStyle = `rgba(2, 132, 199, ${b.alpha * 1.15})`;
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.arc(bx, b.y, b.r, 0, Math.PI * 2);
         ctx.stroke();
 
         // Inner aqua fill
-        ctx.fillStyle = `rgba(34, 211, 238, ${b.alpha * 0.25})`;
+        ctx.fillStyle = `rgba(34, 211, 238, ${b.alpha * 0.28})`;
         ctx.fill();
 
         // Top-left specular reflection dot
-        ctx.fillStyle = `rgba(255, 255, 255, ${Math.min(b.alpha * 1.9, 0.78)})`;
+        ctx.fillStyle = `rgba(255, 255, 255, ${Math.min(b.alpha * 2.2, 0.92)})`;
         ctx.beginPath();
         ctx.arc(bx - b.r * 0.34, b.y - b.r * 0.34, Math.max(0.8, b.r * 0.26), 0, Math.PI * 2);
         ctx.fill();
@@ -240,8 +240,8 @@ export default function SiteFooter() {
 
         // Primary water ring
         ctx.strokeStyle = r.isClick
-          ? `rgba(165, 243, 252, ${fade})`
-          : `rgba(103, 232, 249, ${fade})`;
+          ? `rgba(2, 132, 199, ${Math.min(fade * 1.15, 0.85)})`
+          : `rgba(6, 182, 212, ${fade * 1.15})`;
         ctx.lineWidth = r.lineWidth * (1 - progress * 0.4);
         ctx.beginPath();
         ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
@@ -249,8 +249,8 @@ export default function SiteFooter() {
 
         // Secondary trailing harmonic ring on click ripples
         if (r.isClick && r.radius > 14) {
-          ctx.strokeStyle = `rgba(255, 255, 255, ${fade * 0.45})`;
-          ctx.lineWidth = 1;
+          ctx.strokeStyle = `rgba(255, 255, 255, ${Math.min(fade * 1.2, 0.9)})`;
+          ctx.lineWidth = 1.2;
           ctx.beginPath();
           ctx.arc(r.x, r.y, r.radius - 11, 0, Math.PI * 2);
           ctx.stroke();
@@ -360,30 +360,30 @@ export default function SiteFooter() {
       <svg className="absolute w-0 h-0 pointer-events-none" aria-hidden="true">
         <defs>
           <linearGradient id="waterWaveBackGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="rgba(59, 130, 246, 0.24)" />
+            <stop offset="0%" stopColor="rgba(56, 189, 248, 0.24)" />
             <stop offset="35%" stopColor="rgba(6, 182, 212, 0.30)" />
-            <stop offset="70%" stopColor="rgba(139, 92, 246, 0.24)" />
-            <stop offset="100%" stopColor="rgba(59, 130, 246, 0.24)" />
+            <stop offset="70%" stopColor="rgba(139, 92, 246, 0.22)" />
+            <stop offset="100%" stopColor="rgba(56, 189, 248, 0.24)" />
           </linearGradient>
 
           <linearGradient id="waterWaveMidGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="rgba(34, 211, 238, 0.26)" />
-            <stop offset="50%" stopColor="rgba(56, 189, 248, 0.34)" />
-            <stop offset="100%" stopColor="rgba(34, 211, 238, 0.26)" />
+            <stop offset="0%" stopColor="rgba(34, 211, 238, 0.28)" />
+            <stop offset="50%" stopColor="rgba(125, 211, 252, 0.38)" />
+            <stop offset="100%" stopColor="rgba(34, 211, 238, 0.28)" />
           </linearGradient>
 
           <linearGradient id="waterWaveFrontGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="rgba(103, 232, 249, 0.34)" />
-            <stop offset="45%" stopColor="rgba(14, 165, 233, 0.22)" />
-            <stop offset="100%" stopColor="rgba(6, 24, 52, 0.65)" />
+            <stop offset="0%" stopColor="rgba(165, 243, 252, 0.56)" />
+            <stop offset="45%" stopColor="rgba(186, 230, 253, 0.68)" />
+            <stop offset="100%" stopColor="rgba(224, 247, 254, 0.90)" />
           </linearGradient>
 
           <linearGradient id="waterCrestStrokeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="rgba(255, 255, 255, 0.15)" />
-            <stop offset="25%" stopColor="rgba(165, 243, 252, 0.72)" />
-            <stop offset="50%" stopColor="rgba(255, 255, 255, 0.85)" />
-            <stop offset="75%" stopColor="rgba(103, 232, 249, 0.7)" />
-            <stop offset="100%" stopColor="rgba(255, 255, 255, 0.15)" />
+            <stop offset="0%" stopColor="rgba(255, 255, 255, 0.7)" />
+            <stop offset="25%" stopColor="rgba(6, 182, 212, 0.75)" />
+            <stop offset="50%" stopColor="rgba(255, 255, 255, 0.98)" />
+            <stop offset="75%" stopColor="rgba(14, 165, 233, 0.75)" />
+            <stop offset="100%" stopColor="rgba(255, 255, 255, 0.7)" />
           </linearGradient>
 
           {/* Subtle liquid water refraction filter for decorative glint layer */}
@@ -460,12 +460,12 @@ export default function SiteFooter() {
       {/* 3. LIQUID GLASS WATER BODY & CAUSTIC REFLECTIONS                   */}
       {/* ================================================================== */}
       <div
-        className="relative px-4 pt-6 pb-12 sm:px-6 text-sm text-slate-200 backdrop-blur-2xl"
+        className="relative px-4 pt-6 pb-12 sm:px-6 text-sm text-slate-700 backdrop-blur-2xl"
         style={{
           background:
-            'linear-gradient(180deg, rgba(6, 24, 52, 0.72) 0%, rgba(7, 36, 72, 0.62) 45%, rgba(4, 15, 36, 0.88) 100%)',
+            'linear-gradient(180deg, rgba(224, 247, 254, 0.86) 0%, rgba(212, 241, 255, 0.78) 48%, rgba(196, 236, 255, 0.92) 100%)',
           boxShadow:
-            'inset 0 1px 0 rgba(165, 243, 252, 0.28), 0 -10px 45px rgba(6, 182, 212, 0.16)',
+            'inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 -10px 40px rgba(14, 165, 233, 0.14)',
         }}
       >
         {/* Underwater Animated Caustic Gradients & Refraction Layer (Non-interactive) */}
@@ -479,7 +479,7 @@ export default function SiteFooter() {
             style={{
               filter: 'url(#liquid-water-refract)',
               background:
-                'radial-gradient(circle, rgba(34, 211, 238, 0.24) 0%, rgba(56, 189, 248, 0.1) 55%, transparent 78%)',
+                'radial-gradient(circle, rgba(34, 211, 238, 0.28) 0%, rgba(56, 189, 248, 0.14) 55%, transparent 78%)',
             }}
           />
           <div
@@ -487,16 +487,16 @@ export default function SiteFooter() {
             style={{
               animationDelay: '-5.5s',
               background:
-                'radial-gradient(circle, rgba(59, 130, 246, 0.24) 0%, rgba(139, 92, 246, 0.14) 52%, transparent 78%)',
+                'radial-gradient(circle, rgba(59, 130, 246, 0.22) 0%, rgba(139, 92, 246, 0.14) 52%, transparent 78%)',
             }}
           />
 
-          {/* Diagonal sweeping liquid glass light streak */}
+          {/* Diagonal sweeping liquid glass pearl light streak */}
           <div
             className="animate-light-streak absolute top-0 bottom-0 w-72 pointer-events-none"
             style={{
               background:
-                'linear-gradient(90deg, transparent 0%, rgba(165, 243, 252, 0.08) 45%, rgba(255, 255, 255, 0.12) 50%, rgba(165, 243, 252, 0.06) 55%, transparent 100%)',
+                'linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.45) 45%, rgba(255, 255, 255, 0.7) 50%, rgba(255, 255, 255, 0.4) 55%, transparent 100%)',
             }}
           />
         </div>
@@ -512,11 +512,11 @@ export default function SiteFooter() {
         {/* 4. FOOTER CONTENT (CRISPLY LAYERED OVER WATER SURFACE)           */}
         {/* ================================================================ */}
         <div className="relative z-10 max-w-7xl mx-auto">
-          <div className="rounded-3xl liquid-glass px-6 py-7 md:px-9 md:py-9 border-cyan-300/20 shadow-[0_20px_60px_rgba(0,0,0,0.45)]">
+          <div className="rounded-3xl liquid-glass px-6 py-7 md:px-9 md:py-9 border-white/85 shadow-[0_20px_54px_rgba(14,165,233,0.16)]">
             {/* Top Brand & Quick Navigation Strip */}
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 pb-6 mb-7 border-b border-cyan-200/15">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 pb-6 mb-7 border-b border-sky-900/10">
               <div className="flex items-center gap-3.5">
-                <div className="w-11 h-11 rounded-2xl liquid-icon-bubble p-0.5 ring-1 ring-cyan-300/40 shrink-0 overflow-hidden">
+                <div className="w-11 h-11 rounded-2xl liquid-icon-bubble p-0.5 ring-1 ring-sky-400/40 shrink-0 overflow-hidden">
                   <img
                     src="/logo.jpg"
                     alt="Ignite 2.O"
@@ -525,17 +525,17 @@ export default function SiteFooter() {
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-display font-black text-2xl tracking-tight text-white">
+                    <span className="font-display font-black text-2xl tracking-tight text-slate-900">
                       Ignite{' '}
-                      <span className="bg-gradient-to-r from-cyan-300 via-sky-300 to-violet-300 bg-clip-text text-transparent">
+                      <span className="bg-gradient-to-r from-cyan-600 via-sky-600 to-violet-600 bg-clip-text text-transparent">
                         2.O
                       </span>
                     </span>
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-cyan-400/15 text-cyan-200 border border-cyan-300/30">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-sky-500/15 text-sky-800 border border-sky-400/35">
                       <Waves size={11} /> Liquid Experience
                     </span>
                   </div>
-                  <p className="text-xs text-cyan-100/70 mt-0.5">
+                  <p className="text-xs text-slate-600 mt-0.5 font-medium">
                     Unified Campus Celebration • Batch 2026
                   </p>
                 </div>
@@ -547,7 +547,7 @@ export default function SiteFooter() {
                   <Link
                     key={nav.to}
                     to={nav.to}
-                    className="px-3.5 py-1.5 rounded-full text-xs font-semibold text-cyan-50/90 hover:text-white bg-white/[0.06] hover:bg-cyan-400/20 border border-white/10 hover:border-cyan-300/45 transition-all hover:-translate-y-0.5 shadow-sm"
+                    className="px-3.5 py-1.5 rounded-full text-xs font-semibold text-slate-800 hover:text-sky-800 bg-white/75 hover:bg-white border border-slate-900/10 hover:border-sky-400/50 transition-all hover:-translate-y-0.5 shadow-sm"
                   >
                     {nav.label}
                   </Link>
@@ -558,45 +558,45 @@ export default function SiteFooter() {
             {/* Main 3-Column Preserved Content Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
               {/* Column 1: Institution */}
-              <div className="p-5 rounded-2xl bg-white/[0.04] border border-white/10 backdrop-blur-md hover:border-cyan-300/30 transition-colors">
+              <div className="p-5 rounded-2xl bg-white/70 border border-white/90 ring-1 ring-slate-900/5 backdrop-blur-md hover:border-sky-300/70 transition-colors shadow-sm">
                 <div className="flex items-center gap-2.5 mb-3">
-                  <div className="w-8 h-8 rounded-full liquid-icon-bubble flex items-center justify-center text-cyan-300">
+                  <div className="w-8 h-8 rounded-full liquid-icon-bubble flex items-center justify-center text-sky-600">
                     <Building2 size={15} />
                   </div>
-                  <p className="text-xs uppercase tracking-widest text-cyan-200/80 font-bold">
+                  <p className="text-xs uppercase tracking-widest text-sky-800 font-bold">
                     Institution
                   </p>
                 </div>
-                <p className="text-white font-semibold leading-relaxed">
+                <p className="text-slate-900 font-semibold leading-relaxed">
                   Engineering Department, Institute of Engineering and Technology
                 </p>
-                <p className="text-cyan-100/70 mt-1.5 leading-relaxed">
+                <p className="text-slate-600 mt-1.5 leading-relaxed">
                   Deen Dayal Upadhyaya Gorakhpur University, Gorakhpur
                 </p>
               </div>
 
               {/* Column 2: Organizers & Social Bubbles */}
-              <div className="p-5 rounded-2xl bg-white/[0.04] border border-white/10 backdrop-blur-md hover:border-cyan-300/30 transition-colors">
+              <div className="p-5 rounded-2xl bg-white/70 border border-white/90 ring-1 ring-slate-900/5 backdrop-blur-md hover:border-sky-300/70 transition-colors shadow-sm">
                 <div className="flex items-center gap-2.5 mb-3">
-                  <div className="w-8 h-8 rounded-full liquid-icon-bubble flex items-center justify-center text-sky-300">
+                  <div className="w-8 h-8 rounded-full liquid-icon-bubble flex items-center justify-center text-blue-600">
                     <Users size={15} />
                   </div>
-                  <p className="text-xs uppercase tracking-widest text-cyan-200/80 font-bold">
+                  <p className="text-xs uppercase tracking-widest text-sky-800 font-bold">
                     Organizers
                   </p>
                 </div>
 
-                <p className="text-slate-100">
+                <p className="text-slate-800">
                   Ignite Team | Tech Team:{' '}
-                  <span className="text-cyan-300 font-semibold">Code Dynamics</span>
+                  <span className="text-sky-700 font-semibold">Code Dynamics</span>
                 </p>
-                <p className="mt-1.5 text-slate-200">
+                <p className="mt-1.5 text-slate-700">
                   Guided by:{' '}
                   <a
                     href="https://teamparadox.in"
                     target="_blank"
                     rel="noreferrer"
-                    className="text-cyan-300 hover:text-white font-semibold hover:underline inline-flex items-center gap-0.5 transition-colors"
+                    className="text-sky-700 hover:text-sky-900 font-semibold hover:underline inline-flex items-center gap-0.5 transition-colors"
                   >
                     Teamparadox.in
                     <ArrowUpRight size={13} />
@@ -604,19 +604,19 @@ export default function SiteFooter() {
                 </p>
 
                 {/* Social Media Icons Inside Circular Glass Bubbles */}
-                <div className="mt-4 pt-3 border-t border-white/10 flex flex-wrap items-center gap-2.5">
-                  <span className="text-xs text-cyan-100/70 mr-1">Event Socials:</span>
+                <div className="mt-4 pt-3 border-t border-slate-900/10 flex flex-wrap items-center gap-2.5">
+                  <span className="text-xs text-slate-600 font-medium mr-1">Event Socials:</span>
                   <a
                     href={instagramLink || 'https://www.instagram.com/theignite2.0/?hl=en'}
                     target="_blank"
                     rel="noreferrer"
                     aria-label="Instagram"
-                    className="group inline-flex items-center gap-2 pr-3 pl-1 py-1 rounded-full liquid-glass-pill hover:border-pink-300/50 transition-all hover:-translate-y-0.5"
+                    className="group inline-flex items-center gap-2 pr-3 pl-1 py-1 rounded-full liquid-glass-pill hover:border-pink-400/60 transition-all hover:-translate-y-0.5"
                   >
-                    <span className="w-7 h-7 rounded-full bg-gradient-to-br from-pink-500/35 to-purple-500/35 border border-pink-300/40 flex items-center justify-center text-pink-200 group-hover:scale-110 transition-transform shadow-inner">
+                    <span className="w-7 h-7 rounded-full bg-gradient-to-br from-pink-500/20 to-purple-500/20 border border-pink-400/40 flex items-center justify-center text-pink-600 group-hover:scale-110 transition-transform shadow-inner">
                       <Instagram size={14} />
                     </span>
-                    <span className="text-xs font-semibold text-pink-200 group-hover:text-white">
+                    <span className="text-xs font-semibold text-pink-700 group-hover:text-pink-900">
                       Instagram
                     </span>
                   </a>
@@ -627,12 +627,12 @@ export default function SiteFooter() {
                       target="_blank"
                       rel="noreferrer"
                       aria-label="WhatsApp"
-                      className="group inline-flex items-center gap-2 pr-3 pl-1 py-1 rounded-full liquid-glass-pill hover:border-emerald-300/50 transition-all hover:-translate-y-0.5"
+                      className="group inline-flex items-center gap-2 pr-3 pl-1 py-1 rounded-full liquid-glass-pill hover:border-emerald-400/60 transition-all hover:-translate-y-0.5"
                     >
-                      <span className="w-7 h-7 rounded-full bg-gradient-to-br from-emerald-500/35 to-cyan-500/35 border border-emerald-300/40 flex items-center justify-center text-emerald-200 group-hover:scale-110 transition-transform shadow-inner">
+                      <span className="w-7 h-7 rounded-full bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-700 group-hover:scale-110 transition-transform shadow-inner">
                         <MessageCircle size={14} />
                       </span>
-                      <span className="text-xs font-semibold text-emerald-200 group-hover:text-white">
+                      <span className="text-xs font-semibold text-emerald-800 group-hover:text-emerald-950">
                         WhatsApp
                       </span>
                     </a>
@@ -641,41 +641,41 @@ export default function SiteFooter() {
               </div>
 
               {/* Column 3: Contact */}
-              <div className="p-5 rounded-2xl bg-white/[0.04] border border-white/10 backdrop-blur-md hover:border-cyan-300/30 transition-colors">
+              <div className="p-5 rounded-2xl bg-white/70 border border-white/90 ring-1 ring-slate-900/5 backdrop-blur-md hover:border-sky-300/70 transition-colors shadow-sm">
                 <div className="flex items-center gap-2.5 mb-3">
-                  <div className="w-8 h-8 rounded-full liquid-icon-bubble flex items-center justify-center text-violet-300">
+                  <div className="w-8 h-8 rounded-full liquid-icon-bubble flex items-center justify-center text-violet-600">
                     <Compass size={15} />
                   </div>
-                  <p className="text-xs uppercase tracking-widest text-cyan-200/80 font-bold">
+                  <p className="text-xs uppercase tracking-widest text-sky-800 font-bold">
                     Contact
                   </p>
                 </div>
 
-                <div className="space-y-1.5 text-slate-200">
+                <div className="space-y-1.5 text-slate-700">
                   <p className="flex flex-wrap items-center gap-1.5">
-                    <span className="text-cyan-100/70">Developer:</span>
+                    <span className="text-slate-600">Developer:</span>
                     <a
                       href="mailto:j74117204@gmail.com"
-                      className="text-cyan-300 hover:text-white transition-colors hover:underline inline-flex items-center gap-1 font-medium"
+                      className="text-sky-700 hover:text-sky-950 transition-colors hover:underline inline-flex items-center gap-1 font-medium"
                     >
                       <Mail size={12} /> j74117204@gmail.com
                     </a>
                   </p>
                   <p className="flex flex-wrap items-center gap-1.5">
-                    <span className="text-cyan-100/70">Support:</span>
+                    <span className="text-slate-600">Support:</span>
                     <a
                       href="mailto:vy502847@gmail.com"
-                      className="text-cyan-300 hover:text-white transition-colors hover:underline inline-flex items-center gap-1 font-medium"
+                      className="text-sky-700 hover:text-sky-950 transition-colors hover:underline inline-flex items-center gap-1 font-medium"
                     >
                       <Mail size={12} /> vy502847@gmail.com
                     </a>
                   </p>
                 </div>
 
-                <p className="mt-3 pt-3 border-t border-white/10 text-xs text-cyan-100/75 leading-relaxed">
+                <p className="mt-3 pt-3 border-t border-slate-900/10 text-xs text-slate-600 leading-relaxed">
                   <a
                     href="mailto:vy502847@gmail.com?subject=Ignite%202.O%20Feedback"
-                    className="text-cyan-300 hover:text-white font-semibold hover:underline"
+                    className="text-sky-700 hover:text-sky-950 font-semibold hover:underline"
                   >
                     Send feedback
                   </a>{' '}
@@ -685,12 +685,12 @@ export default function SiteFooter() {
             </div>
 
             {/* Bottom Copyright Bar */}
-            <div className="mt-7 pt-5 border-t border-cyan-200/15 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs text-cyan-100/70">
+            <div className="mt-7 pt-5 border-t border-sky-900/10 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs text-slate-600">
               <div className="flex flex-wrap items-center gap-2">
-                <p className="font-medium text-white/90">&copy; 2026 Ignite 2.O. All rights reserved.</p>
-                <span className="hidden sm:inline text-cyan-300/40">&bull;</span>
-                <span className="inline-flex items-center gap-1 text-[11px] text-cyan-200/80 bg-cyan-400/10 border border-cyan-300/20 px-2.5 py-0.5 rounded-full">
-                  <Droplets size={11} className="text-cyan-300" />
+                <p className="font-semibold text-slate-900">&copy; 2026 Ignite 2.O. All rights reserved.</p>
+                <span className="hidden sm:inline text-sky-500/50">&bull;</span>
+                <span className="inline-flex items-center gap-1 text-[11px] text-sky-800 bg-sky-500/12 border border-sky-400/30 px-2.5 py-0.5 rounded-full font-semibold">
+                  <Droplets size={11} className="text-sky-600" />
                   Move or click water for ripples
                 </span>
               </div>
@@ -701,10 +701,10 @@ export default function SiteFooter() {
                   href="https://teamparadox.in"
                   target="_blank"
                   rel="noreferrer"
-                  className="text-cyan-300 hover:text-white hover:underline font-semibold inline-flex items-center gap-0.5"
+                  className="text-sky-700 hover:text-sky-950 hover:underline font-semibold inline-flex items-center gap-0.5"
                 >
                   Teamparadox.in
-                  <Sparkles size={11} className="text-cyan-300" />
+                  <Sparkles size={11} className="text-sky-600" />
                 </a>
                 <span>&bull; Designed for a smooth and secure registration experience.</span>
               </p>

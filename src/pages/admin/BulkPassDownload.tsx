@@ -180,18 +180,18 @@ export default function BulkPassDownload() {
   };
 
   return (
-    <div className="min-h-screen text-white pt-24 pb-16">
+    <div className="min-h-screen text-slate-900 pt-24 pb-16">
       <div className="max-w-6xl mx-auto px-4">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div className="flex items-center gap-4">
-            <Link to="/admin" className="liquid-icon-bubble w-10 h-10 rounded-xl text-slate-300 hover:text-white">
+            <Link to="/admin" className="liquid-icon-bubble w-10 h-10 rounded-xl text-slate-700 hover:text-slate-900">
               <ArrowLeft size={20} />
             </Link>
             <div>
-              <h1 className="text-3xl font-black bg-gradient-to-r from-white via-cyan-100 to-blue-200 bg-clip-text text-transparent">
+              <h1 className="text-3xl font-black bg-gradient-to-r from-slate-900 via-sky-700 to-blue-700 bg-clip-text text-transparent">
                 Bulk Pass Download
               </h1>
-              <p className="text-slate-300/80 text-sm">Select participants and download all passes in one ZIP.</p>
+              <p className="text-slate-600 text-sm">Select participants and download all passes in one ZIP.</p>
             </div>
           </div>
           <button
@@ -205,19 +205,19 @@ export default function BulkPassDownload() {
 
         <div className="flex flex-col sm:flex-row gap-3 mb-5">
           <div className="relative flex-1">
-            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-cyan-300/70" />
+            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sky-600" />
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search by name, roll / enrolment no, email, branch..."
-              className="liquid-input w-full rounded-xl pl-10 pr-4 py-3 text-white placeholder-slate-400/60"
+              className="liquid-input w-full rounded-xl pl-10 pr-4 py-3 text-slate-900 placeholder-slate-400"
             />
           </div>
           <button
             type="button"
             onClick={toggleAllFiltered}
             disabled={filtered.length === 0}
-            className="liquid-btn-glass w-full sm:w-auto px-4 py-3 rounded-xl text-slate-100 disabled:opacity-50 inline-flex items-center justify-center gap-2"
+            className="liquid-btn-glass w-full sm:w-auto px-4 py-3 rounded-xl text-slate-800 font-medium disabled:opacity-50 inline-flex items-center justify-center gap-2"
           >
             {allFilteredSelected ? <CheckSquare size={16} /> : <Square size={16} />}
             {allFilteredSelected ? 'Unselect Filtered' : 'Select Filtered'}
@@ -225,14 +225,14 @@ export default function BulkPassDownload() {
         </div>
 
         {error && (
-          <div className="liquid-glass mb-5 rounded-2xl border-red-400/35 p-4 text-sm text-red-200 inline-flex items-start gap-2">
-            <AlertCircle size={16} className="mt-0.5 text-red-300" />
+          <div className="liquid-glass mb-5 rounded-2xl border-red-400/40 bg-red-50/85 p-4 text-sm text-red-700 inline-flex items-start gap-2">
+            <AlertCircle size={16} className="mt-0.5 text-red-600" />
             <span>{error}</span>
           </div>
         )}
 
         {progress && (
-          <p className="mb-5 text-sm text-cyan-200">{progress}</p>
+          <p className="mb-5 text-sm text-sky-700 font-medium">{progress}</p>
         )}
 
         {loading ? (
@@ -242,22 +242,22 @@ export default function BulkPassDownload() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="bg-white/[0.06] border-b border-white/10">
+                  <tr className="bg-slate-900/[0.04] border-b border-slate-900/10">
                     <th className="w-12 px-4 py-3.5" />
-                    <th className="text-left px-4 py-3.5 text-xs font-semibold text-cyan-200/80 uppercase tracking-wider">Participant</th>
-                    <th className="text-left px-4 py-3.5 text-xs font-semibold text-cyan-200/80 uppercase tracking-wider hidden sm:table-cell">Roll / Enrolment No</th>
-                    <th className="text-left px-4 py-3.5 text-xs font-semibold text-cyan-200/80 uppercase tracking-wider hidden md:table-cell">Branch</th>
-                    <th className="text-left px-4 py-3.5 text-xs font-semibold text-cyan-200/80 uppercase tracking-wider hidden md:table-cell">Payment</th>
+                    <th className="text-left px-4 py-3.5 text-xs font-semibold text-sky-800 uppercase tracking-wider">Participant</th>
+                    <th className="text-left px-4 py-3.5 text-xs font-semibold text-sky-800 uppercase tracking-wider hidden sm:table-cell">Roll / Enrolment No</th>
+                    <th className="text-left px-4 py-3.5 text-xs font-semibold text-sky-800 uppercase tracking-wider hidden md:table-cell">Branch</th>
+                    <th className="text-left px-4 py-3.5 text-xs font-semibold text-sky-800 uppercase tracking-wider hidden md:table-cell">Payment</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/10">
+                <tbody className="divide-y divide-slate-900/10">
                   {filtered.map((p) => (
-                    <tr key={p.id} className="hover:bg-white/[0.04] transition-colors">
+                    <tr key={p.id} className="hover:bg-sky-500/[0.04] transition-colors">
                       <td className="px-4 py-3">
                         <button
                           type="button"
                           onClick={() => toggleOne(p.id)}
-                          className="liquid-icon-bubble w-9 h-9 rounded-lg text-cyan-200"
+                          className="liquid-icon-bubble w-9 h-9 rounded-lg text-sky-700"
                           title={selected.has(p.id) ? 'Selected' : 'Select'}
                         >
                           {selected.has(p.id) ? <CheckSquare size={16} /> : <Square size={16} />}
@@ -265,21 +265,21 @@ export default function BulkPassDownload() {
                       </td>
                       <td className="px-4 py-3">
                         <div>
-                          <p className="font-medium text-white text-sm">{p.full_name}</p>
-                          <p className="text-slate-400 text-xs">{p.email}</p>
+                          <p className="font-semibold text-slate-900 text-sm">{p.full_name}</p>
+                          <p className="text-slate-500 text-xs">{p.email}</p>
                         </div>
                       </td>
                       <td className="px-4 py-3 hidden sm:table-cell">
-                        <span className="font-mono text-sm text-cyan-100">{p.roll_number}</span>
+                        <span className="font-mono text-sm text-sky-800">{p.roll_number}</span>
                       </td>
                       <td className="px-4 py-3 hidden md:table-cell">
-                        <span className="liquid-glass-pill px-2.5 py-1 rounded-full text-cyan-200 text-xs font-medium">{p.branch}</span>
+                        <span className="liquid-glass-pill px-2.5 py-1 rounded-full text-sky-800 text-xs font-medium">{p.branch}</span>
                       </td>
                       <td className="px-4 py-3 hidden md:table-cell">
                         {p.payment_verified ? (
-                          <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-400/35 text-emerald-200 text-xs font-semibold">Verified</span>
+                          <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-emerald-500/12 border border-emerald-500/35 text-emerald-700 text-xs font-semibold">Verified</span>
                         ) : (
-                          <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-amber-500/15 border border-amber-400/35 text-amber-200 text-xs font-semibold">Pending</span>
+                          <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-amber-500/12 border border-amber-500/35 text-amber-800 text-xs font-semibold">Pending</span>
                         )}
                       </td>
                     </tr>
@@ -288,7 +288,7 @@ export default function BulkPassDownload() {
               </table>
 
               {filtered.length === 0 && (
-                <div className="text-center py-12 text-slate-400">
+                <div className="text-center py-12 text-slate-500">
                   <p>No participants found</p>
                 </div>
               )}

@@ -410,22 +410,22 @@ export default function ValidationHandler() {
 
   if (!unlocked) {
     return (
-      <div className="min-h-screen text-white pt-24 pb-16 px-4">
+      <div className="min-h-screen text-slate-900 pt-24 pb-16 px-4">
         <div className="max-w-md mx-auto liquid-glass-strong rounded-3xl p-7">
-          <h1 className="text-2xl font-black flex items-center gap-2.5 bg-gradient-to-r from-white via-cyan-100 to-blue-200 bg-clip-text text-transparent">
-            <span className="liquid-icon-bubble w-9 h-9 text-cyan-300 shrink-0"><Shield size={18} /></span>
+          <h1 className="text-2xl font-black flex items-center gap-2.5 bg-gradient-to-r from-slate-900 via-sky-700 to-blue-700 bg-clip-text text-transparent">
+            <span className="liquid-icon-bubble w-9 h-9 text-sky-600 shrink-0"><Shield size={18} /></span>
             Validation Handler
           </h1>
-          <p className="text-sm text-slate-300/80 mt-2">Enter password to access this hidden verification page.</p>
+          <p className="text-sm text-slate-600 mt-2">Enter password to access this hidden verification page.</p>
           <form onSubmit={verifyPassword} className="mt-5 space-y-3.5">
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Access password"
-              className="liquid-input w-full rounded-xl px-3.5 py-2.5 text-white placeholder-slate-400/60"
+              className="liquid-input w-full rounded-xl px-3.5 py-2.5 text-slate-900 placeholder-slate-400"
             />
-            {authError && <p className="text-sm text-red-300">{authError}</p>}
+            {authError && <p className="text-sm text-red-600 font-medium">{authError}</p>}
             <button
               type="submit"
               disabled={authLoading || !password.trim()}
@@ -440,15 +440,15 @@ export default function ValidationHandler() {
   }
 
   return (
-    <div className="min-h-screen text-white pt-24 pb-16 px-4">
+    <div className="min-h-screen text-slate-900 pt-24 pb-16 px-4">
       <div className="max-w-6xl mx-auto">
         <div className="mb-6">
-          <h1 className="text-3xl font-black bg-gradient-to-r from-white via-cyan-100 to-violet-200 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-black bg-gradient-to-r from-slate-900 via-sky-700 to-violet-700 bg-clip-text text-transparent">
             Payment / Check-in Handler
           </h1>
-          <p className="text-sm text-slate-300/80 mt-1">QR scan auto-runs when camera is active. Camera pauses while popup is open.</p>
+          <p className="text-sm text-slate-600 mt-1">QR scan auto-runs when camera is active. Camera pauses while popup is open.</p>
           <div className="mt-3 flex flex-wrap items-center gap-2.5">
-            <span className="liquid-glass-pill px-3 py-1 rounded-full text-xs text-cyan-200">
+            <span className="liquid-glass-pill px-3 py-1 rounded-full text-xs text-sky-800 font-medium">
               {cacheLoading
                 ? 'Loading offline cache...'
                 : cacheRows
@@ -459,36 +459,36 @@ export default function ValidationHandler() {
               type="button"
               onClick={refreshCache}
               disabled={cacheLoading}
-              className="liquid-btn-glass px-3 py-1.5 rounded-lg text-slate-200 text-xs disabled:opacity-50"
+              className="liquid-btn-glass px-3 py-1.5 rounded-lg text-slate-700 text-xs disabled:opacity-50"
             >
               Refresh cache
             </button>
-            {cacheError && <span className="text-xs text-cyan-200">{cacheError}</span>}
+            {cacheError && <span className="text-xs text-sky-700">{cacheError}</span>}
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
           <div className="liquid-glass-card rounded-3xl p-5">
-            <p className="text-sm font-medium text-cyan-100 mb-3 flex items-center gap-2"><Camera size={15} className="text-cyan-300" /> QR Scanner</p>
-            <div className="aspect-video rounded-2xl bg-black/50 border border-white/15 overflow-hidden relative">
+            <p className="text-sm font-semibold text-slate-800 mb-3 flex items-center gap-2"><Camera size={15} className="text-sky-600" /> QR Scanner</p>
+            <div className="aspect-video rounded-2xl bg-slate-900 border border-slate-900/15 overflow-hidden relative">
               {lookupLoading && (
-                <div className="absolute inset-0 bg-black/60 backdrop-blur-sm grid place-items-center z-10">
+                <div className="absolute inset-0 bg-white/85 backdrop-blur-sm grid place-items-center z-10">
                   <LoadingSpinner text="Searching..." />
                 </div>
               )}
               {!cameraReady && !cameraError && (
-                <div className="absolute inset-0 grid place-items-center">
+                <div className="absolute inset-0 bg-white/90 grid place-items-center">
                   <LoadingSpinner text="Starting camera..." />
                 </div>
               )}
               <video ref={videoRef} className="w-full h-full object-cover" muted playsInline />
               <canvas ref={canvasRef} className="hidden" />
             </div>
-            {cameraError && <p className="mt-2.5 text-sm text-amber-200">{cameraError}</p>}
+            {cameraError && <p className="mt-2.5 text-sm text-amber-700 font-medium">{cameraError}</p>}
           </div>
 
           <div className="liquid-glass-card rounded-3xl p-5">
-            <p className="text-sm font-medium text-cyan-100 mb-3 flex items-center gap-2"><Search size={15} className="text-cyan-300" /> Quick Search</p>
+            <p className="text-sm font-semibold text-slate-800 mb-3 flex items-center gap-2"><Search size={15} className="text-sky-600" /> Quick Search</p>
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -500,7 +500,7 @@ export default function ValidationHandler() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search by roll, payment id, email, phone, name"
-                className="liquid-input flex-1 rounded-xl px-3.5 py-2.5 text-white placeholder-slate-400/60"
+                className="liquid-input flex-1 rounded-xl px-3.5 py-2.5 text-slate-900 placeholder-slate-400"
               />
               <button
                 type="submit"
@@ -510,71 +510,71 @@ export default function ValidationHandler() {
                 {lookupLoading ? '...' : 'Find'}
               </button>
             </form>
-            {lookupError && <p className="text-sm text-red-300 mt-2">{lookupError}</p>}
+            {lookupError && <p className="text-sm text-red-600 mt-2 font-medium">{lookupError}</p>}
 
-            <div className="mt-4 max-h-80 overflow-auto divide-y divide-white/10">
+            <div className="mt-4 max-h-80 overflow-auto divide-y divide-slate-900/10">
               {results.map((p) => (
                 <button
                   type="button"
                   key={p.id}
                   onClick={() => setSelected(p)}
-                  className="w-full text-left px-2.5 py-2.5 hover:bg-white/[0.06] rounded-xl transition-colors"
+                  className="w-full text-left px-2.5 py-2.5 hover:bg-sky-500/[0.06] rounded-xl transition-colors"
                 >
-                  <p className="text-sm text-white font-medium">{p.full_name}</p>
-                  <p className="text-xs text-slate-300/75">{p.roll_number} | {p.payment_id}</p>
+                  <p className="text-sm text-slate-900 font-semibold">{p.full_name}</p>
+                  <p className="text-xs text-slate-500">{p.roll_number} | {p.payment_id}</p>
                 </button>
               ))}
-              {!results.length && !lookupLoading && <p className="text-sm text-slate-400 py-3">No results yet.</p>}
+              {!results.length && !lookupLoading && <p className="text-sm text-slate-500 py-3">No results yet.</p>}
             </div>
           </div>
         </div>
       </div>
 
       {selected && (
-        <div className="fixed inset-0 z-50 bg-[#020612]/75 backdrop-blur-md p-4 grid place-items-center">
+        <div className="fixed inset-0 z-50 bg-slate-950/35 backdrop-blur-md p-4 grid place-items-center">
           <div className="liquid-glass-strong w-full max-w-lg rounded-3xl overflow-hidden">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-900/10">
               <div>
-                <h2 className="text-lg font-bold text-white">{selected.full_name}</h2>
-                <p className="text-xs text-cyan-200/75 font-mono">{selected.roll_number}</p>
+                <h2 className="text-lg font-bold text-slate-900">{selected.full_name}</h2>
+                <p className="text-xs text-sky-700 font-mono font-medium">{selected.roll_number}</p>
               </div>
-              <button onClick={() => setSelected(null)} className="liquid-icon-bubble w-8 h-8 rounded-lg text-slate-200 hover:text-white">
+              <button onClick={() => setSelected(null)} className="liquid-icon-bubble w-8 h-8 rounded-lg text-slate-700 hover:text-slate-900">
                 <X size={16} />
               </button>
             </div>
-            <div className="p-6 space-y-3 text-sm">
-              <p><span className="text-slate-400">Branch:</span> {selected.branch}</p>
-              <p><span className="text-slate-400">Year:</span> {selected.year}</p>
-              <p><span className="text-slate-400">Email:</span> {selected.email}</p>
-              <p><span className="text-slate-400">WhatsApp:</span> {selected.whatsapp_number}</p>
-              <p><span className="text-slate-400">Payment ID:</span> <span className="font-mono text-cyan-200">{selected.payment_id}</span></p>
-              <p><span className="text-slate-400">Skills:</span> {selected.skills.join(', ') || '-'}</p>
+            <div className="p-6 space-y-3 text-sm text-slate-800">
+              <p><span className="text-slate-500">Branch:</span> {selected.branch}</p>
+              <p><span className="text-slate-500">Year:</span> {selected.year}</p>
+              <p><span className="text-slate-500">Email:</span> {selected.email}</p>
+              <p><span className="text-slate-500">WhatsApp:</span> {selected.whatsapp_number}</p>
+              <p><span className="text-slate-500">Payment ID:</span> <span className="font-mono text-sky-700 font-semibold">{selected.payment_id}</span></p>
+              <p><span className="text-slate-500">Skills:</span> {selected.skills.join(', ') || '-'}</p>
 
               <div className="pt-2 flex flex-wrap items-center gap-2">
                 {selected.payment_verified ? (
-                  <span className="liquid-glass-pill inline-flex items-center gap-1.5 px-3 py-1 rounded-full border-emerald-400/35 bg-emerald-500/15 text-emerald-200 text-xs font-medium"><CheckCircle2 size={14} /> Payment Verified</span>
+                  <span className="liquid-glass-pill inline-flex items-center gap-1.5 px-3 py-1 rounded-full border-emerald-500/35 bg-emerald-500/12 text-emerald-700 text-xs font-semibold"><CheckCircle2 size={14} /> Payment Verified</span>
                 ) : (
-                  <span className="liquid-glass-pill inline-flex items-center gap-1.5 px-3 py-1 rounded-full border-amber-400/35 bg-amber-500/15 text-amber-200 text-xs font-medium"><XCircle size={14} /> Payment Pending</span>
+                  <span className="liquid-glass-pill inline-flex items-center gap-1.5 px-3 py-1 rounded-full border-amber-500/35 bg-amber-500/12 text-amber-800 text-xs font-semibold"><XCircle size={14} /> Payment Pending</span>
                 )}
                 {selected.check_in_status ? (
-                  <span className="liquid-glass-pill inline-flex items-center gap-1.5 px-3 py-1 rounded-full border-emerald-400/35 bg-emerald-500/15 text-emerald-200 text-xs font-medium"><CheckCircle2 size={14} /> Checked In</span>
+                  <span className="liquid-glass-pill inline-flex items-center gap-1.5 px-3 py-1 rounded-full border-emerald-500/35 bg-emerald-500/12 text-emerald-700 text-xs font-semibold"><CheckCircle2 size={14} /> Checked In</span>
                 ) : (
-                  <span className="liquid-glass-pill inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-slate-300 text-xs font-medium"><QrCode size={14} /> Not Checked In</span>
+                  <span className="liquid-glass-pill inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-slate-600 text-xs font-medium"><QrCode size={14} /> Not Checked In</span>
                 )}
               </div>
             </div>
-            <div className="px-6 py-4 border-t border-white/10 flex flex-wrap gap-2.5">
+            <div className="px-6 py-4 border-t border-slate-900/10 flex flex-wrap gap-2.5">
               <button
                 onClick={() => requestUpdate('payment', !selected.payment_verified)}
                 disabled={updating !== null}
-                className="liquid-btn-glass px-3.5 py-2 rounded-xl border-cyan-400/35 text-cyan-200 text-sm disabled:opacity-50"
+                className="liquid-btn-glass px-3.5 py-2 rounded-xl border-sky-400/40 text-sky-800 font-medium text-sm disabled:opacity-50"
               >
                 {updating === 'payment' ? 'Updating...' : selected.payment_verified ? 'Mark Payment Pending' : 'Mark Payment Verified'}
               </button>
               <button
                 onClick={() => requestUpdate('checkin', !selected.check_in_status)}
                 disabled={updating !== null}
-                className="liquid-btn-glass px-3.5 py-2 rounded-xl border-emerald-400/35 text-emerald-200 text-sm disabled:opacity-50"
+                className="liquid-btn-glass px-3.5 py-2 rounded-xl border-emerald-500/35 text-emerald-700 font-medium text-sm disabled:opacity-50"
               >
                 {updating === 'checkin' ? 'Updating...' : selected.check_in_status ? 'Undo Check-in' : 'Mark Checked In'}
               </button>
@@ -584,23 +584,23 @@ export default function ValidationHandler() {
       )}
 
       {notFoundValue !== null && (
-        <div className="fixed inset-0 z-50 bg-[#020612]/75 backdrop-blur-md p-4 grid place-items-center">
+        <div className="fixed inset-0 z-50 bg-slate-950/35 backdrop-blur-md p-4 grid place-items-center">
           <div className="liquid-glass-strong w-full max-w-md rounded-3xl overflow-hidden">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
-              <h2 className="text-lg font-bold text-white">No such data exists</h2>
-              <button onClick={() => setNotFoundValue(null)} className="liquid-icon-bubble w-8 h-8 rounded-lg text-slate-200 hover:text-white">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-900/10">
+              <h2 className="text-lg font-bold text-slate-900">No such data exists</h2>
+              <button onClick={() => setNotFoundValue(null)} className="liquid-icon-bubble w-8 h-8 rounded-lg text-slate-700 hover:text-slate-900">
                 <X size={16} />
               </button>
             </div>
-            <div className="p-6 text-sm text-slate-300">
+            <div className="p-6 text-sm text-slate-700">
               <p>No matching registration found for:</p>
-              <p className="liquid-glass mt-2 font-mono text-xs text-cyan-200 break-all rounded-xl px-3 py-2">{notFoundValue || '-'}</p>
+              <p className="liquid-glass mt-2 font-mono text-xs text-sky-800 break-all rounded-xl px-3 py-2">{notFoundValue || '-'}</p>
             </div>
-            <div className="px-6 py-4 border-t border-white/10">
+            <div className="px-6 py-4 border-t border-slate-900/10">
               <button
                 type="button"
                 onClick={() => setNotFoundValue(null)}
-                className="liquid-btn-glass w-full px-4 py-2.5 rounded-xl text-slate-100"
+                className="liquid-btn-glass w-full px-4 py-2.5 rounded-xl text-slate-800 font-medium"
               >
                 Close
               </button>
@@ -610,40 +610,40 @@ export default function ValidationHandler() {
       )}
 
       {selected && pendingUpdate && (
-        <div className="fixed inset-0 z-[60] bg-[#020612]/75 backdrop-blur-md p-4 grid place-items-center">
-          <div className="liquid-glass-strong w-full max-w-md rounded-3xl border-cyan-400/30 overflow-hidden">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
-              <h2 className="text-lg font-bold text-cyan-200">Confirm action</h2>
-              <button onClick={() => setPendingUpdate(null)} className="liquid-icon-bubble w-8 h-8 rounded-lg text-slate-200 hover:text-white">
+        <div className="fixed inset-0 z-[60] bg-slate-950/35 backdrop-blur-md p-4 grid place-items-center">
+          <div className="liquid-glass-strong w-full max-w-md rounded-3xl border-sky-400/35 overflow-hidden">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-900/10">
+              <h2 className="text-lg font-bold text-sky-800">Confirm action</h2>
+              <button onClick={() => setPendingUpdate(null)} className="liquid-icon-bubble w-8 h-8 rounded-lg text-slate-700 hover:text-slate-900">
                 <X size={16} />
               </button>
             </div>
-            <div className="p-6 text-sm text-slate-300 space-y-3">
-              <p className="text-slate-200">You are about to change status for:</p>
+            <div className="p-6 text-sm text-slate-700 space-y-3">
+              <p className="text-slate-800">You are about to change status for:</p>
               <div className="liquid-glass rounded-2xl px-4 py-3">
-                <p className="font-semibold text-white">{selected.full_name}</p>
-                <p className="text-xs text-cyan-200/75">{selected.roll_number} • {selected.payment_id}</p>
+                <p className="font-semibold text-slate-900">{selected.full_name}</p>
+                <p className="text-xs text-sky-700">{selected.roll_number} • {selected.payment_id}</p>
               </div>
 
               {pendingUpdate.kind === 'payment' ? (
                 <div className="space-y-1">
-                  <p><span className="text-slate-400">Current payment:</span> {selected.payment_verified ? 'Verified' : 'Pending'}</p>
-                  <p><span className="text-slate-400">New payment:</span> {pendingUpdate.nextValue ? 'Verified' : 'Pending'}</p>
+                  <p><span className="text-slate-500">Current payment:</span> {selected.payment_verified ? 'Verified' : 'Pending'}</p>
+                  <p><span className="text-slate-500">New payment:</span> {pendingUpdate.nextValue ? 'Verified' : 'Pending'}</p>
                 </div>
               ) : (
                 <div className="space-y-1">
-                  <p><span className="text-slate-400">Current check-in:</span> {selected.check_in_status ? 'Checked In' : 'Not Checked In'}</p>
-                  <p><span className="text-slate-400">New check-in:</span> {pendingUpdate.nextValue ? 'Checked In' : 'Not Checked In'}</p>
+                  <p><span className="text-slate-500">Current check-in:</span> {selected.check_in_status ? 'Checked In' : 'Not Checked In'}</p>
+                  <p><span className="text-slate-500">New check-in:</span> {pendingUpdate.nextValue ? 'Checked In' : 'Not Checked In'}</p>
                 </div>
               )}
 
-              <p className="text-xs text-cyan-200/80">This is a confirmation step. Nothing has been changed yet.</p>
+              <p className="text-xs text-sky-700">This is a confirmation step. Nothing has been changed yet.</p>
             </div>
-            <div className="px-6 py-4 border-t border-white/10 flex gap-2.5">
+            <div className="px-6 py-4 border-t border-slate-900/10 flex gap-2.5">
               <button
                 type="button"
                 onClick={() => setPendingUpdate(null)}
-                className="liquid-btn-glass flex-1 px-4 py-2.5 rounded-xl text-slate-200"
+                className="liquid-btn-glass flex-1 px-4 py-2.5 rounded-xl text-slate-700 font-medium"
               >
                 Cancel
               </button>

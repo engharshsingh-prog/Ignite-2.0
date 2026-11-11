@@ -211,17 +211,17 @@ export default function MyProfile() {
   };
 
   return (
-    <div className="min-h-screen text-white pt-24 pb-20 px-4">
+    <div className="min-h-screen text-slate-900 pt-24 pb-20 px-4">
       <div className="max-w-lg mx-auto">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <div className="text-center mb-10">
-            <div className="liquid-icon-bubble w-16 h-16 mx-auto mb-4 text-cyan-300 shadow-[0_0_24px_rgba(34,211,238,0.22)]">
+            <div className="liquid-icon-bubble w-16 h-16 mx-auto mb-4 text-sky-600 shadow-[0_8px_24px_rgba(14,165,233,0.16)]">
               <User size={28} />
             </div>
-            <h1 className="text-4xl font-black mb-2 bg-gradient-to-r from-white via-cyan-100 to-violet-300 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-black mb-2 bg-gradient-to-r from-slate-900 via-sky-700 to-violet-700 bg-clip-text text-transparent">
               My Profile
             </h1>
-            <p className="text-slate-300/80 text-sm sm:text-base">
+            <p className="text-slate-600 text-sm sm:text-base">
               Enter your email, roll number/enrolment number, and WhatsApp number to view your registration.
             </p>
           </div>
@@ -229,46 +229,46 @@ export default function MyProfile() {
           <form onSubmit={handleLookup} className="liquid-glass-strong rounded-3xl p-6 sm:p-7 mb-6">
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-200 mb-1.5">Email Address</label>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">Email Address</label>
                 <div className="relative">
-                  <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-cyan-300/70" />
+                  <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sky-600" />
                   <input
                     type="email"
                     value={email}
                     onChange={e => setEmail(e.target.value)}
                     placeholder="yourname@example.com"
-                    className="liquid-input w-full rounded-xl pl-10 pr-4 py-3 text-white placeholder-slate-400/60"
+                    className="liquid-input w-full rounded-xl pl-10 pr-4 py-3 text-slate-900 placeholder-slate-400"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-200 mb-1.5">Roll Number/Enrolment Number</label>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">Roll Number/Enrolment Number</label>
                 <div className="relative">
-                  <Hash size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-cyan-300/70" />
+                  <Hash size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sky-600" />
                   <input
                     value={rollNumber}
                     onChange={e => setRollNumber(e.target.value)}
                     placeholder="Roll number or enrolment number (under 15 chars)"
                     maxLength={15}
-                    className="liquid-input w-full rounded-xl pl-10 pr-4 py-3 text-white placeholder-slate-400/60"
+                    className="liquid-input w-full rounded-xl pl-10 pr-4 py-3 text-slate-900 placeholder-slate-400"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-200 mb-1.5">WhatsApp Number</label>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">WhatsApp Number</label>
                 <div className="relative">
-                  <Phone size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-cyan-300/70" />
+                  <Phone size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sky-600" />
                   <input
                     value={whatsappNumber}
                     onChange={e => setWhatsappNumber(e.target.value)}
                     placeholder="10-digit WhatsApp number"
                     maxLength={10}
-                    className="liquid-input w-full rounded-xl pl-10 pr-4 py-3 text-white placeholder-slate-400/60"
+                    className="liquid-input w-full rounded-xl pl-10 pr-4 py-3 text-slate-900 placeholder-slate-400"
                   />
                 </div>
               </div>
             </div>
-            {error && <p className="text-red-300 text-sm mt-3">{error}</p>}
+            {error && <p className="text-red-600 text-sm mt-3 font-medium">{error}</p>}
             <button
               type="submit"
               disabled={loading}
@@ -281,80 +281,80 @@ export default function MyProfile() {
           {participant && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
               className="liquid-glass-strong rounded-3xl overflow-hidden">
-              <div className="bg-gradient-to-r from-cyan-500/75 via-blue-600/80 to-violet-600/75 backdrop-blur-md border-b border-white/15 p-6">
+              <div className="bg-gradient-to-r from-cyan-500 via-blue-600 to-violet-600 backdrop-blur-md border-b border-white/25 p-6">
                 <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md border border-white/35 flex items-center justify-center text-2xl font-black text-white shadow-lg">
+                  <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md border border-white/40 flex items-center justify-center text-2xl font-black text-white shadow-lg">
                     {participant.full_name.charAt(0)}
                   </div>
                   <div>
                     <h2 className="text-xl font-black text-white">{participant.full_name}</h2>
-                    <p className="text-cyan-100/90 text-sm">{participant.roll_number} | {participant.branch}</p>
+                    <p className="text-cyan-50/90 text-sm">{participant.roll_number} | {participant.branch}</p>
                   </div>
                 </div>
               </div>
               <div className="p-6 space-y-4">
-                <div className="flex items-center justify-between py-3 border-b border-white/10">
-                  <span className="text-slate-400 text-sm">Payment Status</span>
+                <div className="flex items-center justify-between py-3 border-b border-slate-900/10">
+                  <span className="text-slate-500 text-sm">Payment Status</span>
                   <div className="flex items-center gap-2">
                     {participant.payment_verified ? (
-                      <><CheckCircle size={18} className="text-emerald-300" /><span className="text-emerald-300 font-semibold">Verified</span></>
+                      <><CheckCircle size={18} className="text-emerald-600" /><span className="text-emerald-700 font-semibold">Verified</span></>
                     ) : (
-                      <><AlertCircle size={18} className="text-amber-300" /><span className="text-amber-300 font-semibold">Pending Verification</span></>
+                      <><AlertCircle size={18} className="text-amber-600" /><span className="text-amber-700 font-semibold">Pending Verification</span></>
                     )}
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between py-3 border-b border-white/10">
-                  <span className="text-slate-400 text-sm">Check-in Status</span>
+                <div className="flex items-center justify-between py-3 border-b border-slate-900/10">
+                  <span className="text-slate-500 text-sm">Check-in Status</span>
                   <div className="flex items-center gap-2">
                     {participant.check_in_status ? (
-                      <><CheckCircle size={18} className="text-emerald-300" /><span className="text-emerald-300 font-semibold">Checked In</span></>
+                      <><CheckCircle size={18} className="text-emerald-600" /><span className="text-emerald-700 font-semibold">Checked In</span></>
                     ) : (
-                      <><XCircle size={18} className="text-slate-400" /><span className="text-slate-300">Not Yet</span></>
+                      <><XCircle size={18} className="text-slate-400" /><span className="text-slate-600">Not Yet</span></>
                     )}
                   </div>
                 </div>
                 {participant.check_in_time && (
-                  <div className="flex justify-between py-3 border-b border-white/10">
-                    <span className="text-slate-400 text-sm">Check-in Time</span>
-                    <span className="text-white text-sm">{new Date(participant.check_in_time).toLocaleTimeString()}</span>
+                  <div className="flex justify-between py-3 border-b border-slate-900/10">
+                    <span className="text-slate-500 text-sm">Check-in Time</span>
+                    <span className="text-slate-900 text-sm font-medium">{new Date(participant.check_in_time).toLocaleTimeString()}</span>
                   </div>
                 )}
-                <div className="flex justify-between py-3 border-b border-white/10 gap-3">
-                  <span className="text-slate-400 text-sm">Email</span>
-                  <span className="text-white text-sm text-right break-all">{participant.email}</span>
+                <div className="flex justify-between py-3 border-b border-slate-900/10 gap-3">
+                  <span className="text-slate-500 text-sm">Email</span>
+                  <span className="text-slate-900 text-sm text-right break-all font-medium">{participant.email}</span>
                 </div>
-                <div className="flex justify-between py-3 border-b border-white/10 gap-3">
-                  <span className="text-slate-400 text-sm">Year</span>
-                  <span className="text-white text-sm text-right">{participant.year}</span>
+                <div className="flex justify-between py-3 border-b border-slate-900/10 gap-3">
+                  <span className="text-slate-500 text-sm">Year</span>
+                  <span className="text-slate-900 text-sm text-right font-medium">{participant.year}</span>
                 </div>
-                <div className="flex justify-between py-3 border-b border-white/10 gap-3">
-                  <span className="text-slate-400 text-sm">Skills</span>
-                  <span className="text-white text-sm text-right">{Array.isArray(participant.skills) ? participant.skills.join(', ') : ''}</span>
+                <div className="flex justify-between py-3 border-b border-slate-900/10 gap-3">
+                  <span className="text-slate-500 text-sm">Skills</span>
+                  <span className="text-slate-900 text-sm text-right font-medium">{Array.isArray(participant.skills) ? participant.skills.join(', ') : ''}</span>
                 </div>
-                <div className="flex justify-between py-3 border-b border-white/10 gap-3">
-                  <span className="text-slate-400 text-sm">Payment ID</span>
-                  <span className="text-cyan-200 font-mono text-sm text-right">{participant.payment_id}</span>
+                <div className="flex justify-between py-3 border-b border-slate-900/10 gap-3">
+                  <span className="text-slate-500 text-sm">Payment ID</span>
+                  <span className="text-sky-700 font-mono text-sm text-right font-semibold">{participant.payment_id}</span>
                 </div>
-                <div className="flex justify-between py-3 border-b border-white/10 gap-3">
-                  <span className="text-slate-400 text-sm">WhatsApp</span>
-                  <span className="text-white text-sm text-right">{participant.whatsapp_number}</span>
+                <div className="flex justify-between py-3 border-b border-slate-900/10 gap-3">
+                  <span className="text-slate-500 text-sm">WhatsApp</span>
+                  <span className="text-slate-900 text-sm text-right font-medium">{participant.whatsapp_number}</span>
                 </div>
-                <div className="flex justify-between py-3 border-b border-white/10">
-                  <span className="text-slate-400 text-sm">Registered On</span>
-                  <span className="text-white text-sm">{new Date(participant.registered_at).toLocaleDateString()}</span>
+                <div className="flex justify-between py-3 border-b border-slate-900/10">
+                  <span className="text-slate-500 text-sm">Registered On</span>
+                  <span className="text-slate-900 text-sm font-medium">{new Date(participant.registered_at).toLocaleDateString()}</span>
                 </div>
 
-                <div className="mt-2 pt-4 border-t border-white/10">
-                  <p className="text-cyan-100 text-sm font-medium mb-3 flex items-center gap-2"><QrCode size={15} className="text-cyan-300" /> Registration QR</p>
+                <div className="mt-2 pt-4 border-t border-slate-900/10">
+                  <p className="text-slate-800 text-sm font-semibold mb-3 flex items-center gap-2"><QrCode size={15} className="text-sky-600" /> Registration QR</p>
                   <div className="liquid-glass rounded-2xl p-4">
-                    <img src={qrImageUrl} alt="Registration QR" className="w-52 h-52 mx-auto rounded-xl bg-white p-2 shadow-lg" />
+                    <img src={qrImageUrl} alt="Registration QR" className="w-52 h-52 mx-auto rounded-xl bg-white p-2 shadow-md border border-slate-900/10" />
                     <div className="mt-4 flex gap-2.5">
                       <button
                         type="button"
                         onClick={downloadQr}
                         disabled={qrBusy !== null}
-                        className="liquid-btn-glass flex-1 px-3 py-2.5 rounded-xl border-cyan-400/35 text-cyan-200 text-sm disabled:opacity-50 inline-flex items-center justify-center gap-1.5"
+                        className="liquid-btn-glass flex-1 px-3 py-2.5 rounded-xl border-sky-400/35 text-sky-800 text-sm font-medium disabled:opacity-50 inline-flex items-center justify-center gap-1.5"
                       >
                         <Download size={14} /> {qrBusy === 'download' ? 'Downloading...' : 'Download QR'}
                       </button>
@@ -362,7 +362,7 @@ export default function MyProfile() {
                         type="button"
                         onClick={shareQr}
                         disabled={qrBusy !== null}
-                        className="liquid-btn-glass flex-1 px-3 py-2.5 rounded-xl border-violet-400/35 text-violet-200 text-sm disabled:opacity-50 inline-flex items-center justify-center gap-1.5"
+                        className="liquid-btn-glass flex-1 px-3 py-2.5 rounded-xl border-violet-400/35 text-violet-800 text-sm font-medium disabled:opacity-50 inline-flex items-center justify-center gap-1.5"
                       >
                         <Share2 size={14} /> {qrBusy === 'share' ? 'Sharing...' : 'Share QR'}
                       </button>
@@ -370,7 +370,7 @@ export default function MyProfile() {
                   </div>
                 </div>
 
-                <div className="mt-2 pt-4 border-t border-white/10">
+                <div className="mt-2 pt-4 border-t border-slate-900/10">
                   {participant.payment_verified ? (
                     <button
                       type="button"
@@ -381,13 +381,13 @@ export default function MyProfile() {
                       <FileDown size={16} /> {pdfBusy ? 'Generating Pass...' : 'Download Event Pass'}
                     </button>
                   ) : (
-                    <div className="liquid-glass rounded-2xl border-cyan-400/30 p-4">
-                      <p className="text-cyan-100 text-sm leading-relaxed">
+                    <div className="liquid-glass rounded-2xl border-sky-300/40 p-4">
+                      <p className="text-slate-700 text-sm leading-relaxed">
                         {settings.supportNote}
                       </p>
                       <Link
                         to="/management-team"
-                        className="liquid-btn-glass mt-3 inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border-emerald-400/35 text-emerald-200 text-sm"
+                        className="liquid-btn-glass mt-3 inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border-emerald-500/30 text-emerald-700 font-medium text-sm"
                       >
                         <Users size={14} /> Contact Management Team
                       </Link>
@@ -395,7 +395,7 @@ export default function MyProfile() {
                   )}
                 </div>
 
-                {actionMessage && <p className="text-xs text-slate-300">{actionMessage}</p>}
+                {actionMessage && <p className="text-xs text-slate-600">{actionMessage}</p>}
               </div>
             </motion.div>
           )}

@@ -13,7 +13,7 @@ export default function WinnerAvatar({
   src,
   name,
   className = 'w-12 h-12 rounded-full object-cover',
-  fallbackClassName = 'w-12 h-12 rounded-full bg-gradient-to-br from-[#3b82f6] to-[#718044] flex items-center justify-center font-bold text-white',
+  fallbackClassName = 'w-12 h-12 rounded-full bg-gradient-to-br from-blue-600 via-cyan-500 to-violet-600 flex items-center justify-center font-bold text-white shadow-md',
   textSize = 'text-base',
 }: WinnerAvatarProps) {
   const [loadFailed, setLoadFailed] = useState(false);

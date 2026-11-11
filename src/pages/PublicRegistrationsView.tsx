@@ -170,7 +170,7 @@ export default function PublicRegistrationsView() {
 
   if (loading) {
     return (
-      <div className="min-h-screen text-white pt-24 px-4">
+      <div className="min-h-screen text-slate-900 pt-24 px-4">
         <LoadingSpinner text="Loading shared registrations..." />
       </div>
     );
@@ -178,9 +178,9 @@ export default function PublicRegistrationsView() {
 
   if (error) {
     return (
-      <div className="min-h-screen text-white pt-24 px-4">
-        <div className="liquid-glass-strong max-w-3xl mx-auto p-6 rounded-2xl border-red-400/35 text-red-200">
-          <p className="font-semibold flex items-center gap-2"><ShieldAlert size={18} className="text-red-300" /> Access unavailable</p>
+      <div className="min-h-screen text-slate-900 pt-24 px-4">
+        <div className="liquid-glass-strong max-w-3xl mx-auto p-6 rounded-2xl border-red-400/40 bg-red-50/80 text-red-700">
+          <p className="font-semibold flex items-center gap-2"><ShieldAlert size={18} className="text-red-600" /> Access unavailable</p>
           <p className="mt-2 text-sm">{error}</p>
         </div>
       </div>
@@ -188,26 +188,26 @@ export default function PublicRegistrationsView() {
   }
 
   return (
-    <div className="min-h-screen text-white pt-24 pb-20 px-4">
+    <div className="min-h-screen text-slate-900 pt-24 pb-20 px-4">
       <div className="max-w-7xl mx-auto">
         <div className="mb-6">
-          <h1 className="text-3xl font-black bg-gradient-to-r from-white via-cyan-100 to-violet-200 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-black bg-gradient-to-r from-slate-900 via-sky-700 to-violet-700 bg-clip-text text-transparent">
             Registration Records (View Only)
           </h1>
-          <p className="text-slate-300/80 text-sm mt-1">Private shared page. No edit actions are available.</p>
+          <p className="text-slate-600 text-sm mt-1">Private shared page. No edit actions are available.</p>
         </div>
 
         <div className="liquid-glass-card rounded-2xl p-4 sm:p-5 mb-5">
           <div className="flex items-center justify-between gap-3 mb-3">
-            <p className="text-sm text-cyan-100 flex items-center gap-2">
-              <Filter size={15} className="text-cyan-300" /> Filters (AND conditions)
+            <p className="text-sm text-slate-800 font-medium flex items-center gap-2">
+              <Filter size={15} className="text-sky-600" /> Filters (AND conditions)
             </p>
             <div className="flex items-center gap-2">
               {!!filters.length && (
                 <button
                   type="button"
                   onClick={() => setFilters([])}
-                  className="liquid-btn-glass px-3 py-1.5 text-xs rounded-lg text-slate-200"
+                  className="liquid-btn-glass px-3 py-1.5 text-xs rounded-lg text-slate-700"
                 >
                   Clear
                 </button>
@@ -215,7 +215,7 @@ export default function PublicRegistrationsView() {
               <button
                 type="button"
                 onClick={addFilter}
-                className="liquid-btn-glass px-3 py-1.5 text-xs rounded-lg border-cyan-400/40 text-cyan-200 inline-flex items-center gap-1.5"
+                className="liquid-btn-glass px-3 py-1.5 text-xs rounded-lg border-sky-400/40 text-sky-800 inline-flex items-center gap-1.5 font-medium"
               >
                 <Plus size={13} /> Add filter
               </button>
@@ -230,10 +230,10 @@ export default function PublicRegistrationsView() {
                   <select
                     value={f.field}
                     onChange={(e) => updateFilter(f.id, { field: e.target.value as FilterField })}
-                    className="liquid-input rounded-xl px-3 py-2 text-sm text-white"
+                    className="liquid-input rounded-xl px-3 py-2 text-sm text-slate-900"
                   >
                     {FIELD_OPTIONS.map((opt) => (
-                      <option key={opt.key} value={opt.key} className="bg-[#081022] text-white">
+                      <option key={opt.key} value={opt.key} className="bg-white text-slate-900">
                         {opt.label}
                       </option>
                     ))}
@@ -242,17 +242,17 @@ export default function PublicRegistrationsView() {
                   <select
                     value={f.operator}
                     onChange={(e) => updateFilter(f.id, { operator: e.target.value as Operator })}
-                    className="liquid-input rounded-xl px-3 py-2 text-sm text-white"
+                    className="liquid-input rounded-xl px-3 py-2 text-sm text-slate-900"
                   >
                     {(kind === 'bool' ? BOOL_OPERATORS : TEXT_OPERATORS).map((opt) => (
-                      <option key={opt.key} value={opt.key} className="bg-[#081022] text-white">
+                      <option key={opt.key} value={opt.key} className="bg-white text-slate-900">
                         {opt.label}
                       </option>
                     ))}
                   </select>
 
                   {kind === 'bool' ? (
-                    <div className="liquid-glass rounded-xl px-3 py-2 text-sm text-slate-300">
+                    <div className="liquid-glass rounded-xl px-3 py-2 text-sm text-slate-500">
                       No value needed
                     </div>
                   ) : (
@@ -260,14 +260,14 @@ export default function PublicRegistrationsView() {
                       value={f.value}
                       onChange={(e) => updateFilter(f.id, { value: e.target.value })}
                       placeholder="Value"
-                      className="liquid-input rounded-xl px-3 py-2 text-sm text-white placeholder-slate-400/60"
+                      className="liquid-input rounded-xl px-3 py-2 text-sm text-slate-900 placeholder-slate-400"
                     />
                   )}
 
                   <button
                     type="button"
                     onClick={() => removeFilter(f.id)}
-                    className="px-3 py-2 text-sm rounded-xl bg-red-500/15 border border-red-400/35 text-red-200 hover:bg-red-500/25 inline-flex items-center justify-center transition-colors"
+                    className="px-3 py-2 text-sm rounded-xl bg-red-500/12 border border-red-400/35 text-red-700 hover:bg-red-500/20 inline-flex items-center justify-center transition-colors"
                   >
                     <X size={14} />
                   </button>
@@ -281,33 +281,33 @@ export default function PublicRegistrationsView() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="bg-white/[0.06] border-b border-white/10">
-                  <th className="text-left px-4 py-3.5 text-xs font-semibold text-cyan-200/80 uppercase tracking-wider">Name</th>
-                  <th className="text-left px-4 py-3.5 text-xs font-semibold text-cyan-200/80 uppercase tracking-wider">Roll / Enrolment No</th>
-                  <th className="text-left px-4 py-3.5 text-xs font-semibold text-cyan-200/80 uppercase tracking-wider">Branch</th>
-                  <th className="text-left px-4 py-3.5 text-xs font-semibold text-cyan-200/80 uppercase tracking-wider">Year</th>
-                  <th className="text-left px-4 py-3.5 text-xs font-semibold text-cyan-200/80 uppercase tracking-wider">Email</th>
-                  <th className="text-left px-4 py-3.5 text-xs font-semibold text-cyan-200/80 uppercase tracking-wider">WhatsApp</th>
-                  <th className="text-left px-4 py-3.5 text-xs font-semibold text-cyan-200/80 uppercase tracking-wider">Skills</th>
-                  <th className="text-left px-4 py-3.5 text-xs font-semibold text-cyan-200/80 uppercase tracking-wider">Payment ID</th>
-                  <th className="text-left px-4 py-3.5 text-xs font-semibold text-cyan-200/80 uppercase tracking-wider">Payment</th>
-                  <th className="text-left px-4 py-3.5 text-xs font-semibold text-cyan-200/80 uppercase tracking-wider">Check-in</th>
-                  <th className="text-left px-4 py-3.5 text-xs font-semibold text-cyan-200/80 uppercase tracking-wider">QR</th>
+                <tr className="bg-slate-900/[0.04] border-b border-slate-900/10">
+                  <th className="text-left px-4 py-3.5 text-xs font-semibold text-sky-800 uppercase tracking-wider">Name</th>
+                  <th className="text-left px-4 py-3.5 text-xs font-semibold text-sky-800 uppercase tracking-wider">Roll / Enrolment No</th>
+                  <th className="text-left px-4 py-3.5 text-xs font-semibold text-sky-800 uppercase tracking-wider">Branch</th>
+                  <th className="text-left px-4 py-3.5 text-xs font-semibold text-sky-800 uppercase tracking-wider">Year</th>
+                  <th className="text-left px-4 py-3.5 text-xs font-semibold text-sky-800 uppercase tracking-wider">Email</th>
+                  <th className="text-left px-4 py-3.5 text-xs font-semibold text-sky-800 uppercase tracking-wider">WhatsApp</th>
+                  <th className="text-left px-4 py-3.5 text-xs font-semibold text-sky-800 uppercase tracking-wider">Skills</th>
+                  <th className="text-left px-4 py-3.5 text-xs font-semibold text-sky-800 uppercase tracking-wider">Payment ID</th>
+                  <th className="text-left px-4 py-3.5 text-xs font-semibold text-sky-800 uppercase tracking-wider">Payment</th>
+                  <th className="text-left px-4 py-3.5 text-xs font-semibold text-sky-800 uppercase tracking-wider">Check-in</th>
+                  <th className="text-left px-4 py-3.5 text-xs font-semibold text-sky-800 uppercase tracking-wider">QR</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/10">
+              <tbody className="divide-y divide-slate-900/10">
                 {filteredRows.map((p) => (
-                  <tr key={p.id} className="hover:bg-white/[0.04] transition-colors">
-                    <td className="px-4 py-3 text-sm text-white font-medium">{p.full_name}</td>
-                    <td className="px-4 py-3 text-sm text-cyan-100/90 font-mono">{p.roll_number}</td>
-                    <td className="px-4 py-3 text-sm text-slate-200/85">{p.branch}</td>
-                    <td className="px-4 py-3 text-sm text-slate-200/85">{p.year}</td>
-                    <td className="px-4 py-3 text-sm text-slate-200/85">{p.email}</td>
-                    <td className="px-4 py-3 text-sm text-slate-200/85">{p.whatsapp_number}</td>
-                    <td className="px-4 py-3 text-sm text-slate-200/85">{p.skills.join(', ') || '-'}</td>
-                    <td className="px-4 py-3 text-sm text-slate-200/85 font-mono">{p.payment_id}</td>
-                    <td className="px-4 py-3 text-sm">{p.payment_verified ? <span className="text-emerald-300 font-medium">Verified</span> : <span className="text-amber-300 font-medium">Pending</span>}</td>
-                    <td className="px-4 py-3 text-sm">{p.check_in_status ? <span className="text-emerald-300 font-medium">Checked In</span> : <span className="text-slate-400">Not Checked In</span>}</td>
+                  <tr key={p.id} className="hover:bg-sky-500/[0.04] transition-colors">
+                    <td className="px-4 py-3 text-sm text-slate-900 font-semibold">{p.full_name}</td>
+                    <td className="px-4 py-3 text-sm text-sky-800 font-mono">{p.roll_number}</td>
+                    <td className="px-4 py-3 text-sm text-slate-700">{p.branch}</td>
+                    <td className="px-4 py-3 text-sm text-slate-700">{p.year}</td>
+                    <td className="px-4 py-3 text-sm text-slate-700">{p.email}</td>
+                    <td className="px-4 py-3 text-sm text-slate-700">{p.whatsapp_number}</td>
+                    <td className="px-4 py-3 text-sm text-slate-700">{p.skills.join(', ') || '-'}</td>
+                    <td className="px-4 py-3 text-sm text-slate-700 font-mono">{p.payment_id}</td>
+                    <td className="px-4 py-3 text-sm">{p.payment_verified ? <span className="text-emerald-700 font-semibold">Verified</span> : <span className="text-amber-700 font-semibold">Pending</span>}</td>
+                    <td className="px-4 py-3 text-sm">{p.check_in_status ? <span className="text-emerald-700 font-semibold">Checked In</span> : <span className="text-slate-500">Not Checked In</span>}</td>
                     <td className="px-4 py-3 text-sm">
                       <button
                         onClick={() =>
@@ -322,7 +322,7 @@ export default function PublicRegistrationsView() {
                             }),
                           })
                         }
-                        className="liquid-btn-glass px-2.5 py-1.5 rounded-lg border-violet-400/35 text-violet-200 inline-flex items-center gap-1.5 text-xs"
+                        className="liquid-btn-glass px-2.5 py-1.5 rounded-lg border-violet-400/35 text-violet-700 font-medium inline-flex items-center gap-1.5 text-xs"
                       >
                         <QrCode size={13} /> QR
                       </button>
@@ -334,8 +334,8 @@ export default function PublicRegistrationsView() {
           </div>
 
           {filteredRows.length === 0 && (
-            <div className="text-center py-12 text-slate-400">
-              <Users size={32} className="mx-auto mb-3 opacity-50 text-cyan-300" />
+            <div className="text-center py-12 text-slate-500">
+              <Users size={32} className="mx-auto mb-3 opacity-60 text-sky-600" />
               <p>{rows.length === 0 ? 'No registrations found.' : 'No records match current filters.'}</p>
             </div>
           )}
@@ -343,11 +343,11 @@ export default function PublicRegistrationsView() {
       </div>
 
       {qrModal && (
-        <div className="fixed inset-0 bg-[#020612]/75 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-slate-950/35 backdrop-blur-md z-50 flex items-center justify-center p-4">
           <div className="liquid-glass-strong w-full max-w-sm rounded-3xl overflow-hidden">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
-              <h3 className="text-base font-bold text-white">{qrModal.title}</h3>
-              <button onClick={() => setQrModal(null)} className="liquid-icon-bubble w-8 h-8 rounded-lg text-slate-200 hover:text-white">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-900/10">
+              <h3 className="text-base font-bold text-slate-900">{qrModal.title}</h3>
+              <button onClick={() => setQrModal(null)} className="liquid-icon-bubble w-8 h-8 rounded-lg text-slate-700 hover:text-slate-900">
                 <X size={16} />
               </button>
             </div>
@@ -355,9 +355,9 @@ export default function PublicRegistrationsView() {
               <img
                 src={`https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=${encodeURIComponent(qrModal.value)}`}
                 alt="QR Code"
-                className="w-64 h-64 mx-auto rounded-xl bg-white p-2 shadow-lg"
+                className="w-64 h-64 mx-auto rounded-xl bg-white p-2 shadow-md border border-slate-900/10"
               />
-              <p className="mt-3 text-xs text-slate-300/80 break-all">{qrModal.value}</p>
+              <p className="mt-3 text-xs text-slate-600 break-all">{qrModal.value}</p>
             </div>
           </div>
         </div>

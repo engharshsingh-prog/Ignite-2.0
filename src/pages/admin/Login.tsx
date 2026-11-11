@@ -148,10 +148,10 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 pt-24 pb-16 relative">
+    <div className="min-h-screen text-slate-900 flex items-center justify-center px-4 pt-24 pb-16 relative">
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-1/3 left-1/3 w-96 h-96 bg-cyan-500/15 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/3 right-1/3 w-80 h-80 bg-violet-500/15 rounded-full blur-3xl" />
+        <div className="absolute top-1/3 left-1/3 w-96 h-96 bg-cyan-400/12 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/3 right-1/3 w-80 h-80 bg-violet-400/12 rounded-full blur-3xl" />
       </div>
 
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="relative w-full max-w-md">
@@ -163,53 +163,53 @@ export default function AdminLogin() {
               <div className="relative w-20 h-20 mx-auto mb-6 flex items-center justify-center">
                 {pollStatus === 'pending' && (
                   <>
-                    <div className="absolute inset-0 rounded-full border-2 border-cyan-400/40 border-t-cyan-300 animate-spin" />
-                    <div className="liquid-icon-bubble w-14 h-14 text-cyan-300">
+                    <div className="absolute inset-0 rounded-full border-2 border-sky-400/40 border-t-sky-600 animate-spin" />
+                    <div className="liquid-icon-bubble w-14 h-14 text-sky-600">
                       <Clock size={28} />
                     </div>
                   </>
                 )}
                 {pollStatus === 'approved' && (
-                  <div className="w-16 h-16 rounded-full bg-emerald-500/20 border border-emerald-400/50 backdrop-blur-md flex items-center justify-center text-emerald-300 shadow-[0_0_24px_rgba(52,211,153,0.25)]">
+                  <div className="w-16 h-16 rounded-full bg-emerald-500/15 border border-emerald-500/40 backdrop-blur-md flex items-center justify-center text-emerald-600 shadow-[0_8px_24px_rgba(16,185,129,0.2)]">
                     <CheckCircle2 size={36} />
                   </div>
                 )}
                 {(pollStatus === 'rejected' || pollStatus === 'expired') && (
-                  <div className="w-16 h-16 rounded-full bg-red-500/20 border border-red-400/50 backdrop-blur-md flex items-center justify-center text-red-300 shadow-[0_0_24px_rgba(248,113,113,0.25)]">
+                  <div className="w-16 h-16 rounded-full bg-red-500/15 border border-red-500/40 backdrop-blur-md flex items-center justify-center text-red-600 shadow-[0_8px_24px_rgba(239,68,68,0.2)]">
                     <XCircle size={36} />
                   </div>
                 )}
               </div>
 
-              <h2 className="text-2xl font-black text-white mb-2">
+              <h2 className="text-2xl font-black text-slate-900 mb-2">
                 {pollStatus === 'pending' && 'Awaiting Approval'}
                 {pollStatus === 'approved' && 'Login Approved!'}
                 {pollStatus === 'rejected' && 'Access Rejected'}
                 {pollStatus === 'expired' && 'Request Expired'}
               </h2>
 
-              <p className="text-sm text-slate-300/90 max-w-sm mx-auto mb-4 leading-relaxed">
+              <p className="text-sm text-slate-600 max-w-sm mx-auto mb-4 leading-relaxed">
                 {pollMessage}
               </p>
 
               <div className="liquid-glass rounded-2xl p-4 text-left text-xs space-y-2 mb-6">
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Account:</span>
-                  <span className="text-white font-mono font-medium">{pendingRequest.email}</span>
+                  <span className="text-slate-500">Account:</span>
+                  <span className="text-slate-900 font-mono font-semibold">{pendingRequest.email}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Status:</span>
+                  <span className="text-slate-500">Status:</span>
                   <span className={`font-semibold capitalize ${
-                    pollStatus === 'pending' ? 'text-amber-300 flex items-center gap-1' :
-                    pollStatus === 'approved' ? 'text-emerald-300' : 'text-red-300'
+                    pollStatus === 'pending' ? 'text-amber-700 flex items-center gap-1' :
+                    pollStatus === 'approved' ? 'text-emerald-700' : 'text-red-700'
                   }`}>
                     {pollStatus === 'pending' && <RefreshCw size={11} className="animate-spin inline" />}
                     {pollStatus}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Request ID:</span>
-                  <span className="text-slate-400/80 font-mono text-[10px]">{pendingRequest.requestId.slice(0, 12)}...</span>
+                  <span className="text-slate-500">Request ID:</span>
+                  <span className="text-slate-600 font-mono text-[10px]">{pendingRequest.requestId.slice(0, 12)}...</span>
                 </div>
               </div>
 
@@ -217,7 +217,7 @@ export default function AdminLogin() {
                 <button
                   type="button"
                   onClick={handleCancelRequest}
-                  className="liquid-btn-glass w-full py-3 rounded-xl text-slate-200 hover:text-white text-sm font-semibold"
+                  className="liquid-btn-glass w-full py-3 rounded-xl text-slate-800 hover:text-slate-900 text-sm font-semibold"
                 >
                   Cancel Request
                 </button>
@@ -235,25 +235,25 @@ export default function AdminLogin() {
             /* STANDARD LOGIN FORM */
             <>
               <div className="text-center mb-8">
-                <div className="liquid-icon-bubble w-16 h-16 rounded-2xl mx-auto mb-4 text-cyan-200 shadow-[0_0_28px_rgba(34,211,238,0.28)]">
+                <div className="liquid-icon-bubble w-16 h-16 rounded-2xl mx-auto mb-4 text-sky-600 shadow-[0_8px_24px_rgba(14,165,233,0.18)]">
                   <Shield size={28} />
                 </div>
-                <h1 className="text-2xl font-black bg-gradient-to-r from-white via-cyan-100 to-blue-200 bg-clip-text text-transparent">
+                <h1 className="text-2xl font-black bg-gradient-to-r from-slate-900 via-sky-700 to-blue-700 bg-clip-text text-transparent">
                   Admin Access
                 </h1>
-                <p className="text-slate-300/80 text-sm mt-1">Ignite 2.O Control Panel</p>
+                <p className="text-slate-600 text-sm mt-1">Ignite 2.O Control Panel</p>
               </div>
 
               {error && (
-                <div className="flex items-center gap-3 p-3.5 rounded-xl bg-red-500/15 border border-red-400/35 backdrop-blur-md text-red-200 mb-5">
-                  <AlertCircle size={16} className="shrink-0 text-red-300" />
-                  <p className="text-sm">{error}</p>
+                <div className="flex items-center gap-3 p-3.5 rounded-xl bg-red-50/90 border border-red-300/70 backdrop-blur-md text-red-700 mb-5">
+                  <AlertCircle size={16} className="shrink-0 text-red-600" />
+                  <p className="text-sm font-medium">{error}</p>
                 </div>
               )}
 
               <form onSubmit={handleLogin} className="space-y-4">
                 <div>
-                  <label htmlFor="admin-email" className="block text-sm font-medium text-slate-200 mb-1.5">Email</label>
+                  <label htmlFor="admin-email" className="block text-sm font-medium text-slate-700 mb-1.5">Email</label>
                   <input
                     id="admin-email"
                     name="email"
@@ -263,11 +263,11 @@ export default function AdminLogin() {
                     onChange={e => setEmail(e.target.value)}
                     placeholder="name@example.com"
                     required
-                    className="liquid-input w-full rounded-xl px-4 py-3 text-white placeholder-slate-400/60"
+                    className="liquid-input w-full rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400"
                   />
                 </div>
                 <div>
-                  <label htmlFor="admin-password" className="block text-sm font-medium text-slate-200 mb-1.5">Password</label>
+                  <label htmlFor="admin-password" className="block text-sm font-medium text-slate-700 mb-1.5">Password</label>
                   <div className="relative">
                     <input
                       id="admin-password"
@@ -278,13 +278,13 @@ export default function AdminLogin() {
                       onChange={e => setPassword(e.target.value)}
                       placeholder="••••••••••••"
                       required
-                      className="liquid-input w-full rounded-xl px-4 py-3 pr-12 text-white placeholder-slate-400/60"
+                      className="liquid-input w-full rounded-xl px-4 py-3 pr-12 text-slate-900 placeholder-slate-400"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPw(!showPw)}
                       aria-label={showPw ? 'Hide password' : 'Show password'}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-cyan-200 transition-colors"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-sky-700 transition-colors"
                     >
                       {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
@@ -299,7 +299,7 @@ export default function AdminLogin() {
                 </button>
               </form>
 
-              <p className="text-center text-slate-400/80 text-xs mt-6">
+              <p className="text-center text-slate-500 text-xs mt-6">
                 First-time admin logins require Super Admin approval. Once approved, subsequent logins are direct.
               </p>
             </>

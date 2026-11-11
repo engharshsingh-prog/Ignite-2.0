@@ -197,42 +197,42 @@ export default function AdminManager() {
   };
 
   return (
-    <div className="min-h-screen text-white">
+    <div className="min-h-screen text-slate-900">
       {/* HEADER */}
-      <header className="border-b border-white/10 bg-[#060d1f]/75 backdrop-blur-2xl sticky top-0 z-40">
+      <header className="border-b border-slate-900/10 bg-white/80 backdrop-blur-2xl sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="liquid-icon-bubble w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400/35 to-blue-600/35 font-black">
-              <Users size={20} className="text-cyan-200" />
+            <div className="liquid-icon-bubble w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500/20 to-blue-600/20 font-black">
+              <Users size={20} className="text-sky-600" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-lg font-bold text-white">Admin Governance</h1>
-                <span className="liquid-glass-pill px-2.5 py-0.5 rounded-full text-[11px] font-bold text-cyan-200 border-cyan-400/35">
+                <h1 className="text-lg font-bold text-slate-900">Admin Governance</h1>
+                <span className="liquid-glass-pill px-2.5 py-0.5 rounded-full text-[11px] font-bold text-sky-800 border-sky-400/40">
                   Super Admin Exclusive
                 </span>
               </div>
-              <p className="text-xs text-slate-300/75">Manage Portal Administrators & Access Roles</p>
+              <p className="text-xs text-slate-500">Manage Portal Administrators & Access Roles</p>
             </div>
           </div>
 
           <div className="flex items-center gap-2 flex-wrap">
             <Link
               to="/admin/control"
-              className="liquid-btn-glass px-3.5 py-2 rounded-xl text-xs font-semibold border-cyan-400/35 text-cyan-200 flex items-center gap-1.5"
+              className="liquid-btn-glass px-3.5 py-2 rounded-xl text-xs font-semibold border-sky-400/40 text-sky-800 flex items-center gap-1.5"
             >
               <ShieldAlert size={14} />
               Control Center
             </Link>
             <Link
               to="/admin"
-              className="liquid-btn-glass px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-200"
+              className="liquid-btn-glass px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700"
             >
               Dashboard
             </Link>
             <button
               onClick={handleSignOut}
-              className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-red-500/15 border border-red-400/35 text-red-200 hover:bg-red-500/25 transition-colors flex items-center gap-1.5"
+              className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-red-500/12 border border-red-400/35 text-red-700 hover:bg-red-500/20 transition-colors flex items-center gap-1.5"
             >
               <LogOut size={14} />
               Sign Out
@@ -244,10 +244,10 @@ export default function AdminManager() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         {actionMessage && (
           <div
-            className={`liquid-glass p-4 rounded-2xl mb-6 text-sm flex items-center justify-between ${
+            className={`liquid-glass p-4 rounded-2xl mb-6 text-sm flex items-center justify-between font-medium ${
               actionMessage.type === 'success'
-                ? 'border-emerald-400/35 text-emerald-200'
-                : 'border-red-400/35 text-red-200'
+                ? 'border-emerald-500/35 bg-emerald-50/85 text-emerald-800'
+                : 'border-red-400/35 bg-red-50/85 text-red-700'
             }`}
           >
             <span>{actionMessage.text}</span>
@@ -263,8 +263,8 @@ export default function AdminManager() {
         {/* ACTION BAR */}
         <div className="liquid-glass-strong flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-3xl p-5 mb-6">
           <div>
-            <h2 className="text-base font-bold text-white">Administrator Accounts</h2>
-            <p className="text-xs text-slate-300/80">
+            <h2 className="text-base font-bold text-slate-900">Administrator Accounts</h2>
+            <p className="text-xs text-slate-600">
               Only Super Admins can add, suspend, reactivate, or remove admin portal users.
             </p>
           </div>
@@ -273,7 +273,7 @@ export default function AdminManager() {
             <button
               onClick={fetchAdmins}
               disabled={loading}
-              className="liquid-btn-glass px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 flex items-center gap-1.5"
+              className="liquid-btn-glass px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-700 flex items-center gap-1.5"
             >
               <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
               Refresh
@@ -295,7 +295,7 @@ export default function AdminManager() {
         <div className="liquid-glass-strong rounded-3xl overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-white/[0.06] text-cyan-200/80 border-b border-white/10">
+              <thead className="bg-slate-900/[0.04] text-sky-800 border-b border-slate-900/10">
                 <tr>
                   <th className="py-3.5 px-4 font-semibold">Admin Account</th>
                   <th className="py-3.5 px-4 font-semibold">Role</th>
@@ -306,31 +306,31 @@ export default function AdminManager() {
                   <th className="py-3.5 px-4 font-semibold text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/10">
+              <tbody className="divide-y divide-slate-900/10">
                 {admins.map((adm) => (
-                  <tr key={adm.id} className="hover:bg-white/[0.04] transition-colors">
+                  <tr key={adm.id} className="hover:bg-sky-500/[0.04] transition-colors">
                     <td className="py-3.5 px-4">
                       <div className="flex items-center gap-2.5">
                         <div
                           className={`liquid-icon-bubble w-7 h-7 rounded-lg font-bold text-[11px] ${
                             adm.is_super_admin
-                              ? 'border-cyan-400/40 text-cyan-200'
-                              : 'border-violet-400/35 text-violet-200'
+                              ? 'border-sky-400/40 text-sky-700'
+                              : 'border-violet-400/40 text-violet-700'
                           }`}
                         >
                           {adm.is_super_admin ? <ShieldAlert size={14} /> : <Shield size={14} />}
                         </div>
-                        <span className="font-bold text-white text-sm">{adm.email}</span>
+                        <span className="font-bold text-slate-900 text-sm">{adm.email}</span>
                       </div>
                     </td>
 
                     <td className="py-3.5 px-4">
                       {adm.is_super_admin ? (
-                        <span className="liquid-glass-pill px-2.5 py-0.5 rounded-full text-[10px] font-black text-cyan-200 border-cyan-400/40">
+                        <span className="liquid-glass-pill px-2.5 py-0.5 rounded-full text-[10px] font-black text-sky-800 border-sky-400/40">
                           SUPER ADMIN
                         </span>
                       ) : (
-                        <span className="liquid-glass-pill px-2.5 py-0.5 rounded-full text-[10px] font-bold text-violet-200 border-violet-400/40">
+                        <span className="liquid-glass-pill px-2.5 py-0.5 rounded-full text-[10px] font-bold text-violet-700 border-violet-400/40">
                           ADMIN
                         </span>
                       )}
@@ -341,19 +341,19 @@ export default function AdminManager() {
                         <span
                           className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${
                             adm.status === 'active'
-                              ? 'bg-emerald-500/15 text-emerald-200 border-emerald-400/35'
-                              : 'bg-red-500/15 text-red-200 border-red-400/35'
+                              ? 'bg-emerald-500/12 text-emerald-700 border-emerald-500/35'
+                              : 'bg-red-500/12 text-red-700 border-red-400/35'
                           }`}
                         >
                           {adm.status.toUpperCase()}
                         </span>
                         {!adm.is_super_admin && (
                           adm.is_approved ? (
-                            <span className="px-2 py-0.5 rounded-full text-[9px] font-semibold bg-emerald-500/10 text-emerald-200 border border-emerald-400/30 flex items-center gap-1">
+                            <span className="px-2 py-0.5 rounded-full text-[9px] font-semibold bg-emerald-500/10 text-emerald-700 border border-emerald-500/30 flex items-center gap-1">
                               <CheckCircle2 size={10} /> Approved
                             </span>
                           ) : (
-                            <span className="px-2 py-0.5 rounded-full text-[9px] font-semibold bg-amber-500/15 text-amber-200 border border-amber-400/35">
+                            <span className="px-2 py-0.5 rounded-full text-[9px] font-semibold bg-amber-500/12 text-amber-800 border border-amber-500/35">
                               Pending 1st Approval
                             </span>
                           )
@@ -361,25 +361,25 @@ export default function AdminManager() {
                       </div>
                     </td>
 
-                    <td className="py-3.5 px-4 text-slate-300/80 font-mono text-[11px]">{adm.added_by}</td>
+                    <td className="py-3.5 px-4 text-slate-600 font-mono text-[11px]">{adm.added_by}</td>
 
-                    <td className="py-3.5 px-4 text-slate-300/80">
+                    <td className="py-3.5 px-4 text-slate-600">
                       {adm.created_at ? new Date(adm.created_at).toLocaleDateString() : '—'}
                     </td>
 
-                    <td className="py-3.5 px-4 text-slate-300/80">
+                    <td className="py-3.5 px-4 text-slate-600">
                       {adm.last_login_at ? new Date(adm.last_login_at).toLocaleString() : 'Never'}
                     </td>
 
                     <td className="py-3.5 px-4 text-right">
                       {adm.is_super_admin ? (
-                        <span className="text-[11px] text-slate-400 italic">Server Configured (Locked)</span>
+                        <span className="text-[11px] text-slate-500 italic">Server Configured (Locked)</span>
                       ) : (
                         <div className="flex items-center justify-end gap-1.5">
                           {!adm.is_approved ? (
                             <button
                               onClick={() => handleToggleApproval(adm)}
-                              className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-emerald-500/15 border border-emerald-400/35 text-emerald-200 hover:bg-emerald-500/25 transition-colors"
+                              className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-emerald-500/12 border border-emerald-500/35 text-emerald-700 hover:bg-emerald-500/20 transition-colors"
                               title="Pre-approve admin for direct login"
                             >
                               Approve
@@ -387,7 +387,7 @@ export default function AdminManager() {
                           ) : (
                             <button
                               onClick={() => handleToggleApproval(adm)}
-                              className="liquid-btn-glass px-2.5 py-1 rounded-lg text-[10px] font-semibold text-slate-300 hover:text-white"
+                              className="liquid-btn-glass px-2.5 py-1 rounded-lg text-[10px] font-semibold text-slate-700 hover:text-slate-900"
                               title="Revoke approval (forces re-approval on next login)"
                             >
                               Revoke
@@ -398,8 +398,8 @@ export default function AdminManager() {
                             onClick={() => handleToggleStatus(adm)}
                             className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold border transition-colors ${
                               adm.status === 'active'
-                                ? 'bg-amber-500/15 border-amber-400/35 text-amber-200 hover:bg-amber-500/25'
-                                : 'bg-emerald-500/15 border-emerald-400/35 text-emerald-200 hover:bg-emerald-500/25'
+                                ? 'bg-amber-500/12 border-amber-500/35 text-amber-800 hover:bg-amber-500/20'
+                                : 'bg-emerald-500/12 border-emerald-500/35 text-emerald-700 hover:bg-emerald-500/20'
                             }`}
                           >
                             {adm.status === 'active' ? 'Suspend' : 'Reactivate'}
@@ -410,7 +410,7 @@ export default function AdminManager() {
                               setResetTarget(adm);
                               setResetPassword('');
                             }}
-                            className="liquid-icon-bubble w-7 h-7 rounded-lg text-slate-200"
+                            className="liquid-icon-bubble w-7 h-7 rounded-lg text-slate-700"
                             title="Reset Password"
                           >
                             <KeyRound size={13} />
@@ -418,7 +418,7 @@ export default function AdminManager() {
 
                           <button
                             onClick={() => setDeleteTarget(adm)}
-                            className="w-7 h-7 rounded-lg bg-red-500/15 border border-red-400/35 hover:bg-red-500/25 text-red-200 flex items-center justify-center transition-colors"
+                            className="w-7 h-7 rounded-lg bg-red-500/12 border border-red-400/35 hover:bg-red-500/20 text-red-700 flex items-center justify-center transition-colors"
                             title="Remove Admin"
                           >
                             <Trash2 size={13} />
@@ -436,20 +436,20 @@ export default function AdminManager() {
 
       {/* ADD ADMIN MODAL */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 bg-[#020612]/75 backdrop-blur-md flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-slate-950/35 backdrop-blur-md flex items-center justify-center p-4">
           <div className="liquid-glass-strong rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl">
             <div className="flex items-center gap-3 mb-6">
-              <div className="liquid-icon-bubble w-10 h-10 rounded-xl border-cyan-400/35 text-cyan-200 font-bold">
+              <div className="liquid-icon-bubble w-10 h-10 rounded-xl border-sky-400/35 text-sky-600 font-bold">
                 <UserPlus size={20} />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white">Add Administrator</h3>
-                <p className="text-xs text-slate-300/80">Grant admin dashboard access</p>
+                <h3 className="text-lg font-bold text-slate-900">Add Administrator</h3>
+                <p className="text-xs text-slate-600">Grant admin dashboard access</p>
               </div>
             </div>
 
             {formError && (
-              <div className="liquid-glass p-3 rounded-xl border-red-400/35 text-red-200 text-xs mb-4 flex items-center gap-2">
+              <div className="liquid-glass p-3 rounded-xl border-red-400/40 bg-red-50/85 text-red-700 text-xs mb-4 flex items-center gap-2 font-medium">
                 <AlertCircle size={14} />
                 <span>{formError}</span>
               </div>
@@ -457,19 +457,19 @@ export default function AdminManager() {
 
             <form onSubmit={handleAddAdmin} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-200 mb-1.5">Admin Email</label>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">Admin Email</label>
                 <input
                   type="email"
                   value={newEmail}
                   onChange={(e) => setNewEmail(e.target.value)}
                   placeholder="admin@example.com"
                   required
-                  className="liquid-input w-full rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-400/60"
+                  className="liquid-input w-full rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-200 mb-1.5">Initial Password (min 8 chars)</label>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">Initial Password (min 8 chars)</label>
                 <div className="relative">
                   <input
                     type={showPw ? 'text' : 'password'}
@@ -478,19 +478,19 @@ export default function AdminManager() {
                     placeholder="••••••••••••"
                     required
                     minLength={8}
-                    className="liquid-input w-full rounded-xl px-4 py-2.5 pr-10 text-sm text-white placeholder-slate-400/60"
+                    className="liquid-input w-full rounded-xl px-4 py-2.5 pr-10 text-sm text-slate-900 placeholder-slate-400"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPw(!showPw)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-cyan-200"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-sky-700"
                   >
                     {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
               </div>
 
-              <div className="liquid-glass p-3 rounded-xl border-cyan-400/30 text-cyan-100 text-[11px] leading-relaxed">
+              <div className="liquid-glass p-3 rounded-xl border-sky-400/35 text-sky-900 text-[11px] leading-relaxed">
                 When this admin signs in, you (Super Admin) will receive a real-time authorization request to approve their session.
               </div>
 
@@ -498,7 +498,7 @@ export default function AdminManager() {
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="liquid-btn-glass px-4 py-2 rounded-xl text-slate-200 text-xs font-semibold"
+                  className="liquid-btn-glass px-4 py-2 rounded-xl text-slate-700 text-xs font-semibold"
                 >
                   Cancel
                 </button>
@@ -517,11 +517,11 @@ export default function AdminManager() {
 
       {/* RESET PASSWORD MODAL */}
       {resetTarget && (
-        <div className="fixed inset-0 z-50 bg-[#020612]/75 backdrop-blur-md flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-slate-950/35 backdrop-blur-md flex items-center justify-center p-4">
           <div className="liquid-glass-strong rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl">
-            <h3 className="text-base font-bold text-white mb-2">Reset Password</h3>
-            <p className="text-xs text-slate-300/80 mb-4">
-              Enter a new password for <strong className="text-white">{resetTarget.email}</strong>:
+            <h3 className="text-base font-bold text-slate-900 mb-2">Reset Password</h3>
+            <p className="text-xs text-slate-600 mb-4">
+              Enter a new password for <strong className="text-slate-900">{resetTarget.email}</strong>:
             </p>
 
             <form onSubmit={handleResetPassword} className="space-y-4">
@@ -533,12 +533,12 @@ export default function AdminManager() {
                   placeholder="New password (min 8 chars)"
                   required
                   minLength={8}
-                  className="liquid-input w-full rounded-xl px-4 py-2.5 pr-10 text-sm text-white"
+                  className="liquid-input w-full rounded-xl px-4 py-2.5 pr-10 text-sm text-slate-900 placeholder-slate-400"
                 />
                 <button
                   type="button"
                   onClick={() => setShowResetPw(!showResetPw)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-cyan-200"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-sky-700"
                 >
                   {showResetPw ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
@@ -548,7 +548,7 @@ export default function AdminManager() {
                 <button
                   type="button"
                   onClick={() => setResetTarget(null)}
-                  className="liquid-btn-glass px-4 py-2 rounded-xl text-slate-200 text-xs font-semibold"
+                  className="liquid-btn-glass px-4 py-2 rounded-xl text-slate-700 text-xs font-semibold"
                 >
                   Cancel
                 </button>
@@ -567,27 +567,27 @@ export default function AdminManager() {
 
       {/* DELETE CONFIRM MODAL */}
       {deleteTarget && (
-        <div className="fixed inset-0 z-50 bg-[#020612]/75 backdrop-blur-md flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-slate-950/35 backdrop-blur-md flex items-center justify-center p-4">
           <div className="liquid-glass-strong rounded-3xl p-6 sm:p-8 max-w-sm w-full shadow-2xl text-center">
-            <div className="liquid-icon-bubble w-12 h-12 rounded-full border-red-400/40 bg-red-500/15 text-red-300 mx-auto mb-4">
+            <div className="liquid-icon-bubble w-12 h-12 rounded-full border-red-400/40 bg-red-500/12 text-red-600 mx-auto mb-4">
               <AlertCircle size={24} />
             </div>
-            <h3 className="text-base font-bold text-white mb-2">Remove Administrator?</h3>
-            <p className="text-xs text-slate-300/80 mb-6 leading-relaxed">
-              Are you sure you want to remove <strong className="text-white">{deleteTarget.email}</strong>? All their active sessions will be revoked immediately.
+            <h3 className="text-base font-bold text-slate-900 mb-2">Remove Administrator?</h3>
+            <p className="text-xs text-slate-600 mb-6 leading-relaxed">
+              Are you sure you want to remove <strong className="text-slate-900">{deleteTarget.email}</strong>? All their active sessions will be revoked immediately.
             </p>
             <div className="flex items-center justify-center gap-3">
               <button
                 type="button"
                 onClick={() => setDeleteTarget(null)}
-                className="liquid-btn-glass px-4 py-2 rounded-xl text-slate-200 text-xs font-semibold"
+                className="liquid-btn-glass px-4 py-2 rounded-xl text-slate-700 text-xs font-semibold"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={handleDeleteAdmin}
-                className="px-5 py-2 rounded-xl bg-red-500/85 hover:bg-red-500 text-white font-bold text-xs shadow-lg shadow-red-500/20 transition-colors"
+                className="px-5 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-lg shadow-red-500/20 transition-colors"
               >
                 Yes, Remove
               </button>

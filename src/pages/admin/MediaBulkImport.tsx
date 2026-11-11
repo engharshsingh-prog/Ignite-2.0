@@ -137,65 +137,65 @@ export default function MediaBulkImport() {
   };
 
   return (
-    <div className="min-h-screen text-white pt-24 pb-16">
+    <div className="min-h-screen text-slate-900 pt-24 pb-16">
       <div className="max-w-5xl mx-auto px-4">
         <div className="flex items-center gap-4 mb-8">
-          <Link to="/admin/upload" className="liquid-icon-bubble w-10 h-10 rounded-xl text-slate-300 hover:text-white">
+          <Link to="/admin/upload" className="liquid-icon-bubble w-10 h-10 rounded-xl text-slate-700 hover:text-slate-900">
             <ArrowLeft size={20} />
           </Link>
           <div>
-            <h1 className="text-3xl font-black bg-gradient-to-r from-white via-cyan-100 to-blue-200 bg-clip-text text-transparent">
+            <h1 className="text-3xl font-black bg-gradient-to-r from-slate-900 via-sky-700 to-blue-700 bg-clip-text text-transparent">
               Bulk Media Import
             </h1>
-            <p className="text-slate-300/80 text-sm">Upload many files or import from public Google Drive links</p>
+            <p className="text-slate-600 text-sm">Upload many files or import from public Google Drive links</p>
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <form onSubmit={handleBulkFiles} className="liquid-glass-strong rounded-3xl p-6 space-y-4">
-            <h2 className="text-lg font-bold flex items-center gap-2 text-white"><Upload size={18} className="text-cyan-300" /> Bulk File Upload</h2>
+            <h2 className="text-lg font-bold flex items-center gap-2 text-slate-900"><Upload size={18} className="text-sky-600" /> Bulk File Upload</h2>
             <input
               type="file"
               accept="image/*,video/*"
               multiple
               onChange={e => setFiles(Array.from(e.target.files || []))}
-              className="liquid-input w-full rounded-xl px-4 py-3 text-white file:mr-3 file:rounded-lg file:border file:border-cyan-300/30 file:bg-cyan-500/20 file:px-3 file:py-2 file:text-cyan-100 file:text-xs file:font-semibold"
+              className="liquid-input w-full rounded-xl px-4 py-3 text-slate-800 file:mr-3 file:rounded-lg file:border file:border-sky-500/30 file:bg-sky-500/12 file:px-3 file:py-2 file:text-sky-800 file:text-xs file:font-semibold"
             />
-            <input value={fileCaption} onChange={e => setFileCaption(e.target.value)} placeholder="Caption (applies to all)" className="liquid-input w-full rounded-xl px-4 py-3 text-white placeholder-slate-400/60" />
-            <select value={fileCategory} onChange={e => setFileCategory(e.target.value)} className="liquid-input w-full rounded-xl px-4 py-3 text-white">
-              <option value="general" className="bg-[#081022] text-white">General</option>
-              <option value="winner" className="bg-[#081022] text-white">Winner</option>
+            <input value={fileCaption} onChange={e => setFileCaption(e.target.value)} placeholder="Caption (applies to all)" className="liquid-input w-full rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400" />
+            <select value={fileCategory} onChange={e => setFileCategory(e.target.value)} className="liquid-input w-full rounded-xl px-4 py-3 text-slate-900">
+              <option value="general" className="bg-white text-slate-900">General</option>
+              <option value="winner" className="bg-white text-slate-900">Winner</option>
             </select>
             <button type="submit" disabled={fileLoading} className="liquid-btn-primary w-full py-3 rounded-xl text-white font-bold disabled:opacity-50">
               {fileLoading ? 'Uploading...' : 'Upload Files'}
             </button>
-            {fileResult && <p className="text-sm text-slate-200 flex items-center gap-2"><CheckCircle2 size={14} className="text-emerald-300" /> {fileResult}</p>}
+            {fileResult && <p className="text-sm text-slate-700 flex items-center gap-2"><CheckCircle2 size={14} className="text-emerald-600" /> {fileResult}</p>}
           </form>
 
           <form onSubmit={handleDriveImport} className="liquid-glass-strong rounded-3xl p-6 space-y-4">
-            <h2 className="text-lg font-bold flex items-center gap-2 text-white"><Link2 size={18} className="text-violet-300" /> Google Drive Shared Links</h2>
+            <h2 className="text-lg font-bold flex items-center gap-2 text-slate-900"><Link2 size={18} className="text-violet-600" /> Google Drive Shared Links</h2>
             <textarea
               value={driveLinks}
               onChange={e => setDriveLinks(e.target.value)}
               placeholder="Paste one public Drive link per line"
               rows={6}
-              className="liquid-input w-full rounded-xl px-4 py-3 text-white placeholder-slate-400/60 resize-none"
+              className="liquid-input w-full rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 resize-none"
             />
-            <input value={driveCaption} onChange={e => setDriveCaption(e.target.value)} placeholder="Caption (applies to all)" className="liquid-input w-full rounded-xl px-4 py-3 text-white placeholder-slate-400/60" />
+            <input value={driveCaption} onChange={e => setDriveCaption(e.target.value)} placeholder="Caption (applies to all)" className="liquid-input w-full rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400" />
             <div className="grid grid-cols-2 gap-3">
-              <select value={driveCategory} onChange={e => setDriveCategory(e.target.value)} className="liquid-input w-full rounded-xl px-4 py-3 text-white">
-                <option value="general" className="bg-[#081022] text-white">General</option>
-                <option value="winner" className="bg-[#081022] text-white">Winner</option>
+              <select value={driveCategory} onChange={e => setDriveCategory(e.target.value)} className="liquid-input w-full rounded-xl px-4 py-3 text-slate-900">
+                <option value="general" className="bg-white text-slate-900">General</option>
+                <option value="winner" className="bg-white text-slate-900">Winner</option>
               </select>
-              <select value={driveType} onChange={e => setDriveType(e.target.value as 'image' | 'video')} className="liquid-input w-full rounded-xl px-4 py-3 text-white">
-                <option value="image" className="bg-[#081022] text-white">Image Links</option>
-                <option value="video" className="bg-[#081022] text-white">Video Links</option>
+              <select value={driveType} onChange={e => setDriveType(e.target.value as 'image' | 'video')} className="liquid-input w-full rounded-xl px-4 py-3 text-slate-900">
+                <option value="image" className="bg-white text-slate-900">Image Links</option>
+                <option value="video" className="bg-white text-slate-900">Video Links</option>
               </select>
             </div>
             <button type="submit" disabled={driveLoading} className="liquid-btn-primary w-full py-3 rounded-xl text-white font-bold disabled:opacity-50">
               {driveLoading ? 'Importing...' : 'Import Links'}
             </button>
-            {driveResult && <p className="text-sm text-slate-200 flex items-center gap-2"><CheckCircle2 size={14} className="text-emerald-300" /> {driveResult}</p>}
+            {driveResult && <p className="text-sm text-slate-700 flex items-center gap-2"><CheckCircle2 size={14} className="text-emerald-600" /> {driveResult}</p>}
           </form>
         </div>
       </div>

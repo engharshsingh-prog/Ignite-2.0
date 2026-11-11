@@ -85,27 +85,27 @@ export default function HallOfFame() {
   const rest = normalizedWinners.filter((w) => !featuredAwards.has(w.award_title));
 
   return (
-    <div className="min-h-screen text-white pt-24 pb-20">
+    <div className="min-h-screen text-slate-900 pt-24 pb-20">
       <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/10 via-blue-500/5 to-transparent pointer-events-none" />
-        <div className="absolute top-2 left-1/2 -translate-x-1/2 w-[28rem] h-48 bg-cyan-400/12 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-cyan-400/12 via-blue-400/6 to-transparent pointer-events-none" />
+        <div className="absolute top-2 left-1/2 -translate-x-1/2 w-[28rem] h-48 bg-cyan-400/15 rounded-full blur-3xl pointer-events-none" />
         <div className="relative max-w-7xl mx-auto px-4 py-14 text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full liquid-glass-pill text-xs font-semibold tracking-widest uppercase text-cyan-200 mb-5">
-              <Crown size={14} className="text-cyan-300" /> Champions & Icons
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full liquid-glass-pill text-xs font-semibold tracking-widest uppercase text-sky-800 mb-5">
+              <Crown size={14} className="text-sky-600" /> Champions & Icons
             </div>
             <div className="flex items-center justify-center gap-3 mb-4">
-              <span className="liquid-icon-bubble w-11 h-11 text-cyan-300 shrink-0">
+              <span className="liquid-icon-bubble w-11 h-11 text-sky-600 shrink-0">
                 <Trophy size={22} />
               </span>
-              <h1 className="text-4xl sm:text-6xl font-black bg-gradient-to-r from-white via-cyan-200 to-violet-300 bg-clip-text text-transparent">
+              <h1 className="text-4xl sm:text-6xl font-black bg-gradient-to-r from-slate-900 via-sky-700 to-violet-700 bg-clip-text text-transparent">
                 Hall of Fame
               </h1>
-              <span className="liquid-icon-bubble w-11 h-11 text-cyan-300 shrink-0">
+              <span className="liquid-icon-bubble w-11 h-11 text-sky-600 shrink-0">
                 <Trophy size={22} />
               </span>
             </div>
-            <p className="text-slate-300/85 text-lg">The stars of Ignite 2.O</p>
+            <p className="text-slate-600 text-lg">The stars of Ignite 2.O</p>
           </motion.div>
         </div>
       </div>
@@ -113,10 +113,10 @@ export default function HallOfFame() {
       <div className="max-w-7xl mx-auto px-4">
         {loading ? <LoadingSpinner text="Loading winners..." /> : normalizedWinners.length === 0 ? (
           <div className="liquid-glass-card rounded-3xl max-w-md mx-auto text-center py-14 px-8">
-            <div className="liquid-icon-bubble w-16 h-16 mx-auto mb-4 text-cyan-300/75">
+            <div className="liquid-icon-bubble w-16 h-16 mx-auto mb-4 text-sky-600">
               <Crown size={30} />
             </div>
-            <p className="text-slate-300">Winners will be announced soon. Stay tuned!</p>
+            <p className="text-slate-600">Winners will be announced soon. Stay tuned!</p>
           </div>
         ) : (
           <>
@@ -124,7 +124,7 @@ export default function HallOfFame() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
                 {topTwo.map((winner, i) => {
                   const FeaturedIcon = AWARD_ICONS[winner.award_title] || Trophy;
-                  const badgeGradient = AWARD_COLORS[winner.award_title] || 'from-cyan-400 to-blue-500';
+                  const badgeGradient = AWARD_COLORS[winner.award_title] || 'from-cyan-500 to-blue-600';
                   return (
                     <motion.div
                       key={winner.id}
@@ -133,31 +133,31 @@ export default function HallOfFame() {
                       transition={{ delay: i * 0.15 }}
                       className="relative group"
                     >
-                      <div className={`absolute -inset-0.5 bg-gradient-to-br ${badgeGradient} rounded-3xl opacity-20 group-hover:opacity-35 blur-md transition-opacity duration-300 pointer-events-none`} />
+                      <div className={`absolute -inset-0.5 bg-gradient-to-br ${badgeGradient} rounded-3xl opacity-15 group-hover:opacity-25 blur-md transition-opacity duration-300 pointer-events-none`} />
                       <div className="relative liquid-glass-strong rounded-3xl p-8 text-center overflow-hidden transition-transform duration-300 group-hover:-translate-y-1">
-                        <div className="absolute top-4 right-4 liquid-icon-bubble w-9 h-9 text-cyan-300">
+                        <div className="absolute top-4 right-4 liquid-icon-bubble w-9 h-9 text-sky-600">
                           <Star size={16} fill="currentColor" />
                         </div>
                         <div className="mb-4 flex justify-center">
-                          <div className="liquid-icon-bubble w-16 h-16 rounded-2xl text-cyan-200 shadow-[0_0_24px_rgba(34,211,238,0.22)]">
+                          <div className="liquid-icon-bubble w-16 h-16 rounded-2xl text-sky-700 shadow-[0_8px_24px_rgba(14,165,233,0.2)]">
                             <FeaturedIcon size={32} />
                           </div>
                         </div>
-                        <div className={`inline-block px-4 py-1.5 rounded-full text-sm font-bold mb-5 bg-gradient-to-r ${badgeGradient} text-slate-950 shadow-lg shadow-cyan-500/20`}>
+                        <div className={`inline-block px-4 py-1.5 rounded-full text-sm font-bold mb-5 bg-gradient-to-r ${badgeGradient} text-white shadow-md shadow-cyan-500/20`}>
                           {winner.award_title}
                         </div>
                         <div className="flex justify-center mb-4">
                           <WinnerAvatar
                             src={winner.image_url}
                             name={winner.name}
-                            className="w-32 h-32 rounded-full object-cover border-4 border-cyan-300/35 shadow-[0_0_28px_rgba(34,211,238,0.22)]"
-                            fallbackClassName="w-32 h-32 rounded-full bg-gradient-to-br from-blue-500 via-cyan-500 to-violet-500 flex items-center justify-center text-4xl font-black text-white border-4 border-cyan-300/35 shadow-[0_0_28px_rgba(34,211,238,0.22)]"
+                            className="w-32 h-32 rounded-full object-cover border-4 border-sky-300/60 shadow-[0_12px_28px_rgba(14,165,233,0.22)]"
+                            fallbackClassName="w-32 h-32 rounded-full bg-gradient-to-br from-blue-600 via-cyan-500 to-violet-600 flex items-center justify-center text-4xl font-black text-white border-4 border-white shadow-[0_12px_28px_rgba(14,165,233,0.22)]"
                             textSize="text-4xl"
                           />
                         </div>
-                        <h2 className="text-2xl font-black text-white mb-1">{winner.name}</h2>
-                        <p className="text-cyan-200/75 text-sm mb-3">{winner.roll_no} &bull; {winner.branch}</p>
-                        {winner.description && <p className="text-slate-300/90 text-sm leading-relaxed">{winner.description}</p>}
+                        <h2 className="text-2xl font-black text-slate-900 mb-1">{winner.name}</h2>
+                        <p className="text-sky-700 text-sm font-medium mb-3">{winner.roll_no} &bull; {winner.branch}</p>
+                        {winner.description && <p className="text-slate-600 text-sm leading-relaxed">{winner.description}</p>}
                       </div>
                     </motion.div>
                   );
@@ -167,13 +167,13 @@ export default function HallOfFame() {
 
             {rest.length > 0 && (
               <>
-                <h2 className="text-2xl font-bold text-center mb-8 bg-gradient-to-r from-white to-cyan-200 bg-clip-text text-transparent">
+                <h2 className="text-2xl font-bold text-center mb-8 bg-gradient-to-r from-slate-900 to-sky-700 bg-clip-text text-transparent">
                   Other Award Winners
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   {rest.map((winner, i) => {
                     const CardIcon = AWARD_ICONS[winner.award_title] || Trophy;
-                    const badgeGradient = AWARD_COLORS[winner.award_title] || 'from-cyan-400 to-blue-500';
+                    const badgeGradient = AWARD_COLORS[winner.award_title] || 'from-cyan-500 to-blue-600';
                     return (
                       <motion.div
                         key={winner.id}
@@ -186,24 +186,24 @@ export default function HallOfFame() {
                           <WinnerAvatar
                             src={winner.image_url}
                             name={winner.name}
-                            className="w-16 h-16 rounded-full object-cover border-2 border-cyan-400/40 shadow-[0_0_16px_rgba(34,211,238,0.18)] shrink-0"
-                            fallbackClassName="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 via-cyan-500 to-violet-500 flex items-center justify-center text-2xl font-black text-white border-2 border-cyan-400/40 shrink-0"
+                            className="w-16 h-16 rounded-full object-cover border-2 border-sky-400/50 shadow-sm shrink-0"
+                            fallbackClassName="w-16 h-16 rounded-full bg-gradient-to-br from-blue-600 via-cyan-500 to-violet-600 flex items-center justify-center text-2xl font-black text-white border-2 border-white shrink-0"
                             textSize="text-2xl"
                           />
                           <div>
-                            <h3 className="font-bold text-white">{winner.name}</h3>
-                            <p className="text-slate-300/75 text-xs">{winner.roll_no} &bull; {winner.branch}</p>
+                            <h3 className="font-bold text-slate-900">{winner.name}</h3>
+                            <p className="text-slate-600 text-xs">{winner.roll_no} &bull; {winner.branch}</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-2 mb-3">
-                          <span className="liquid-icon-bubble w-8 h-8 rounded-lg text-cyan-300 shrink-0">
+                          <span className="liquid-icon-bubble w-8 h-8 rounded-lg text-sky-600 shrink-0">
                             <CardIcon size={16} />
                           </span>
-                          <span className={`px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r ${badgeGradient} text-slate-950 shadow-sm shadow-cyan-500/20`}>
+                          <span className={`px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r ${badgeGradient} text-white shadow-sm`}>
                             {winner.award_title}
                           </span>
                         </div>
-                        {winner.description && <p className="text-slate-300/80 text-sm leading-relaxed">{winner.description}</p>}
+                        {winner.description && <p className="text-slate-600 text-sm leading-relaxed">{winner.description}</p>}
                       </motion.div>
                     );
                   })}

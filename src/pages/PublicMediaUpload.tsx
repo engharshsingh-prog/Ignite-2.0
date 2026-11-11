@@ -90,39 +90,39 @@ export default function PublicMediaUpload() {
   };
 
   return (
-    <div className="min-h-screen text-white pt-24 pb-20 px-4">
+    <div className="min-h-screen text-slate-900 pt-24 pb-20 px-4">
       <div className="max-w-2xl mx-auto">
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-10">
-          <span className="liquid-glass-pill inline-block px-4 py-1.5 rounded-full text-cyan-200 text-xs font-semibold uppercase tracking-wider mb-4">
+          <span className="liquid-glass-pill inline-block px-4 py-1.5 rounded-full text-sky-800 text-xs font-semibold uppercase tracking-wider mb-4">
             Ignite 2.O Community
           </span>
-          <h1 className="text-4xl sm:text-5xl font-black mb-2 bg-gradient-to-r from-white via-cyan-100 to-blue-200 bg-clip-text text-transparent">
+          <h1 className="text-4xl sm:text-5xl font-black mb-2 bg-gradient-to-r from-slate-900 via-sky-700 to-blue-700 bg-clip-text text-transparent">
             Public Media Upload
           </h1>
-          <p className="text-slate-300/85">Share event photos and videos. Submissions are reviewed before publishing.</p>
-          <p className="text-cyan-200/70 text-sm mt-2">Max file size: 16 MB</p>
+          <p className="text-slate-600">Share event photos and videos. Submissions are reviewed before publishing.</p>
+          <p className="text-sky-700 text-sm mt-2 font-medium">Max file size: 16 MB</p>
         </motion.div>
 
         {checkingControl ? (
           <div className="liquid-glass-card rounded-3xl p-12 text-center">
-            <Loader2 className="animate-spin mx-auto text-cyan-300 mb-3" size={32} />
-            <p className="text-slate-300/80 text-sm">Checking upload portal status...</p>
+            <Loader2 className="animate-spin mx-auto text-sky-600 mb-3" size={32} />
+            <p className="text-slate-600 text-sm">Checking upload portal status...</p>
           </div>
         ) : !uploadsEnabled ? (
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="liquid-glass-strong border-amber-400/30 rounded-3xl p-8 sm:p-10 text-center space-y-5"
+            className="liquid-glass-strong border-amber-500/30 rounded-3xl p-8 sm:p-10 text-center space-y-5"
           >
-            <div className="liquid-icon-bubble w-16 h-16 rounded-2xl border-amber-400/30 bg-amber-500/15 text-amber-300 mx-auto">
+            <div className="liquid-icon-bubble w-16 h-16 rounded-2xl border-amber-500/30 bg-amber-500/12 text-amber-600 mx-auto">
               <Lock size={30} />
             </div>
             <div>
-              <span className="inline-block px-3 py-1 rounded-full bg-amber-400/15 border border-amber-300/30 text-amber-200 text-xs font-semibold uppercase tracking-wider mb-2">
+              <span className="inline-block px-3 py-1 rounded-full bg-amber-500/12 border border-amber-500/30 text-amber-800 text-xs font-semibold uppercase tracking-wider mb-2">
                 Submissions Paused
               </span>
-              <h2 className="text-2xl font-bold text-white">Public Media Uploads are Currently Closed</h2>
-              <p className="text-slate-300/85 text-sm max-w-md mx-auto mt-2 leading-relaxed">
+              <h2 className="text-2xl font-bold text-slate-900">Public Media Uploads are Currently Closed</h2>
+              <p className="text-slate-600 text-sm max-w-md mx-auto mt-2 leading-relaxed">
                 Public uploads have been temporarily closed by the event administrators. You can still view all approved event photos and videos in the Gallery.
               </p>
             </div>
@@ -135,7 +135,7 @@ export default function PublicMediaUpload() {
               </Link>
               <Link
                 to="/"
-                className="liquid-btn-glass w-full sm:w-auto px-5 py-2.5 rounded-xl text-slate-200 hover:text-white text-sm font-medium flex items-center justify-center gap-2"
+                className="liquid-btn-glass w-full sm:w-auto px-5 py-2.5 rounded-xl text-slate-700 hover:text-slate-900 text-sm font-medium flex items-center justify-center gap-2"
               >
                 <ArrowLeft size={16} /> Back to Home
               </Link>
@@ -144,46 +144,46 @@ export default function PublicMediaUpload() {
         ) : (
           <form onSubmit={handleSubmit} className="liquid-glass-strong rounded-3xl p-6 sm:p-8 space-y-5">
             <div>
-              <label className="block text-sm font-medium text-slate-200 mb-1.5">Media File *</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Media File *</label>
               <input
                 type="file"
                 accept="image/*,video/*"
                 onChange={e => setFile(e.target.files?.[0] || null)}
-                className="liquid-input w-full rounded-xl px-4 py-3 text-white file:mr-4 file:rounded-lg file:border file:border-cyan-300/30 file:bg-cyan-400/20 file:px-3.5 file:py-2 file:text-cyan-100 file:text-xs file:font-semibold hover:file:bg-cyan-400/30 file:transition-colors"
+                className="liquid-input w-full rounded-xl px-4 py-3 text-slate-800 file:mr-4 file:rounded-lg file:border file:border-sky-500/30 file:bg-sky-500/12 file:px-3.5 file:py-2 file:text-sky-800 file:text-xs file:font-semibold hover:file:bg-sky-500/20 file:transition-colors"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-200 mb-1.5">Caption (optional)</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Caption (optional)</label>
               <input
                 value={caption}
                 onChange={e => setCaption(e.target.value)}
                 placeholder="Write a short caption"
-                className="liquid-input w-full rounded-xl px-4 py-3 text-white placeholder-slate-400/60"
+                className="liquid-input w-full rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-200 mb-1.5">Category</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Category</label>
               <select
                 value={category}
                 onChange={e => setCategory(e.target.value)}
-                className="liquid-input w-full rounded-xl px-4 py-3 text-white"
+                className="liquid-input w-full rounded-xl px-4 py-3 text-slate-900"
               >
-                <option value="general" className="bg-[#081022] text-white">General</option>
-                <option value="winner" className="bg-[#081022] text-white">Winner</option>
+                <option value="general" className="bg-white text-slate-900">General</option>
+                <option value="winner" className="bg-white text-slate-900">Winner</option>
               </select>
             </div>
 
             {error && (
-              <div className="flex items-center gap-2 text-red-200 bg-red-500/15 border border-red-400/35 backdrop-blur-md rounded-xl px-4 py-3 text-sm">
-                <AlertCircle size={16} className="shrink-0 text-red-300" /> {error}
+              <div className="flex items-center gap-2 text-red-700 bg-red-50/90 border border-red-300/70 backdrop-blur-md rounded-xl px-4 py-3 text-sm">
+                <AlertCircle size={16} className="shrink-0 text-red-600" /> {error}
               </div>
             )}
 
             {success && (
-              <div className="flex items-center gap-2 text-emerald-200 bg-emerald-500/15 border border-emerald-400/35 backdrop-blur-md rounded-xl px-4 py-3 text-sm">
-                <CheckCircle2 size={16} className="shrink-0 text-emerald-300" /> {success}
+              <div className="flex items-center gap-2 text-emerald-800 bg-emerald-50/90 border border-emerald-300/70 backdrop-blur-md rounded-xl px-4 py-3 text-sm">
+                <CheckCircle2 size={16} className="shrink-0 text-emerald-600" /> {success}
               </div>
             )}
 

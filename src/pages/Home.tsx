@@ -74,7 +74,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen text-white overflow-x-hidden relative">
+    <div className="min-h-screen text-slate-900 overflow-x-hidden relative">
       <SplashScreen show={showSplash} />
 
       {/* Floating Glass Elements */}
@@ -82,10 +82,10 @@ export default function Home() {
         {FLOATING_ICONS.map((item, idx) => (
           <motion.div
             key={`floating-icon-${idx}`}
-            className="absolute hidden md:flex w-13 h-13 rounded-2xl liquid-icon-bubble items-center justify-center text-cyan-200"
+            className="absolute hidden md:flex w-13 h-13 rounded-2xl liquid-icon-bubble items-center justify-center text-sky-600"
             style={{ top: item.top, left: item.left, right: item.right }}
             initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: [0.45, 0.9, 0.45], y: [0, -16, 0], rotate: [0, 5, 0] }}
+            animate={{ opacity: [0.55, 0.95, 0.55], y: [0, -16, 0], rotate: [0, 5, 0] }}
             transition={{ delay: item.delay, duration: item.duration, repeat: Infinity, ease: 'easeInOut' }}
           >
             <item.icon size={20} />
@@ -103,25 +103,25 @@ export default function Home() {
         >
           <motion.div
             variants={fadeUp}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full liquid-glass-pill text-cyan-200 text-sm font-medium mb-8"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full liquid-glass-pill text-sky-800 text-sm font-medium mb-8"
           >
-            <Sparkles size={14} className="text-cyan-300" />
+            <Sparkles size={14} className="text-sky-600" />
             <span>Institute of Engineering and Technology | Batch 2026</span>
           </motion.div>
 
-          <motion.h1 variants={fadeUp} className="text-5xl sm:text-7xl md:text-8xl font-black tracking-tight mb-4 drop-shadow-[0_6px_30px_rgba(34,211,238,0.2)]">
-            <span className="text-white">Ignite</span>
-            <span className="bg-gradient-to-r from-cyan-300 via-sky-300 to-violet-300 bg-clip-text text-transparent">2.O</span>
+          <motion.h1 variants={fadeUp} className="text-5xl sm:text-7xl md:text-8xl font-black tracking-tight mb-4 drop-shadow-[0_10px_28px_rgba(14,165,233,0.14)]">
+            <span className="text-slate-900">Ignite</span>
+            <span className="bg-gradient-to-r from-cyan-600 via-blue-600 to-violet-600 bg-clip-text text-transparent">2.O</span>
             <br />
-            <span className="text-3xl sm:text-4xl md:text-5xl font-light text-cyan-200/90 tracking-[0.28em]">2026</span>
+            <span className="text-3xl sm:text-4xl md:text-5xl font-light text-sky-700 tracking-[0.28em]">2026</span>
           </motion.h1>
 
-          <motion.p variants={fadeUp} className="text-lg sm:text-xl text-slate-200/90 max-w-3xl mx-auto mb-9 leading-relaxed">
+          <motion.p variants={fadeUp} className="text-lg sm:text-xl text-slate-600 max-w-3xl mx-auto mb-9 leading-relaxed">
             The unified campus celebration of talent, style, interaction, fresh energy and unforgettable moments. Music, motion, crowns, and a full-day social vibe.
           </motion.p>
 
           <motion.div variants={fadeUp} className="mb-10">
-            <p className="text-cyan-200/90 text-xs sm:text-sm font-semibold tracking-[0.25em] uppercase mb-5">Event Countdown</p>
+            <p className="text-sky-700 text-xs sm:text-sm font-semibold tracking-[0.25em] uppercase mb-5">Event Countdown</p>
             <Countdown targetDateIso={scheduleConfigured ? settings.countdownIso : ''} />
           </motion.div>
 
@@ -135,7 +135,7 @@ export default function Home() {
             </Link>
             <Link
               to="/gallery"
-              className="px-8 py-4 rounded-2xl liquid-btn-glass text-white font-semibold text-lg"
+              className="px-8 py-4 rounded-2xl liquid-btn-glass text-slate-900 font-semibold text-lg"
             >
               View Gallery
             </Link>
@@ -148,9 +148,9 @@ export default function Home() {
           transition={{ delay: 0.45 }}
           className="absolute top-24 right-6 sm:right-14 px-4 py-3 rounded-2xl liquid-glass-pill hidden md:block z-10"
         >
-          <p className="text-[11px] text-cyan-200/70 uppercase tracking-widest mb-1">Live Energy</p>
-          <div className="flex items-center gap-2 text-cyan-200 text-sm font-semibold">
-            <BadgeCheck size={15} className="text-cyan-300" /> Campus Pulse: High
+          <p className="text-[11px] text-sky-700 uppercase tracking-widest mb-1 font-semibold">Live Energy</p>
+          <div className="flex items-center gap-2 text-slate-900 text-sm font-semibold">
+            <BadgeCheck size={15} className="text-cyan-600" /> Campus Pulse: High
           </div>
         </motion.div>
       </section>
@@ -162,10 +162,10 @@ export default function Home() {
             {quickDetails.map((item, i) => {
               const toneClass =
                 item.tone === 'blue'
-                  ? 'text-blue-300'
+                  ? 'text-blue-600'
                   : item.tone === 'cyan'
-                  ? 'text-cyan-300'
-                  : 'text-violet-300';
+                  ? 'text-cyan-600'
+                  : 'text-violet-600';
 
               const content = (
                 <>
@@ -173,12 +173,12 @@ export default function Home() {
                     <item.icon size={22} className="shrink-0" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-xs text-cyan-200/70 uppercase tracking-wider font-semibold">{item.label}</p>
-                    <p className="text-white font-bold text-base truncate mt-0.5">
+                    <p className="text-xs text-slate-500 uppercase tracking-wider font-semibold">{item.label}</p>
+                    <p className="text-slate-900 font-bold text-base truncate mt-0.5">
                       {loading ? 'Loading…' : error ? 'Details unavailable' : (item.value || 'To be announced')}
                     </p>
                     {'link' in item && item.link ? (
-                      <span className="mt-1.5 inline-flex items-center gap-1 text-xs font-semibold text-cyan-300 group-hover:text-cyan-200 transition-colors">
+                      <span className="mt-1.5 inline-flex items-center gap-1 text-xs font-semibold text-sky-700 group-hover:text-sky-800 transition-colors">
                         <Navigation size={12} className="shrink-0" />
                         {item.actionText}
                         <ExternalLink size={11} className="shrink-0 opacity-75" />
@@ -199,7 +199,7 @@ export default function Home() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: i * 0.1 }}
-                    className="group flex items-center gap-4 p-6 rounded-3xl liquid-glass-card border-cyan-300/25"
+                    className="group flex items-center gap-4 p-6 rounded-3xl liquid-glass-card border-sky-400/25"
                   >
                     {content}
                   </motion.a>
@@ -226,14 +226,14 @@ export default function Home() {
       {/* MARQUEE STRIP */}
       <section className="py-8 px-4 relative z-10 scroll-snap-section">
         <div className="max-w-6xl mx-auto">
-          <div className="relative overflow-hidden rounded-2xl liquid-glass border-cyan-200/15">
+          <div className="relative overflow-hidden rounded-2xl liquid-glass border-sky-300/30">
             <motion.div className="flex gap-5 py-4 whitespace-nowrap" animate={{ x: ['0%', '-50%'] }} transition={{ duration: 22, repeat: Infinity, ease: 'linear' }}>
               {Array.from({ length: 2 }).map((_, loop) => (
                 <div key={loop} className="flex gap-5 px-2">
                   {['Music', 'Dance', 'Fashion Walk', 'Open Mic', 'Crown Finale', 'Afterparty'].map(tag => (
                     <span
                       key={`${loop}-${tag}`}
-                      className="px-4 py-1.5 rounded-full liquid-glass-pill text-cyan-100 text-sm font-medium"
+                      className="px-4 py-1.5 rounded-full liquid-glass-pill text-slate-800 text-sm font-medium"
                     >
                       {tag}
                     </span>
@@ -249,18 +249,18 @@ export default function Home() {
       <section className="py-12 px-4 relative z-10 scroll-snap-section">
         <div className="max-w-4xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-7">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-2">Dress Code</h2>
-            <p className="text-slate-300">Come dressed to match the Ignite 2.O vibe.</p>
+            <h2 className="text-3xl sm:text-4xl font-bold mb-2 text-slate-900">Dress Code</h2>
+            <p className="text-slate-600">Come dressed to match the Ignite 2.O vibe.</p>
           </motion.div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <motion.div initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="p-6 rounded-3xl liquid-glass-card border-sky-400/30">
-              <p className="text-xs text-cyan-300 uppercase tracking-widest font-bold mb-1.5">For Boys / Male</p>
-              <p className="text-xl sm:text-2xl font-bold text-white">{settings.dressCodeMale}</p>
+              <p className="text-xs text-sky-700 uppercase tracking-widest font-bold mb-1.5">For Boys / Male</p>
+              <p className="text-xl sm:text-2xl font-bold text-slate-900">{settings.dressCodeMale}</p>
             </motion.div>
             <motion.div initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.06 }} className="p-6 rounded-3xl liquid-glass-card border-violet-400/30">
-              <p className="text-xs text-violet-300 uppercase tracking-widest font-bold mb-1.5">For Girls / Ladies</p>
-              <p className="text-xl sm:text-2xl font-bold text-white">{settings.dressCodeFemale}</p>
+              <p className="text-xs text-violet-700 uppercase tracking-widest font-bold mb-1.5">For Girls / Ladies</p>
+              <p className="text-xl sm:text-2xl font-bold text-slate-900">{settings.dressCodeFemale}</p>
             </motion.div>
           </div>
         </div>
@@ -273,38 +273,38 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="relative overflow-hidden rounded-3xl liquid-glass p-7 sm:p-10 border-cyan-300/25 shadow-2xl"
+            className="relative overflow-hidden rounded-3xl liquid-glass p-7 sm:p-10 border-sky-300/40"
           >
             {/* Ambient Liquid Highlights */}
             <div className="absolute -top-24 -right-24 w-80 h-80 bg-cyan-400/15 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute -bottom-24 -left-24 w-80 h-80 bg-violet-500/15 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-24 -left-24 w-80 h-80 bg-violet-400/15 rounded-full blur-3xl pointer-events-none" />
 
             <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
               <div className="lg:col-span-7 space-y-5">
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full liquid-glass-pill text-cyan-200 text-xs font-semibold uppercase tracking-wider">
-                  <MapPin size={13} className="shrink-0 text-cyan-300" />
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full liquid-glass-pill text-sky-800 text-xs font-semibold uppercase tracking-wider">
+                  <MapPin size={13} className="shrink-0 text-sky-600" />
                   Event Venue & Navigation
                 </div>
 
-                <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+                <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
                   Reach the Celebration Venue
                 </h2>
 
-                <p className="text-slate-200 text-base leading-relaxed">
+                <p className="text-slate-600 text-base leading-relaxed">
                   Join us at the official venue for Ignite 2.O. Find your way effortlessly using Google Maps navigation with real-time route directions and live traffic updates.
                 </p>
 
-                <div className="p-4 rounded-2xl bg-white/[0.05] border border-white/15 backdrop-blur-md flex items-start gap-3.5">
-                  <div className="w-11 h-11 rounded-xl liquid-icon-bubble text-cyan-300 flex items-center justify-center shrink-0 mt-0.5">
+                <div className="p-4 rounded-2xl bg-white/75 border border-slate-900/10 backdrop-blur-md flex items-start gap-3.5 shadow-sm">
+                  <div className="w-11 h-11 rounded-xl liquid-icon-bubble text-sky-600 flex items-center justify-center shrink-0 mt-0.5">
                     <MapPin size={22} />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-xs text-cyan-200/75 uppercase tracking-wider font-semibold">Venue Location</p>
-                    <p className="text-white font-bold text-lg sm:text-xl">
+                    <p className="text-xs text-slate-500 uppercase tracking-wider font-semibold">Venue Location</p>
+                    <p className="text-slate-900 font-bold text-lg sm:text-xl">
                       {settings.venue || 'Institute Campus Grounds'}
                     </p>
-                    <p className="text-xs text-cyan-300 mt-1 flex items-center gap-1.5 font-medium">
-                      <span className="w-2 h-2 rounded-full bg-cyan-300 animate-pulse inline-block" />
+                    <p className="text-xs text-sky-700 mt-1 flex items-center gap-1.5 font-medium">
+                      <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse inline-block" />
                       Live Location Pin Ready • Tap below to start navigation
                     </p>
                   </div>
@@ -326,7 +326,7 @@ export default function Home() {
                     href={VENUE_MAP_URL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl liquid-btn-glass text-white font-semibold text-sm"
+                    className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl liquid-btn-glass text-slate-900 font-semibold text-sm"
                   >
                     <span>Get Directions</span>
                     <ArrowRight size={16} />
@@ -340,23 +340,23 @@ export default function Home() {
                   href={VENUE_MAP_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group block relative overflow-hidden rounded-3xl liquid-glass-card p-5 border-cyan-300/30"
+                  className="group block relative overflow-hidden rounded-3xl liquid-glass-card p-5 border-sky-300/35"
                 >
-                  <div className="aspect-[4/3] w-full rounded-2xl bg-[#051024]/70 border border-white/15 relative flex flex-col items-center justify-center text-center p-6 overflow-hidden">
-                    <div className="absolute inset-0 bg-[radial-gradient(#22d3ee_1px,transparent_1px)] [background-size:18px_18px] opacity-20" />
-                    <div className="absolute -inset-4 bg-gradient-to-t from-[#040814]/80 via-transparent to-transparent pointer-events-none" />
+                  <div className="aspect-[4/3] w-full rounded-2xl bg-gradient-to-br from-sky-50/95 via-cyan-50/80 to-violet-50/90 border border-sky-200/80 relative flex flex-col items-center justify-center text-center p-6 overflow-hidden">
+                    <div className="absolute inset-0 bg-[radial-gradient(#0284c7_1px,transparent_1px)] [background-size:18px_18px] opacity-20" />
+                    <div className="absolute -inset-4 bg-gradient-to-t from-white/75 via-transparent to-transparent pointer-events-none" />
 
                     <div className="relative z-10 flex flex-col items-center">
-                      <div className="w-16 h-16 rounded-2xl liquid-icon-bubble text-cyan-300 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                      <div className="w-16 h-16 rounded-2xl liquid-icon-bubble text-sky-600 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
                         <MapPin size={28} className="group-hover:-translate-y-1 transition-transform" />
                       </div>
-                      <p className="text-white font-bold text-base group-hover:text-cyan-200 transition-colors">
+                      <p className="text-slate-900 font-bold text-base group-hover:text-sky-700 transition-colors">
                         Tap to View Venue Map
                       </p>
-                      <p className="text-xs text-slate-300 mt-1 max-w-[220px]">
+                      <p className="text-xs text-slate-600 mt-1 max-w-[220px]">
                         Opens directly in Google Maps app for seamless driving and walking directions
                       </p>
-                      <span className="mt-4 inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full liquid-glass-pill text-cyan-200 text-xs font-semibold group-hover:border-cyan-300/60 transition-all">
+                      <span className="mt-4 inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full liquid-glass-pill text-sky-800 text-xs font-semibold group-hover:border-sky-400/60 transition-all">
                         <Navigation size={12} />
                         Start GPS Navigation
                       </span>
@@ -373,8 +373,8 @@ export default function Home() {
       <section className="py-16 px-4 relative z-10 scroll-snap-section">
         <div className="max-w-6xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-14">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-3">What Awaits You</h2>
-            <p className="text-slate-300">A day packed with talent, glamour, and celebration</p>
+            <h2 className="text-3xl sm:text-4xl font-bold mb-3 text-slate-900">What Awaits You</h2>
+            <p className="text-slate-600">A day packed with talent, glamour, and celebration</p>
           </motion.div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -387,11 +387,11 @@ export default function Home() {
                 transition={{ delay: i * 0.1 }}
                 className="p-6 rounded-3xl liquid-glass-card group"
               >
-                <div className="w-12 h-12 rounded-2xl mb-4 liquid-icon-bubble text-cyan-300 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <div className="w-12 h-12 rounded-2xl mb-4 liquid-icon-bubble text-sky-600 flex items-center justify-center group-hover:scale-110 transition-transform">
                   <item.icon size={20} />
                 </div>
-                <h3 className="font-bold text-white text-lg mb-2 group-hover:text-cyan-200 transition-colors">{item.title}</h3>
-                <p className="text-slate-300 text-sm leading-relaxed">{item.desc}</p>
+                <h3 className="font-bold text-slate-900 text-lg mb-2 group-hover:text-sky-700 transition-colors">{item.title}</h3>
+                <p className="text-slate-600 text-sm leading-relaxed">{item.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -402,8 +402,8 @@ export default function Home() {
       <section className="py-16 px-4 relative z-10 scroll-snap-section">
         <div className="max-w-6xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-8">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-2">Day Flow</h2>
-            <p className="text-slate-300">A quick look at the rhythm of Ignite 2.O.</p>
+            <h2 className="text-3xl sm:text-4xl font-bold mb-2 text-slate-900">Day Flow</h2>
+            <p className="text-slate-600">A quick look at the rhythm of Ignite 2.O.</p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -417,16 +417,16 @@ export default function Home() {
                 className="p-5 rounded-2xl liquid-glass-card"
               >
                 <div className="flex items-start gap-4">
-                  <div className="px-3 py-1 rounded-xl liquid-glass-pill text-cyan-200 text-sm font-bold shrink-0">
+                  <div className="px-3 py-1 rounded-xl liquid-glass-pill text-sky-800 text-sm font-bold shrink-0">
                     {item.time}
                   </div>
                   <div>
-                    <h3 className="font-semibold text-white text-base mb-1">{item.title}</h3>
-                    <p className="text-sm text-slate-300">{item.desc}</p>
+                    <h3 className="font-semibold text-slate-900 text-base mb-1">{item.title}</h3>
+                    <p className="text-sm text-slate-600">{item.desc}</p>
                   </div>
                 </div>
               </motion.div>
-            )) : <p className="text-slate-300">{error ? 'Schedule unavailable.' : 'Schedule to be announced.'}</p>}
+            )) : <p className="text-slate-600">{error ? 'Schedule unavailable.' : 'Schedule to be announced.'}</p>}
           </div>
         </div>
       </section>
@@ -438,16 +438,16 @@ export default function Home() {
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="relative rounded-3xl overflow-hidden liquid-glass border-cyan-300/35 shadow-[0_25px_70px_rgba(6,182,212,0.22)]"
+            className="relative rounded-3xl overflow-hidden liquid-glass border-sky-300/45 shadow-[0_24px_60px_rgba(14,165,233,0.14)]"
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-600/35 via-cyan-500/25 to-violet-600/35 pointer-events-none" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.2),transparent_45%),radial-gradient(circle_at_80%_75%,rgba(103,232,249,0.22),transparent_42%)] pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-br from-sky-400/15 via-cyan-400/12 to-violet-400/15 pointer-events-none" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.65),transparent_45%),radial-gradient(circle_at_80%_75%,rgba(14,165,233,0.14),transparent_42%)] pointer-events-none" />
             <div className="relative p-10 sm:p-16 text-center">
-              <div className="w-16 h-16 rounded-2xl liquid-icon-bubble mx-auto mb-5 flex items-center justify-center text-cyan-200">
+              <div className="w-16 h-16 rounded-2xl liquid-icon-bubble mx-auto mb-5 flex items-center justify-center text-sky-600">
                 <PartyPopper size={30} />
               </div>
-              <h2 className="text-3xl sm:text-4xl font-black mb-4 text-white">Secure Your Spot</h2>
-              <p className="text-cyan-50/90 mb-8 text-lg">Limited seats available. Register before they run out.</p>
+              <h2 className="text-3xl sm:text-4xl font-black mb-4 text-slate-900">Secure Your Spot</h2>
+              <p className="text-slate-600 mb-8 text-lg">Limited seats available. Register before they run out.</p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link
                   to="/register"
@@ -457,7 +457,7 @@ export default function Home() {
                 </Link>
                 <Link
                   to="/my-profile"
-                  className="px-8 py-4 rounded-2xl liquid-btn-glass text-white font-semibold text-base"
+                  className="px-8 py-4 rounded-2xl liquid-btn-glass text-slate-900 font-semibold text-base"
                 >
                   Already Registered?
                 </Link>
