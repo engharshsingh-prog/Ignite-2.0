@@ -1166,15 +1166,35 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
                     type="button"
                     onClick={handleSendOtp}
                     disabled={otpLoading || otpCooldown > 0 || validateField('email', form.email) !== 'valid'}
-                    className="liquid-btn-glass sm:w-40 px-4 py-2.5 rounded-xl border-sky-400/40 text-sky-800 text-sm font-medium disabled:opacity-50"
+                    className={`sm:w-44 px-4 py-2.5 rounded-xl text-sm font-bold text-white transition-all flex items-center justify-center gap-2 ${
+                      validateField('email', form.email) === 'valid' && otpCooldown === 0 && !otpLoading
+                        ? 'liquid-btn-primary shadow-lg shadow-sky-500/30 hover:scale-[1.02] cursor-pointer'
+                        : otpCooldown > 0
+                        ? 'bg-amber-600/85 text-white border border-amber-400/50 shadow-sm cursor-not-allowed'
+                        : 'liquid-btn-primary opacity-60 cursor-not-allowed'
+                    }`}
                   >
-                    {otpLoading
-                      ? 'Sending...'
-                      : otpCooldown > 0
-                      ? `Resend in ${otpCooldown}s`
-                      : otpSent
-                      ? 'Resend OTP'
-                      : 'Send OTP'}
+                    {otpLoading ? (
+                      <>
+                        <RefreshCw size={14} className="animate-spin" />
+                        <span>Sending...</span>
+                      </>
+                    ) : otpCooldown > 0 ? (
+                      <>
+                        <Clock size={14} />
+                        <span>Resend in {otpCooldown}s</span>
+                      </>
+                    ) : otpSent ? (
+                      <>
+                        <RefreshCw size={14} />
+                        <span>Resend OTP</span>
+                      </>
+                    ) : (
+                      <>
+                        <Mail size={14} />
+                        <span>Send OTP</span>
+                      </>
+                    )}
                   </button>
                   <div className="flex-1 flex gap-2">
                     <input
@@ -1191,20 +1211,46 @@ I am sharing my payment screenshot for verification. Please confirm my payment.`
                         }
                       }}
                       maxLength={6}
+                      readOnly={otpVerified}
                       placeholder="Enter 6-digit OTP"
-                      className="liquid-input flex-1 rounded-xl px-3.5 py-2 text-slate-900 placeholder-slate-400"
+                      className={`liquid-input flex-1 rounded-xl px-3.5 py-2 text-slate-900 placeholder-slate-400 font-mono tracking-widest text-sm ${
+                        otpVerified
+                          ? 'bg-emerald-50/70 border-emerald-500/60 text-emerald-950 font-bold cursor-not-allowed'
+                          : otpSent
+                          ? 'border-sky-400/80 focus:border-sky-500 shadow-sm shadow-sky-500/10'
+                          : ''
+                      }`}
                     />
                     <button
                       type="button"
                       onClick={handleVerifyOtp}
                       disabled={otpLoading || !otpSent || otpVerified}
-                      className={`liquid-btn-glass px-4 py-2 rounded-xl text-sm font-medium disabled:opacity-50 ${
+                      className={`px-5 py-2.5 rounded-xl text-sm font-bold text-white transition-all flex items-center justify-center gap-1.5 ${
                         otpVerified
-                          ? 'border-emerald-500/45 bg-emerald-500/15 text-emerald-800'
-                          : 'border-sky-400/40 text-sky-800'
+                          ? 'bg-emerald-600 border border-emerald-400 shadow-md shadow-emerald-500/25 cursor-default'
+                          : otpSent && otp.trim().length === 6
+                          ? 'liquid-btn-success shadow-xl shadow-emerald-500/40 hover:scale-[1.03] animate-pulse cursor-pointer'
+                          : otpSent
+                          ? 'liquid-btn-success shadow-md shadow-emerald-500/25 cursor-pointer'
+                          : 'liquid-btn-success opacity-60 cursor-not-allowed'
                       }`}
                     >
-                      {otpLoading ? '...' : otpVerified ? 'Verified' : 'Verify'}
+                      {otpLoading ? (
+                        <>
+                          <RefreshCw size={14} className="animate-spin" />
+                          <span>Verifying...</span>
+                        </>
+                      ) : otpVerified ? (
+                        <>
+                          <CheckCircle size={15} className="text-white" />
+                          <span>Verified</span>
+                        </>
+                      ) : (
+                        <>
+                          <ShieldCheck size={15} />
+                          <span>Verify</span>
+                        </>
+                      )}
                     </button>
                   </div>
                 </div>
